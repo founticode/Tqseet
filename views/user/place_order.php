@@ -32,8 +32,20 @@ $commissionRate = 0.10;
 $commission = $totalPrice * $commissionRate;
 $merchantEarning = $totalPrice - $commission;
 
-// 3. Save the Initial Order
-// The status starts as 'pending' until the installments are confirmed.
+// 3. --- NEW: CHECK FOR EXISTING PENDING ORDER (Tabby/Klarna Style) ---
+// If the user already has a pending order for this exact product, reuse it!
+$stmt_check = $conn->prepare("SELECT id FROM orders WHERE user_id = ? AND product_id = ? AND status = 'pending' LIMIT 1");
+$stmt_check->bind_param("ii", $user['id'], $productId);
+$stmt_check->execute();
+$existingOrder = $stmt_check->get_result()->fetch_assoc();
+
+if ($existingOrder) {
+    // Reuse the existing pending order
+    header("Location: calculate_installments.php?order_id=" . $existingOrder['id']);
+    exit;
+}
+
+// 4. Save a NEW Order (Only if no pending one exists)
 $stmt_order = $conn->prepare("INSERT INTO orders (user_id, product_id, total_price, commission, merchant_earning, status) VALUES (?, ?, ?, ?, ?, 'pending')");
 $stmt_order->bind_param("iiddd", $user['id'], $productId, $totalPrice, $commission, $merchantEarning);
 

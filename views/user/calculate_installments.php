@@ -27,12 +27,13 @@ if (!$order) {
          </div>");
 }
 
-// 2. Logic: Fixed 3-Month Installment Plan
+// 2. Logic: Split into 4 installments (Pay in 4 Model)
 $totalAmount = $order['total_price'];
-$installmentAmount = $totalAmount / 3;
+$installmentAmount = $totalAmount / 4;
 
-// 3. Define Due Dates (Month 1, Month 2, Month 3)
+// 3. Define Due Dates (Today, +1 month, +2 months, +3 months)
 $dates = [
+    date('Y-m-d'), // TODAY (Downpayment)
     date('Y-m-d', strtotime('+1 month')),
     date('Y-m-d', strtotime('+2 months')),
     date('Y-m-d', strtotime('+3 months'))
@@ -66,8 +67,15 @@ $dates = [
             <?php foreach ($dates as $index => $date): ?>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #f1f1f1;">
                     <div>
-                        <div style="font-weight: bold; font-size: 1.1rem; color: #333;">Installment #<?php echo $index + 1; ?></div>
-                        <div style="font-size: 0.9rem; color: #999; margin-top: 5px;">Due: <?php echo date('d M Y', strtotime($date)); ?></div>
+                        <div style="font-weight: bold; font-size: 1.1rem; color: #333;">
+                            Installment #<?php echo $index + 1; ?>
+                            <?php if ($index === 0): ?>
+                                <span style="font-size: 0.7rem; background: #222; color: white; padding: 2px 6px; border-radius: 10px; vertical-align: middle; margin-left: 5px;">PAY NOW</span>
+                            <?php endif; ?>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #999; margin-top: 5px;">
+                            Due: <?php echo ($index === 0) ? "Today" : date('d M Y', strtotime($date)); ?>
+                        </div>
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 1.2rem; font-weight: bold; color: #007bff;"><?php echo number_format($installmentAmount, 2); ?> DH</div>

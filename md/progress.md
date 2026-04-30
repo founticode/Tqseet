@@ -89,8 +89,8 @@
 ## Phase 10: Orders & Allocation ⬜
 - [x] Step 1: User places an order
 - [x] Step 2: Calculate installments (split into payments)
-- [ ] Step 3: Save order + installments to database
-- [ ] Step 4: User views their orders
+- [x] Step 3: Save order + installments to database
+- [x] Step 4: User views their orders
 - [ ] Step 5: User views their installments
 - [ ] Step 6: Mark installments as paid
 
@@ -124,4 +124,4 @@
 
 ---
 
-## Current Position: Phase 10, Step 3 (Save Installments)
+## Current Position: Phase 10, Step 5 (View Installments)

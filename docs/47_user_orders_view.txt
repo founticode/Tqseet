@@ -1,0 +1,26 @@
+# User Orders View (Phase 10, Step 4)
+
+We built a modern, card-based order history dashboard inspired by premium BNPL apps like Tabby and Klarna.
+
+## What we built:
+The `views/user/orders.php` page.
+
+## Why we built it:
+The user needs a central hub to track their purchases and see which plans are currently active. A high-quality UI here builds trust and encourages repeat shopping.
+
+## Key Technical Features:
+
+1. **Relational Data Retrieval**:
+   The page performs a `JOIN` between `orders` and `products` to pull in the product name and image associated with each order.
+
+2. **UX-Driven Badges**:
+   The status of each order is dynamically styled:
+   - `active`: Green badge ("Active Plan")
+   - `pending`: Yellow badge ("Payment Pending")
+   - Other states: Neutral gray.
+
+3. **Success States**:
+   The page detects the `?success=1` GET parameter to show a congratulatory message after a successful checkout.
+
+## How to use:
+This page serves as the main destination after a user completes a checkout. It is also accessible from the user's dashboard or navbar.

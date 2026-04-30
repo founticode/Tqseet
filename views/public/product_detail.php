@@ -10,8 +10,8 @@ $conn = $db->connect();
 // Fetch product details and link to the merchant's user name
 $stmt = $conn->prepare("SELECT p.*, u.name as merchant_name 
                         FROM products p 
-                        JOIN merchants m ON p.merchant_id = m.id 
-                        JOIN users u ON m.user_id = u.id 
+                        LEFT JOIN merchants m ON p.merchant_id = m.id 
+                        LEFT JOIN users u ON m.user_id = u.id 
                         WHERE p.id = ?");
 $stmt->bind_param("i", $productId);
 $stmt->execute();
@@ -25,8 +25,8 @@ if (!$product) {
          </div>");
 }
 
-// Simple Installment Calculation (3 months)
-$monthlyPayment = $product['price'] / 3;
+// Pay in 4 Model: Split into 4 payments
+$monthlyPayment = $product['price'] / 4;
 ?>
 <!DOCTYPE html>
 <html lang="en">

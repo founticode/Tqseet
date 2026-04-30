@@ -32,6 +32,7 @@ $base = "";
                     <a href="<?php echo $base; ?>/views/admin/verifications.php" style="margin-right: 15px; text-decoration: none; color: #856404;">Verifications</a>
                 <?php endif; ?>
 
+                <a href="<?php echo $base; ?>/views/user/orders.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Shopping</a>
                 <a href="<?php echo $base; ?>/views/<?php echo $user['role']; ?>/dashboard.php" style="margin-right: 15px; text-decoration: none; color: #333; font-weight: bold;">Dashboard</a>
                 <a href="<?php echo $base; ?>/controllers/AuthController.php?action=logout" style="text-decoration: none; color: #d9534f; font-weight: bold;">Logout</a>
             <?php else: ?>

@@ -1,0 +1,26 @@
+# Save Installments Logic (Phase 10, Step 3)
+
+We implemented the final database transaction for the BNPL checkout.
+
+## What we built:
+The `views/user/save_installments.php` processing script.
+
+## Why we built it:
+This is the script that converts a "Calculation" into a "Commitment". It persists the payment dates and amounts to the database.
+
+## Key Technical Features:
+
+1. **Transactional Integrity**:
+   The script performs multiple operations:
+   - Recalculates values from the source order.
+   - Inserts 4 installment records.
+   - Updates the parent order status.
+
+2. **Downpayment Simulation**:
+   Following the "Pay in 4" business logic, the first record is created with a `status = 'paid'`. This reflects the user's initial payment at checkout.
+
+3. **Future Scheduling**:
+   The remaining 3 installments are scheduled exactly 1, 2, and 3 months into the future. These will be used for the "Due Soon" notifications and repayment dashboard later.
+
+## How to use:
+This script is triggered by the "Confirm My Plan" button. It handles all backend processing and then redirects the user to their order history.

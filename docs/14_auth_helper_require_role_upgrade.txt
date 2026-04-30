@@ -1,0 +1,135 @@
+# Auth Helper — requireRole() Upgrade (Phase 4, Step 2 — Sub-Step 2)
+
+We upgraded requireRole() to accept one role OR multiple roles.
+This makes it flexible for pages that allow more than one role.
+
+File changed:
+- includes/auth.php (requireRole function)
+
+---
+
+THE PROBLEM:
+
+Before, requireRole() only accepted ONE role as a string:
+requireRole("admin");
+
+But what if a page should be accessible by BOTH merchant AND admin?
+There was no way to do that. You would need ugly workarounds like:
+if ($_SESSION["user_role"] !== "admin" && $_SESSION["user_role"] !== "merchant")
+
+---
+
+THE FIX:
+
+We made requireRole() accept EITHER:
+- A single string:  requireRole("admin")
+- An array of roles: requireRole(["merchant", "admin"])
+
+Both work. Old code using a single string will NOT break.
+
+---
+
+NEW FUNCTION: is_string()
+
+is_string($role)
+
+What it does:
+Checks if a value is a string (text).
+Returns true or false.
+
+Examples:
+is_string("admin")      → true
+is_string(["a", "b"])   → false
+is_string(123)          → false
+
+How we use it:
+if (is_string($role)) {
+    $role = [$role];
+}
+
+This says:
+"If the user passed a single string, wrap it in an array."
+So "admin" becomes ["admin"].
+Now we can always use in_array() to check.
+
+---
+
+NEW FUNCTION: in_array()
+
+in_array($needle, $haystack)
+
+What it does:
+Checks if a value exists inside an array.
+Returns true or false.
+
+$needle   = the value you're looking for
+$haystack = the array to search in
+
+Examples:
+in_array("admin", ["user", "merchant", "admin"])  → true
+in_array("admin", ["user", "merchant"])            → false
+
+How we use it:
+if (!in_array($_SESSION["user_role"], $role)) {
+    // Access denied
+}
+
+This says:
+"If the user's role is NOT in the allowed roles list → block them."
+
+---
+
+NEW CONCEPT: string|array (type hint in comments)
+
+@param string|array $role
+
+The | means "OR".
+This tells other developers: this parameter can be a string OR an array.
+It's just documentation — PHP does not enforce it.
+
+---
+
+HOW IT WORKS STEP BY STEP:
+
+Example 1 — Single role (same as before):
+requireRole("admin")
+→ is_string("admin") = true
+→ convert to ["admin"]
+→ in_array($_SESSION["user_role"], ["admin"])
+→ if role matches → allowed
+→ if not → 403 Access Denied
+
+Example 2 — Multiple roles (new feature):
+requireRole(["merchant", "admin"])
+→ is_string([...]) = false → skip conversion
+→ in_array($_SESSION["user_role"], ["merchant", "admin"])
+→ if user is merchant OR admin → allowed
+→ if user is "user" → 403 Access Denied
+
+---
+
+USAGE EXAMPLES:
+
+Single role (old way — still works):
+requireRole("user");       // only users
+requireRole("admin");      // only admins
+requireRole("merchant");   // only merchants
+
+Multiple roles (new way):
+requireRole(["merchant", "admin"]);  // merchants AND admins can access
+
+---
+
+SUMMARY:
+
+What we did:
+- Upgraded requireRole() to accept string or array
+- Used is_string() to detect the input type
+- Used in_array() to check if role is in the allowed list
+
+Why:
+- Some pages need to allow more than one role
+- Old code with single strings still works (backward compatible)
+- Cleaner than writing multiple if conditions
+
+This is Sub-Step 2 of building the auth helper system.

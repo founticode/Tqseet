@@ -1,0 +1,26 @@
+# Product Detail View (Phase 9, Step 2)
+
+We built the "Sales Page" for individual products on the TQSEET platform.
+
+## What we built:
+The `views/public/product_detail.php` page.
+
+## Why we built it:
+The detail page is where the actual "conversion" happens. It provides all the necessary details to convince a buyer. Most importantly, it introduces the core value of our app: the ability to pay in installments.
+
+## Key Technical Features:
+
+1. **Merchant-Product JOIN**:
+   The SQL query joins `products` → `merchants` → `users`. This allows us to display the actual human name of the seller, building trust with the buyer.
+
+2. **Installment Calculation**:
+   We implemented a simple server-side math logic: `$price / 3`. This is displayed in a blue "BNPL Highlight Box" to remind users they don't have to pay the full price today.
+
+3. **Multi-device Support**:
+   The page uses `flex-wrap: wrap`, meaning on mobile devices, the product info will move *below* the image automatically, ensuring a perfect experience on all screen sizes.
+
+4. **Security**:
+   Used `htmlspecialchars()` for the name and description to prevent cross-site scripting (XSS) if a merchant enters malicious code into their product info.
+
+## How to use:
+This page currently ends with a "Proceed to Checkout" button. In Phase 10, we will build the logic that actually creates an order when this button is clicked.

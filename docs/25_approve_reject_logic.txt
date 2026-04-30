@@ -1,0 +1,30 @@
+# Approve & Reject Logic (Phase 6, Step 5)
+
+We completed the verification workflow by adding the approval system.
+
+## What we built:
+The `controllers/AdminController.php` script which handles the final decision.
+
+## Why we built it:
+To bridge the gap between "submitted documents" and "verified account". This logic allows an administrator to change a user's permissions in the system.
+
+## Key Actions:
+
+1. **Approval**:
+   - `UPDATE users SET is_verified = 1`: This is the permanent change that "unlocks" the account.
+   - `DELETE FROM user_verifications`: We remove the entry because it is no longer pending. This keeps the admin's "To-Do" list clean.
+
+2. **Rejection**:
+   - `DELETE FROM user_verifications`: We remove the entry so the user can see that their verification failed and try again with better documents.
+
+## Security:
+The controller is protected by `requireRole("admin")`. This prevents any malicious user from sending a "fake" POST request to verify themselves.
+
+---
+
+## Phase 6 Summary:
+- [x] Verification Form created.
+- [x] File upload handling implemented.
+- [x] KYC data saved to database.
+- [x] Admin dashboard view created.
+- [x] Approval/Rejection logic completed.

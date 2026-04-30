@@ -1,0 +1,28 @@
+# OTP Verification UI (Phase 7, Step 5)
+
+We completed the One-Time Password system by building the user interface.
+
+## What we built:
+The verification page (`views/auth/verify_otp.php`).
+
+## Why we built it:
+To provide a place where the user can submit the code they received. This page acts as the "bridge" between the user's contact (Email/SMS) and our server logic.
+
+## Key Workflow Features:
+
+1. **Self-Contained Logic**:
+   The page handles the POST request, calls the `verifyOTP()` helper, and handles the database update all in one place.
+
+2. **UX (User Experience)**:
+   - `maxlength="6"`: Prevents users from typing more than 6 digits.
+   - `letter-spacing`: Makes the numbers easier to read.
+   - Testing Tip: We included a small hint to check `otp_sent.log` to help you test faster.
+
+3. **Status Promotion**:
+   If the code is correct, we immediately run:
+   `UPDATE users SET is_verified = 1 WHERE id = ?`
+   This "promotes" the user to a verified status, unlocking their BNPL credit features.
+
+## How to use:
+Direct the user to this page after you have triggered the `sendOTP()` function.
+Once they succeed, they are sent back to the dashboard with a `?verified=1` success message.

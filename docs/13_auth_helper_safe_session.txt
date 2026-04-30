@@ -1,0 +1,118 @@
+# Auth Helper — Safe Session Start (Phase 4, Step 2 — Sub-Step 1)
+
+We started building reusable auth helper functions.
+First fix: make session_start() safe so it never causes errors.
+
+File changed:
+- includes/auth.php (line 3)
+
+---
+
+THE PROBLEM:
+
+Before, auth.php had this on line 3:
+session_start();
+
+And AuthController.php ALSO has:
+session_start();
+
+If any page includes both files, PHP will call session_start() twice.
+This causes a warning:
+"Warning: session_start(): Session cannot be started after headers have already been sent"
+
+A helper file should be SAFE to include from ANYWHERE,
+without worrying about conflicts.
+
+---
+
+THE FIX:
+
+We replaced:
+session_start();
+
+With:
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+---
+
+NEW FUNCTION: session_status()
+
+session_status()
+
+What it does:
+Returns the current state of the session system.
+
+It returns one of 3 values:
+- PHP_SESSION_DISABLED → sessions are turned off (rare)
+- PHP_SESSION_NONE     → no session started yet
+- PHP_SESSION_ACTIVE   → a session is already running
+
+How we use it:
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+This says:
+"Only start a session if one is NOT already running."
+
+If a session is already active → skip it, no error.
+If no session exists yet → start one.
+
+---
+
+NEW CONSTANT: PHP_SESSION_NONE
+
+PHP_SESSION_NONE
+
+What it is:
+A built-in PHP constant (a fixed value that never changes).
+Its value is 1.
+
+Why use it instead of the number 1?
+- PHP_SESSION_NONE is readable — you know what it means
+- The number 1 means nothing to someone reading the code
+- Always use the constant name, not the number
+
+---
+
+WHY THIS MATTERS:
+
+A helper file (like auth.php) can be included by many pages:
+- Dashboard pages
+- Profile pages
+- Settings pages
+- API endpoints
+
+Each of those pages might also start a session themselves.
+With the safe check, auth.php will NEVER cause a conflict.
+
+Rule: Helper files should never assume they are the FIRST file to run.
+They should always check before doing something that can only happen once.
+
+---
+
+BEFORE vs AFTER:
+
+BEFORE (unsafe):
+session_start();  ← crashes if session already started
+
+AFTER (safe):
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();  ← only runs if needed
+}
+
+---
+
+SUMMARY:
+
+What we did:
+- Made session_start() safe in includes/auth.php
+- Used session_status() to check before starting
+
+Why:
+- Prevents PHP warnings from double session_start()
+- Makes auth.php safe to include from any file
+
+This is Sub-Step 1 of building the auth helper system.

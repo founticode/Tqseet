@@ -1,0 +1,29 @@
+# Product Controller Logic (Phase 8, Step 3.2)
+
+We built the backend engine that processes product listings.
+
+## What we built:
+The `controllers/ProductController.php` script.
+
+## Why we built it:
+A form alone is just text. The controller is the "Worker" that takes that text, moves the physical image file to the correct folder, and creates a permanent entry in the MySQL database.
+
+## Key Logic Features:
+
+1. **Merchant-Product Link**:
+   We use `$_SESSION["user_id"]` to set the `merchant_id`. This ensures that every product is "owned" by the merchant who uploaded it.
+
+2. **Decimal Handling**:
+   In our `bind_param("issds", ...)`, we use the `d` type for the price. This is crucial for financial applications to support prices like "999.99" accurately.
+
+3. **Validation**:
+   The script checks `getimagesize()` to make sure the user isn't trying to upload a malicious script disguised as a photo.
+
+4. **Directory Management**:
+   The controller automatically ensures that the `uploads/products/` folder exists, creating it with correct permissions if necessary.
+
+## How to verify:
+After submitting the form, verify that:
+- A new row appears in the `products` table.
+- A new file appears in `uploads/products/`.
+- The `merchant_id` in the database matches the ID of the logged-in merchant.

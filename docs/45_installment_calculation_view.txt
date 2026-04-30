@@ -1,0 +1,23 @@
+# Installment Calculation View (Phase 10, Step 2)
+
+We built the "Transparency Layer" for the BNPL checkout flow.
+
+## What we built:
+The `views/user/calculate_installments.php` page.
+
+## Why we built it:
+A core requirement of BNPL is that users must understand their future financial obligations before committing. This page calculates and displays those obligations clearly.
+
+## Key Technical Features:
+
+1. **Date Projection**:
+   We used `strtotime('+1 month')` in a loop to generate future due dates. This ensures that the user's payment schedule is always relative to the day they place the order.
+
+2. **Order-User Binding**:
+   The page verifies that the `order_id` in the URL actually belongs to the logged-in user. This prevents users from snooping on each other's payment plans.
+
+3. **Interest-Free Logic**:
+   The system currently splits the total into 3 equal parts with 0% interest. This is hardcoded for simplicity but can be extended in the future for different durations (6 or 12 months).
+
+## How to use:
+This page appears immediately after the user places an initial order. It requires a valid `order_id` in the GET parameters.

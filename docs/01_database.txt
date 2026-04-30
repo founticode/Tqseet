@@ -1,0 +1,57 @@
+# Database Design (TQSEET)
+
+The database is used to store all the data of the system such as users, products, orders, and payments.
+
+Main idea:
+The platform connects three roles:
+- User (customer)
+- Merchant (seller)
+- Admin (manager)
+
+All users are stored in one table with a role field.
+
+Key tables:
+
+1. users
+Stores all users (customer, merchant, admin)
+Fields:
+- id
+- full_name
+- email
+- password
+- role (user / merchant / admin)
+- is_verified
+
+2. user_verifications
+Stores identity verification (KYC)
+- user_id
+- cin
+- cin_image
+
+3. products
+Products added by merchants
+- id
+- merchant_id
+- name
+- price
+- stock
+
+4. orders
+Orders created by users
+- id
+- user_id
+- total_price
+- status
+
+5. installments
+Payment split system
+- order_id
+- amount
+- due_date
+- status
+
+Concept:
+The user buys a product and pays in installments (for example 4 months).
+Each order is divided into multiple payments.
+
+This database structure is simple but scalable for future features.

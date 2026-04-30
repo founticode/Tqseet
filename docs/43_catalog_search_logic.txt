@@ -1,0 +1,27 @@
+# Catalog Search Logic (Phase 9, Step 3)
+
+We implemented a keyword-based search system to help users find products.
+
+## What we built:
+The search integration in `views/public/catalog.php`.
+
+## Why we built it:
+Search is the primary way users interact with large catalogs. It significantly improves the user experience by reducing the time it takes to find a specific item.
+
+## Key Technical Features:
+
+1. **Prepared Statements with LIKE**:
+   We used the `LIKE` operator combined with wildcards (`%`). 
+   `searchTerm = "%$search%"` ensures that if a user searches for "Phone", it will find both "iPhone" and "Phone Case".
+
+2. **Multi-Column Matching**:
+   The search query checks both the `name` OR the `description`. This makes the search much more "intelligent" as it can find products based on features mentioned only in the text.
+
+3. **Persistent State**:
+   The search input uses `value="<?php echo htmlspecialchars($search); ?>"` so that after clicking search, the word the user typed stays in the box.
+
+4. **Reset Logic**:
+   We added a conditional "Clear" link that only appears when a search query is present.
+
+## How to use:
+Simply use the search bar at the top of the catalog page. The URL will change to something like `catalog.php?search=laptop`.

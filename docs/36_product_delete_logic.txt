@@ -1,0 +1,25 @@
+# Product Delete Logic (Phase 8, Step 4.2)
+
+We implemented the secure deletion of product listings.
+
+## What we built:
+The `delete` action in `controllers/ProductController.php`.
+
+## Why we built it:
+To allow merchants to remove items that are no longer available. However, deletion must be handled carefully to maintain security and server health.
+
+## Key Security Features:
+
+1. **Ownership Verification**:
+   Before deleting, the system runs:
+   `SELECT image FROM products WHERE id = ? AND merchant_id = ?`
+   If the `merchant_id` doesn't match the one in the session, the request is rejected. This prevents anyone from deleting someone else's product by guessing the ID.
+
+2. **File Cleanup (unlink)**:
+   When a database record is deleted, the physical image file still exists in the `uploads/products/` folder. We use the `unlink()` function to delete the file, preventing the server from filling up with "ghost" images.
+
+3. **User Flow**:
+   On success, the user is redirected back to the inventory list with a `?deleted=1` parameter, which can be used to show a success message.
+
+## How to verify:
+Delete a product and check your `uploads/products/` folder. The corresponding file should disappear immediately.

@@ -1,0 +1,140 @@
+# Redirect & Logout (Step 7 - Login System)
+
+After login, the user is redirected to their dashboard based on role.
+We also added logout and protected dashboard pages.
+
+Files changed/created:
+- controllers/AuthController.php (redirect + logout)
+- views/user/dashboard.php (new)
+- views/merchant/dashboard.php (new)
+- views/admin/dashboard.php (new)
+
+---
+
+NEW FUNCTION: header()
+
+header("Location: ../views/user/dashboard.php");
+
+What it does:
+Sends an HTTP header to the browser BEFORE any page content.
+"Location:" tells the browser to go to a different URL.
+The user never sees the current page — they jump directly.
+
+Rules:
+- Must be called BEFORE any echo, HTML, or whitespace
+- Must be followed by exit; to stop the script
+- If you echo something before header(), PHP gives an error
+
+Example flow:
+Login successful → header("Location: dashboard.php") → exit
+→ browser receives redirect instruction → goes to dashboard.php
+→ user sees the dashboard, not the controller
+
+---
+
+NEW STATEMENT: switch
+
+switch ($user["role"]) {
+    case "admin":
+        header("Location: ../views/admin/dashboard.php");
+        break;
+    case "merchant":
+        header("Location: ../views/merchant/dashboard.php");
+        break;
+    default:
+        header("Location: ../views/user/dashboard.php");
+        break;
+}
+
+What is switch?
+Like multiple if/elseif but cleaner when comparing ONE value
+against many options.
+
+How it works:
+- PHP takes the value ($user["role"])
+- Checks each case: does it match "admin"? "merchant"?
+- Runs the code inside the matching case
+- break; stops it from falling into the next case
+- default: runs if NO case matches (like else)
+
+Same logic with if/elseif:
+if ($user["role"] === "admin") { ... }
+elseif ($user["role"] === "merchant") { ... }
+else { ... }
+
+When to use switch vs if:
+- switch: comparing ONE variable against many values
+- if/elseif: comparing different conditions
+
+---
+
+NEW KEYWORD: exit
+
+exit;
+
+What it does:
+Stops PHP from running any more code after this line.
+
+Why use it after header()?
+Without exit, PHP continues running the code below.
+The browser would redirect, but the server still processes
+everything. This can cause unexpected behavior or security issues.
+
+Always pair them:
+header("Location: ...");
+exit;
+
+---
+
+LOGOUT action:
+
+} elseif ($action === "logout") {
+    session_destroy();
+    header("Location: ../views/auth/login.php");
+    exit;
+}
+
+session_destroy() deletes all session data on the server.
+Then we redirect to the login page.
+The user is now "forgotten" — they must login again.
+
+---
+
+DASHBOARD PROTECTION:
+
+Each dashboard page checks two things:
+
+1. Is the user logged in?
+if (!isset($_SESSION["user_id"])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+isset() checks if a variable exists.
+!isset() means "does NOT exist" → user not logged in → redirect
+
+2. Does the user have the correct role?
+if ($_SESSION["user_role"] !== "user") {
+    echo "Access denied.";
+    exit;
+}
+
+This prevents a regular user from accessing the admin dashboard.
+Each dashboard checks for ITS OWN role.
+
+---
+
+Flow after login:
+User submits login form → controller validates → password correct
+→ session created → switch on role
+→ role = "user"     → redirect to views/user/dashboard.php
+→ role = "merchant" → redirect to views/merchant/dashboard.php
+→ role = "admin"    → redirect to views/admin/dashboard.php
+
+Flow for logout:
+User clicks Logout → AuthController.php?action=logout
+→ session_destroy() → redirect to login page
+
+Flow for protection:
+User tries to open dashboard without login
+→ session check fails → redirect to login page

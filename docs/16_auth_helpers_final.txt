@@ -1,0 +1,58 @@
+# Final Auth Helpers (Phase 4, Step 2 - Complete)
+
+We have finalized the authentication helper system. These functions are now the "tools" we use to protect our pages and manage user data easily.
+
+## What we built:
+A set of 5 reusable functions inside `includes/auth.php`.
+
+## Why we built it:
+To avoid repeating messy session logic on every page and to make the code more professional and secure.
+
+## The Functions:
+
+1. isLoggedIn()
+   - Returns: true or false.
+   - Use: Check if a user is logged in before showing a link or a button.
+
+2. requireLogin()
+   - Action: If NOT logged in, it sends the user to the login page immediately.
+   - Use: Protect any page that requires an account.
+
+3. requireRole($role)
+   - Action: Checks if the logged-in user has a specific role (like "admin" or "merchant").
+   - Action: If the role doesn't match, it shows an "Access Denied" error.
+   - Use: Protect dashboard pages (e.g., only admins can see admin/dashboard.php).
+
+4. currentUser()
+   - Returns: An associative array with ID, Name, Email, and Role.
+   - Returns: null if not logged in.
+   - Use: Display the user's name or email on the page without typing $_SESSION every time.
+
+5. redirectIfLoggedIn() [NEW]
+   - Action: If the user is ALREADY logged in, it sends them back to their dashboard.
+   - Use: Put this at the top of login.php and register.php.
+
+---
+
+## Example Usage:
+
+### To protect a Dashboard:
+```php
+require_once "../../includes/auth.php";
+requireRole("user"); // This also handles requireLogin()
+$user = currentUser();
+echo "Welcome " . $user["name"];
+```
+
+### To prevent logged-in users from seeing the Login page:
+```php
+require_once "../../includes/auth.php";
+redirectIfLoggedIn();
+// ... show login form ...
+```
+
+---
+
+## What Changed:
+- Added `redirectIfLoggedIn()` to handle the logic of skipping login/register forms for active users.
+- Cleaned up the helper system to be fully ready for use in all Dashboards.

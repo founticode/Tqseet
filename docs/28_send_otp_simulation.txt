@@ -1,0 +1,23 @@
+# Sending OTP (Phase 7, Step 3)
+
+We implemented a simulation system to "send" the codes.
+
+## What we built:
+The `sendOTP()` function in `includes/otp_helpers.php`.
+
+## Why we built it:
+Real-world apps use paid services (like Twilio or Mailgun) to send SMS or Emails. Since we are testing locally, we use a "Logger" simulation. This lets us verify that our logic works without spending money or setting up complex servers.
+
+## How it works:
+
+1. **Logging**:
+   Every time an OTP is "sent", the script writes a line to a file named `otp_sent.log` in your project root.
+   
+2. **File Content**:
+   The log includes the Timestamp, the Email address, and the 6-digit Code.
+
+3. **PHP function**:
+   We use `file_put_contents()` with the `FILE_APPEND` flag. This means it creates the file if it doesn't exist and adds new codes to the bottom without deleting old ones.
+
+## How to test:
+Run your OTP generation script and then check the `otp_sent.log` file. You should see your code there, which you can then copy and use for verification in the next step.

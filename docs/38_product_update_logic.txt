@@ -1,0 +1,25 @@
+# Product Update Logic (Phase 8, Step 4.4)
+
+We implemented the complex logic for updating product data and managing assets.
+
+## What we built:
+The `edit` action in `controllers/ProductController.php`.
+
+## Why we built it:
+Update logic is more "intelligent" than creation logic because it must handle existing files. We want to avoid orphaned files (images that take up space but aren't used) and ensure data integrity.
+
+## Key Technical Features:
+
+1. **Conditional SQL**:
+   The script checks if `$_FILES["product_image"]["name"]` is empty.
+   - If **Empty**: We update only `name`, `description`, and `price`.
+   - If **Not Empty**: We update everything AND handle the file replacement.
+
+2. **Asset Replacement (unlink)**:
+   If a merchant uploads a new image, the system retrieves the old filename from the database and uses `unlink()` to delete the old file before saving the new one. This keeps the `uploads/products/` folder efficient.
+
+3. **Double-Binding**:
+   We used two different `bind_param()` strings (`ssdsi` vs `ssdi`) depending on which query was executed. This ensures that the types always match the SQL statement.
+
+## How to use:
+When the merchant submits the edit form, they are redirected back to their inventory list with a `?updated=1` notification.

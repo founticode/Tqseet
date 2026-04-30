@@ -1,0 +1,114 @@
+# Input Validation (Step 3 - Auth System)
+
+We added validation rules to check user input before doing anything with it.
+
+File: controllers/AuthController.php
+
+Why validate?
+- Never trust user input
+- A user could send empty data, fake emails, or short passwords
+- We must check everything BEFORE saving to the database
+- This protects the system and ensures clean data
+
+Validation rules we added:
+
+1. Empty fields check
+   if (empty($name)) → true if $name is "" or just spaces
+   We check all 5 fields at once using || (OR)
+   If ANY field is empty → show error and STOP
+
+2. Email format check
+   filter_var($email, FILTER_VALIDATE_EMAIL)
+   This is a built-in PHP function that checks email format
+   Returns the email if valid, or false if invalid
+   Example: "user@mail.com" → valid / "user@" → invalid
+
+3. Phone format check (Moroccan)
+   preg_match("/^0[67]\d{8}$/", $phone)
+   This checks if the phone matches a specific pattern
+
+4. Password length check
+   strlen($password) < 6
+   strlen() returns the number of characters in a string
+   We require at least 6 characters for security
+
+5. Password match check
+   $password !== $confirm
+   !== means "not identical"
+   If the two values are different → error
+
+---
+
+NEW FUNCTION: preg_match()
+
+What is it?
+preg_match() is a PHP function that checks if a string
+matches a pattern (called a regular expression / regex).
+
+How it works:
+preg_match("/pattern/", $string)
+Returns 1 if the string matches the pattern
+Returns 0 if it does not match
+
+Our pattern: "/^0[67]\d{8}$/"
+
+Breaking it down piece by piece:
+/        → start of regex
+^        → means "start of string" (nothing before this)
+0        → the first character must be the digit 0
+[67]     → the second character must be 6 OR 7
+\d       → means "any digit" (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+{8}      → repeat the previous rule exactly 8 times
+$        → means "end of string" (nothing after this)
+/        → end of regex
+
+So the full pattern means:
+Start with 0, then 6 or 7, then exactly 8 digits, then end
+Total: 1 + 1 + 8 = 10 digits
+
+Examples:
+0612345678 → ✓ matches (starts with 06, 10 digits)
+0798765432 → ✓ matches (starts with 07, 10 digits)
+0512345678 → ✗ fails (starts with 05, not 06 or 07)
+061234     → ✗ fails (only 6 digits, need 10)
+06abcd1234 → ✗ fails (letters are not digits)
+
+When to use preg_match?
+Use it when you need to check a specific format/pattern
+Examples: phone numbers, postal codes, usernames, dates
+
+---
+
+NEW FUNCTION: filter_var()
+
+What is it?
+filter_var() is a PHP function that validates or cleans data.
+
+How we used it:
+filter_var($email, FILTER_VALIDATE_EMAIL)
+This checks if $email looks like a real email address
+
+Returns:
+- The email string if valid
+- false if invalid
+
+We use ! (NOT) to reverse it:
+if (!filter_var(...)) means "if NOT valid"
+
+---
+
+Validation logic (order matters):
+
+Step 1: Are all fields filled?
+  → NO  → show "All fields required" and STOP
+  → YES → continue to next checks
+
+Step 2: Is email format valid?
+Step 3: Is phone format valid?
+Step 4: Is password long enough?
+Step 5: Do passwords match?
+
+Why this order?
+If fields are empty, checking email format or password length
+makes no sense. So we check empty FIRST, then details.
+This gives the user clear, helpful error messages.

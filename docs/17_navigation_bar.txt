@@ -1,0 +1,26 @@
+# Navigation Bar (Phase 4, Step 5)
+
+We created a reusable navigation bar that adapts to the user's status.
+
+## What we built:
+A file called `includes/navbar.php` that contains the HTML and PHP logic for our header menu.
+
+## Why we built it:
+1. DRY (Don't Repeat Yourself): We write the menu once and include it on all pages.
+2. Dynamic UX: The user sees different options based on whether they are logged in or not.
+
+## New logic used:
+
+- `isLoggedIn()`: Used to toggle between showing "Login/Register" and "Dashboard/Logout".
+- `currentUser()`: Used to fetch and display the user's name (e.g., "Hello, Ahmed!").
+- `{$user['role']}`: Used to dynamically build the dashboard link (e.g., if you are an admin, it links to `/admin/dashboard.php`).
+
+## How to include it:
+On any page, add this at the top of the body:
+```php
+<?php include_once "includes/navbar.php"; ?>
+```
+
+## Summary of links:
+- Guest: Home, Login, Register.
+- Logged-in: Home, Hello [Name], Dashboard, Logout.

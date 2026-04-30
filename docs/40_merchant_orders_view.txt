@@ -1,0 +1,29 @@
+# Merchant Orders View (Phase 8, Step 5)
+
+We built the sales tracking interface for merchants.
+
+## What we built:
+The `views/merchant/orders.php` page.
+
+## Why we built it:
+To complete the merchant lifecycle. A merchant needs to track their sales and see the status of installment payments.
+
+## Key Technical Features:
+
+1. **Complex SQL Joins**:
+   The page uses a 3-way JOIN:
+   - `orders` (the transaction)
+   - `products` (to filter by merchant)
+   - `users` (to get the customer's name)
+
+2. **Status Highlighting**:
+   Used a dynamic color-coding system for order statuses:
+   - **Green** for `paid`
+   - **Yellow** for `pending`
+   - **Red** for `cancelled`
+
+3. **Data Security**:
+   The query is filtered by `p.merchant_id = ?`. This ensures a merchant can only see orders for products they personally own.
+
+## How to verify:
+(Note: You will need to manually insert a test order into the `orders` table to see data on this page, as we haven't built the "Buy" button yet!)

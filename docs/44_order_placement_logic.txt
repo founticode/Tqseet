@@ -1,0 +1,26 @@
+# Order Placement Logic (Phase 10, Step 1)
+
+We implemented the foundational step of the BNPL checkout process.
+
+## What we built:
+The `views/user/place_order.php` script.
+
+## Why we built it:
+Before we can split a price into installments, we must have a record of the transaction. This script acts as the "bridge" between the public catalog and the private installment plan.
+
+## Key Technical Features:
+
+1. **Revenue Calculation**:
+   The script handles the platform's business logic:
+   - `total_price`: The sticker price of the product.
+   - `commission`: Calculated at 10%.
+   - `merchant_earning`: The remaining 90% that will eventually be paid to the seller.
+
+2. **Database State**:
+   The order is created with a `pending` status. It is not considered "Active" until the user confirms their installment plan in the next step.
+
+3. **Data Security**:
+   We use `currentUser()` to link the order to the logged-in user. This prevents anyone from placing orders on behalf of someone else.
+
+## How to use:
+This page is triggered when a user clicks "Proceed to Checkout" on a product detail page. It automatically redirects to the next phase of the checkout flow.

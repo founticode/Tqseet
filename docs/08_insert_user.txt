@@ -1,0 +1,88 @@
+# Check Duplicates & Insert User (Steps 5+6 - Auth System)
+
+After validation passes and password is hashed, we check if the
+email or phone already exists, then insert the user into the database.
+
+File: controllers/AuthController.php
+
+---
+
+STEP 5: Check if email or phone already exists
+
+Why check both?
+- Email is unique → one account per email
+- Phone is unique → one account per phone (important for OTP and risk management)
+- We check BEFORE inserting to show friendly error messages
+
+How we check:
+
+1. Check email:
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$emailResult = $stmt->get_result();
+$stmt->close();
+
+2. Check phone:
+$stmt = $conn->prepare("SELECT id FROM users WHERE phone = ?");
+$stmt->bind_param("s", $phone);
+$stmt->execute();
+$phoneResult = $stmt->get_result();
+$stmt->close();
+
+3. Check results:
+if ($emailResult->num_rows > 0 || $phoneResult->num_rows > 0)
+→ show specific error for each
+
+Why two separate queries instead of one?
+One query: WHERE email = ? OR phone = ?
+→ We can't tell WHICH one is the problem
+Two queries: check email, then check phone
+→ We can show "email taken" or "phone taken" or BOTH
+→ Better UX for the user
+
+Database change:
+We also added UNIQUE to the phone column in the schema:
+phone VARCHAR(20) UNIQUE
+And ran: ALTER TABLE users ADD UNIQUE (phone);
+This is a safety net — even if PHP check fails, MySQL blocks duplicates
+
+---
+
+STEP 6: Insert user into database
+
+After all checks pass, we insert the user:
+
+$stmt2 = $conn->prepare(
+    "INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)"
+);
+$stmt2->bind_param("ssss", $name, $email, $hashedPassword, $phone);
+
+Key points:
+- We use $hashedPassword (not $password) → never store plain text
+- "ssss" → four strings (name, email, hash, phone)
+- We don't insert role or is_verified → database uses defaults:
+  role = 'user' (from schema DEFAULT)
+  is_verified = FALSE (from schema DEFAULT)
+
+Checking if insert worked:
+if ($stmt2->execute()) → returns true on success, false on failure
+
+Cleanup:
+$stmt2->close() → close insert statement
+$conn->close()  → close database connection
+
+---
+
+Full flow of registration:
+
+1. User fills form and clicks Register
+2. PHP receives POST data (Step 2)
+3. PHP validates: empty fields, email, phone, password (Step 3)
+4. PHP hashes the password (Step 4)
+5. PHP checks if email/phone already exist (Step 5)
+6. PHP inserts the user into the database (Step 6)
+7. PHP shows success or error message
+
+The registration system is now COMPLETE!
+Next: Login system

@@ -1,0 +1,26 @@
+# Saving Verification Data (Phase 6, Step 3)
+
+We connected the file upload system to the database.
+
+## What we built:
+The second half of `controllers/VerificationController.php` which handles MySQL insertion.
+
+## Why we built it:
+To create a permanent record of the user's identification. This record links the physical file on the server (the image) to the user's account in the database.
+
+## Key Logic:
+
+1. **Prepared Statement**:
+   `INSERT INTO user_verifications (user_id, cin, cin_image) VALUES (?, ?, ?)`
+   This prevents SQL Injection and ensures the data is saved correctly.
+
+2. **Data Mapping**:
+   - `user_id`: Taken from the active session.
+   - `cin`: Taken from the form input.
+   - `cin_image`: The unique filename generated in Step 2.
+
+3. **Success Feedback**:
+   We provide a clear message to the user that their documents are "Pending review".
+
+## Next Steps:
+In the next steps (Step 4 & 5), we will build the Admin interface where a manager can see these submissions and click "Approve" or "Reject".

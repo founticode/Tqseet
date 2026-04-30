@@ -1,0 +1,25 @@
+# Add Product Form (Phase 8, Step 3.1)
+
+We built the interface for merchants to list their inventory.
+
+## What we built:
+A product entry page (`views/merchant/add_product.php`).
+
+## Why we built it:
+To populate the marketplace. This form captures the four essential data points for any item in the system: Name, Description, Price, and Visual (Image).
+
+## Key UI/UX Features:
+
+1. **Step-based Input**:
+   We used specific HTML5 input types:
+   - `type="number"` with `step="0.01"` for currency precision.
+   - `type="file"` with `accept="image/*"` for visual assets.
+
+2. **Styling**:
+   The form includes a "dashed border" area for the image upload, making it visually distinct and easy for merchants to find.
+
+3. **Protection**:
+   The page calls `requireRole("merchant")` at the very top. This is the first line of defense to ensure only authorized sellers can add items to the platform.
+
+## How to use:
+The form submits to `controllers/ProductController.php?action=add`. In the next step, we will build that controller to process these variables.

@@ -1,0 +1,49 @@
+# Register Form (Step 1 - Auth System)
+
+We created the registration form where new users can sign up.
+
+File: views/auth/register.php
+
+What it contains:
+- An HTML form with method="POST"
+- 5 input fields:
+  1. Full Name (text)
+  2. Email (email)
+  3. Phone (text)
+  4. Password (password)
+  5. Confirm Password (password)
+
+Key concepts:
+
+1. method="POST"
+   POST sends data securely in the request body.
+   We use POST instead of GET because:
+   - GET puts data in the URL (visible to everyone)
+   - POST hides data (safe for passwords)
+
+2. name="" attribute
+   Each input has a name like name="email"
+   This is the key we use in PHP to get the value:
+   $_POST["email"]
+
+3. type="password"
+   The browser hides the characters (shows dots instead)
+   This is only visual — the real security comes later with hashing
+
+4. type="email"
+   The browser checks if the format looks like an email
+   Example: user@email.com ✓ / user@ ✗
+   This is basic validation — we add server-side validation later
+
+5. Confirm Password field
+   We ask the user to type the password twice
+   Later in PHP, we check if both match
+   If they don't match → show error, don't save
+
+Form flow:
+User fills the form → clicks Register → data is sent via POST
+→ PHP receives it (Step 2) → validates it (Step 3) → saves to DB (Step 6)
+
+Note:
+The form has no styling yet. We focus on functionality first.
+Design (CSS/UI) will be added after the logic is complete.

@@ -1,0 +1,27 @@
+# Account Status (Phase 5, Step 3)
+
+We added a verification indicator to the dashboard.
+
+## What we built:
+A dynamic status badge that shows whether the user has been verified by the admin.
+
+## Why we built it:
+In a Buy Now Pay Later (BNPL) system, verification is the most important step. The user needs to know their status before they try to buy anything.
+
+## Implementation:
+
+1. **Session storage**: During login, we fetch the `is_verified` column (0 or 1) and save it in the session.
+2. **Helper function**: `currentUser()` now returns `is_verified`.
+3. **Conditional UI**: We use an `if/else` statement in the HTML to show different colors and icons:
+   - If 1 → Show Green "Verified"
+   - If 0 → Show Red "Not Verified"
+
+## Importance for Next Steps:
+In the next phase (Phase 6), we will build the form where users can upload their ID to change this status from "Not Verified" to "Pending/Verified".
+
+---
+
+## Phase 5 Summary:
+- [x] Basic Dashboard created.
+- [x] Full user info (Name, Email, Phone) displayed.
+- [x] Account status visible.

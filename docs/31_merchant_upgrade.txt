@@ -1,0 +1,26 @@
+# Merchant Upgrade System (Phase 8, Step 1)
+
+We implemented the logic to allow users to become sellers on the platform.
+
+## What we built:
+A specialized page (`views/user/upgrade_merchant.php`) for role promotion.
+
+## Why we built it:
+In a Buy Now Pay Later (BNPL) system, we need a clear distinction between the person buying (User) and the person selling (Merchant). This page allows users to transition between these roles securely.
+
+## Key Logic Features:
+
+1. **Role Update**:
+   The primary action is a simple SQL Update:
+   `UPDATE users SET role = 'merchant' WHERE id = ?`
+
+2. **Immediate Session Update**:
+   After the database update, we must update the active session:
+   `$_SESSION['user_role'] = 'merchant';`
+   Without this line, the user would still be seen as a "User" by our helper functions until they logged out and back in.
+
+3. **Role-Based Redirection**:
+   The page automatically redirects the user to the merchant dashboard after a short delay using the `header("refresh:...")` function.
+
+## Security:
+The page is protected so that only users with the `role = 'user'` can access it. Admins or existing merchants are blocked from re-upgrading.

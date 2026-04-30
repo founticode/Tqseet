@@ -1,0 +1,51 @@
+# Database Connection (MySQLi)
+
+We created a Database class to manage the connection with MySQL.
+
+We used MySQLi with exception mode to handle errors in a clean way.
+
+Important line:
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+This allows MySQLi to throw exceptions when an error happens.
+
+Connection steps:
+
+1. Create Database class
+Contains:
+- host
+- user
+- password
+- database name
+- port
+
+2. connect() function
+This function creates the connection using:
+
+new mysqli(...)
+
+3. Error handling
+We used try/catch:
+
+- try → attempt connection
+- catch → handle errors
+
+4. Logging system
+If an error happens:
+- logError() saves it in errors.log
+- userError() shows a simple message to the user
+
+Example flow:
+
+connect()
+→ try connection
+→ success → return connection
+→ error → catch
+→ log error
+→ show safe message
+
+Security:
+The user never sees technical errors.
+All details are saved in a log file for the developer.
+
+This makes the system more secure and professional.

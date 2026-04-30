@@ -1,0 +1,99 @@
+# Sessions (Step 6 - Login System)
+
+After login is successful, we start a SESSION to remember the user
+across all pages. Without sessions, the user would have to login
+on every single page they visit.
+
+File: controllers/AuthController.php
+
+---
+
+NEW CONCEPT: Sessions
+
+What is a session?
+A way for the server to remember WHO a user is across multiple pages.
+
+Analogy: think of a wristband at an event
+- You login → the system gives you a wristband (session)
+- You visit any page → you show your wristband → system knows you
+- You logout → wristband is removed → system forgets you
+
+How it works technically:
+1. PHP creates a session file on the server (stores data)
+2. PHP sends a cookie called PHPSESSID to the browser
+3. On every next request, the browser sends this cookie back
+4. PHP reads the cookie → finds the matching session file
+5. PHP loads the $_SESSION data → now it knows who you are
+
+---
+
+NEW FUNCTION: session_start()
+
+session_start();
+
+What it does:
+- If no session exists → creates a new one
+- If a session already exists → resumes it (loads the data)
+
+Rules:
+- MUST be called BEFORE any HTML output or echo
+- MUST be called on EVERY page that needs session data
+- Usually placed at the very top of the PHP file
+
+---
+
+NEW VARIABLE: $_SESSION
+
+$_SESSION is a special PHP array (like $_POST and $_GET)
+that stores data that persists across pages.
+
+How to store data:
+$_SESSION["user_id"]   = $user["id"];
+$_SESSION["user_name"] = $user["name"];
+$_SESSION["user_email"]= $user["email"];
+$_SESSION["user_role"] = $user["role"];
+
+How to read data (on any other page):
+echo $_SESSION["user_name"];  → "Ahmed"
+echo $_SESSION["user_role"];  → "user"
+
+How to delete data (logout):
+session_destroy();  → deletes the entire session
+
+---
+
+Comparison: $_POST vs $_GET vs $_SESSION
+
+$_POST:
+- Data from form submissions
+- Only available on the page that receives the form
+- Disappears after the page loads
+
+$_GET:
+- Data from URL parameters (?key=value)
+- Visible in the URL
+- Disappears when URL changes
+
+$_SESSION:
+- Data stored on the server
+- Available on ALL pages (as long as session_start() is called)
+- Persists until logout or session expires
+- NOT visible to the user
+
+---
+
+What we store in the session:
+
+user_id    → to identify the user (for database queries)
+user_name  → to display "Welcome, Ahmed" on pages
+user_email → to show account info
+user_role  → to control access (user/merchant/admin)
+
+We DON'T store the password in the session — never needed after login.
+
+---
+
+Flow:
+Login form → POST → validate → find user → verify password
+→ password correct → session_start() → store user data in $_SESSION
+→ user can now visit any page and the system remembers them

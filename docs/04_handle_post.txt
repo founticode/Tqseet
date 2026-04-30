@@ -1,0 +1,49 @@
+# Handling Form Submission (Step 2 - Auth System)
+
+We created the AuthController to receive the data sent from the register form.
+
+File: controllers/AuthController.php
+
+What it does:
+- Checks if the request is a POST (form was submitted)
+- Grabs the data from $_POST
+- Displays it on screen (temporary — for testing only)
+
+Key concepts:
+
+1. $_SERVER["REQUEST_METHOD"]
+   This tells us HOW the page was accessed:
+   - "POST" → the user submitted a form
+   - "GET"  → someone opened the URL directly
+   We check this to make sure we only process form data
+
+2. $_POST["name"]
+   $_POST is a special PHP array that contains all the data
+   sent from a form with method="POST"
+   Each key matches the name="" attribute in the HTML input
+   Example:
+   <input name="email"> → $_POST["email"]
+
+3. Form action path
+   The form is at: views/auth/register.php
+   The controller is at: controllers/AuthController.php
+   So we use: ../../controllers/AuthController.php
+   Meaning: go up 2 folders (from auth → views → root) then into controllers
+
+4. Why check REQUEST_METHOD?
+   Without this check, if someone opens AuthController.php directly,
+   PHP would try to read $_POST values that don't exist → errors
+   The if/else protects against this
+
+Flow:
+register.php (form) → user clicks Register
+→ POST data sent to AuthController.php
+→ PHP reads $_POST["name"], $_POST["email"], etc.
+→ Displays the values (temporary test)
+
+Security note:
+We displayed the password on screen for testing only.
+In a real app, NEVER show passwords. We will remove this soon.
+
+Next step:
+Validate the inputs (check empty fields, email format, password match)

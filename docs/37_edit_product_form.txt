@@ -1,0 +1,26 @@
+# Edit Product Form (Phase 8, Step 4.3)
+
+We built the interface for updating existing product information.
+
+## What we built:
+The `views/merchant/edit_product.php` page.
+
+## Why we built it:
+To give merchants flexibility. Business needs change—prices fluctuate, and descriptions might need improvement. This page allows for those changes without deleting the product's history.
+
+## Key Logic Features:
+
+1. **Pre-population**:
+   We use the product's current values to fill the `value` attribute of inputs and the content of the `textarea`. This saves the merchant from starting from scratch.
+
+2. **Conditional Image Upload**:
+   The form is designed to handle two scenarios:
+   - The merchant wants to change the text only.
+   - The merchant wants to change the text AND the image.
+   Providing a preview of the current image helps the merchant decide.
+
+3. **Data Security**:
+   By using `htmlspecialchars($product['name'])`, we ensure that any special characters in the product name (like quotes or brackets) don't "break" the HTML of the page or create security vulnerabilities.
+
+## How to use:
+The form points to `controllers/ProductController.php?action=edit`. In the next step, we will implement the logic to handle these multi-part updates.

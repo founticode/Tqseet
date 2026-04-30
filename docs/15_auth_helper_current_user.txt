@@ -1,0 +1,165 @@
+# Auth Helper — currentUser() Function (Phase 4, Step 2 — Sub-Step 3)
+
+We added a new helper function: currentUser()
+It gives you the logged-in user's data in a clean way.
+
+Files changed:
+- includes/auth.php (added currentUser function)
+- views/user/dashboard.php (updated to use currentUser)
+
+---
+
+THE PROBLEM:
+
+Before, to get the user's name on any page, you had to write:
+$_SESSION["user_name"]
+$_SESSION["user_email"]
+$_SESSION["user_role"]
+
+This has problems:
+1. Long and ugly to type every time
+2. If we change the session key names later, we'd have to update EVERY page
+3. No single place to control what user data looks like
+
+---
+
+THE FIX:
+
+We created a function that returns all user data in one clean array:
+
+function currentUser() {
+    if (!isLoggedIn()) {
+        return null;
+    }
+
+    return [
+        "id"    => $_SESSION["user_id"],
+        "name"  => $_SESSION["user_name"],
+        "email" => $_SESSION["user_email"],
+        "role"  => $_SESSION["user_role"],
+    ];
+}
+
+---
+
+HOW TO USE IT:
+
+On any page that includes auth.php:
+
+$user = currentUser();
+
+echo $user["name"];    // "Ahmed"
+echo $user["email"];   // "ahmed@email.com"
+echo $user["role"];    // "user"
+echo $user["id"];      // 1
+
+If the user is NOT logged in:
+$user = currentUser();  // returns null
+
+---
+
+BEFORE vs AFTER (in dashboard):
+
+BEFORE:
+<p>Welcome, <?php echo $_SESSION["user_name"]; ?>!</p>
+<p>Email: <?php echo $_SESSION["user_email"]; ?></p>
+<p>Role: <?php echo $_SESSION["user_role"]; ?></p>
+
+AFTER:
+$user = currentUser();
+<p>Welcome, <?php echo $user["name"]; ?>!</p>
+<p>Email: <?php echo $user["email"]; ?>!</p>
+<p>Role: <?php echo $user["role"]; ?>!</p>
+
+Why is AFTER better?
+- Shorter key names (name vs user_name)
+- All session logic is in ONE function
+- If we add more data later (phone, avatar), we add it in ONE place
+- Pages don't need to know about $_SESSION at all
+
+---
+
+NEW CONCEPT: return null
+
+return null;
+
+What is null?
+null means "nothing" or "no value".
+It's different from "" (empty string) or 0 (zero).
+It means the variable has NO value at all.
+
+Why return null?
+If the user is not logged in, there is no user data to return.
+Returning null tells the calling code: "there is no user."
+
+The calling code can check:
+$user = currentUser();
+if ($user === null) {
+    echo "Not logged in";
+}
+
+---
+
+NEW CONCEPT: Associative Array (return)
+
+return [
+    "id"    => $_SESSION["user_id"],
+    "name"  => $_SESSION["user_name"],
+];
+
+What is this?
+An associative array — an array with named keys.
+Instead of $arr[0], $arr[1], you use $arr["id"], $arr["name"].
+
+The => symbol means "maps to":
+"id" => 5  means  the key "id" has the value 5
+
+Why use it here?
+It groups related data together in one clean package.
+One function call gives you everything you need.
+
+---
+
+WHY THIS MATTERS:
+
+Without currentUser():
+Every page talks directly to $_SESSION.
+If we rename a session key, we break every page.
+
+With currentUser():
+Every page calls currentUser().
+If we rename a session key, we fix it in ONE function.
+All pages keep working.
+
+This is called ABSTRACTION:
+Hide the messy details behind a clean function.
+Pages don't care HOW user data is stored.
+They just call currentUser() and get what they need.
+
+---
+
+FINAL AUTH HELPER SUMMARY:
+
+includes/auth.php now has 4 functions:
+
+1. isLoggedIn()         → returns true/false
+2. requireLogin()       → redirects if not logged in
+3. requireRole($role)   → blocks if wrong role (string or array)
+4. currentUser()        → returns user data array or null
+
+These are the building blocks we'll use on every page going forward.
+
+---
+
+SUMMARY:
+
+What we did:
+- Added currentUser() to includes/auth.php
+- Updated views/user/dashboard.php to use it
+
+Why:
+- Cleaner code on every page
+- One place to manage session data
+- Easy to extend later (add phone, avatar, etc.)
+
+This is Sub-Step 3 (final) of building the auth helper system.

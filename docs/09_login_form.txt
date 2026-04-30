@@ -1,0 +1,68 @@
+# Login Form (Step 1 - Login System)
+
+We created the login form where existing users can sign in.
+
+File: views/auth/login.php
+
+What it contains:
+- An HTML form with method="POST"
+- 2 input fields:
+  1. Email (email)
+  2. Password (password)
+- A link to the register page
+
+---
+
+Key difference from register form:
+
+Register form: action="../../controllers/AuthController.php"
+Login form:    action="../../controllers/AuthController.php?action=login"
+
+The ?action=login part is called a QUERY PARAMETER.
+
+NEW CONCEPT: Query Parameters
+
+What are they?
+Extra data attached to the end of a URL after the ? symbol.
+
+Example: AuthController.php?action=login
+- URL = AuthController.php
+- Parameter name = action
+- Parameter value = login
+
+How to read them in PHP:
+$_GET["action"] → returns "login"
+
+$_GET vs $_POST:
+- $_GET  → reads data from the URL (visible in the address bar)
+- $_POST → reads data from the form body (hidden)
+- The form data (email, password) goes through POST
+- The action parameter goes through GET (in the URL)
+
+Why use this?
+We have ONE controller file (AuthController.php) that handles
+both register and login. The ?action=login tells the controller
+which action to perform:
+- No action or action=register → handle registration
+- action=login → handle login
+
+---
+
+Navigation between pages:
+
+Register page has: "Already have an account? Login here"
+Login page has:    "Don't have an account? Register here"
+
+Both use <a href="..."> links.
+Since both files are in the same folder (views/auth/),
+we just use the filename directly:
+<a href="login.php">    → goes to login
+<a href="register.php"> → goes to register
+
+---
+
+Flow:
+User opens login page → fills email + password → clicks Login
+→ POST data sent to AuthController.php?action=login
+→ Controller reads ?action=login and knows it's a login request
+→ (Steps 2-7: validate, find user, verify password, start session)

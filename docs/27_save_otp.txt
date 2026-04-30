@@ -1,0 +1,29 @@
+# Save OTP to Database (Phase 7, Step 2)
+
+We implemented the database storage for our One-Time Passwords.
+
+## What we built:
+1. A new table `user_otps` in the database.
+2. A new function `saveOTP()` in `includes/otp_helpers.php`.
+
+## Why we built it:
+To verify an OTP, the server must be able to compare what the user typed with what was actually sent. The database serves as the "source of truth".
+
+## Key technical features:
+
+1. **Expiration (expires_at)**:
+   We set the OTP to expire after 10 minutes. This is a security best practice to prevent someone from using an old code they might have found.
+
+2. **Prepared Statements**:
+   Just like our login/register system, we use `prepare()` and `bind_param()` to protect against SQL injection.
+
+3. **Foreign Key**:
+   The `user_id` in `user_otps` is linked to the `id` in the `users` table. If a user is deleted, their OTPs are automatically deleted too (`ON DELETE CASCADE`).
+
+## How to use:
+```php
+$code = generateOTP();
+if (saveOTP($conn, $userId, $code)) {
+    // Code is now safely stored in the database
+}
+```

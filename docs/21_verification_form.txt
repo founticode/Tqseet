@@ -1,0 +1,28 @@
+# User Verification Form (Phase 6, Step 1)
+
+We created the user interface for identity verification (KYC).
+
+## What we built:
+A page (`views/user/verify.php`) where users can submit their identification data.
+
+## Why we built it:
+To allow users to move from "Not Verified" to "Verified". This is required for using the BNPL installment system.
+
+## Key technical features:
+
+1. **File Upload Support**:
+   The form uses `method="POST"` and `enctype="multipart/form-data"`. This is essential for PHP to receive files in the `$_FILES` array.
+
+2. **Access Control**:
+   - `requireRole("user")`: Only customers can access this page.
+   - Redirect logic: If `is_verified` is already true, the user is sent back to the dashboard (preventing double submission).
+
+3. **CIN Input**:
+   A text field to capture the National Identity Number.
+
+4. **Image Input**:
+   A file input restricted to images (`accept="image/*"`).
+
+## How to use:
+Users can access this page via a link (which we will add to the dashboard later) or directly via the URL.
+The form currently points to `controllers/VerificationController.php`.

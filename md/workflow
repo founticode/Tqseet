@@ -1,0 +1,214 @@
+# TQSEET — BNPL Project Development Workflow
+
+> Buy Now Pay Later platform — PHP/MySQL MVC architecture
+
+---
+
+## Current Project Structure
+
+```
+Tqseet/
+├── config/             ✅ DONE — db.php, dev_logs.php, user_errors.php
+├── database/           ✅ schema.sql ready
+│   └── schema.sql
+├── models/             🔲 empty
+├── controllers/        🔲 empty
+├── views/
+│   ├── auth/           🔲 login, register, OTP, etc.
+│   ├── user/           🔲 dashboard, installments, verification
+│   ├── merchant/       🔲 products, orders, earnings
+│   └── admin/          🔲 approvals, users, overview
+├── includes/           🔲 header, footer, session, helpers
+├── index.php           🔲 entry point / router
+├── test.php            ✅ error handling tests pass
+└── errors.log          ✅ working
+```
+
+---
+
+## Phase 1 — Config & Database ✅ COMPLETE
+
+- [x] `config/db.php` — Database connection class
+- [x] `config/dev_logs.php` — `logError()` → writes to `errors.log`
+- [x] `config/user_errors.php` — `userError()` → safe user messages
+- [x] `database/schema.sql` — All 7 tables defined
+- [x] Test error handling with `test.php`
+
+---
+
+## Phase 2 — Includes (Shared Components)
+
+Build the reusable pieces that every page will need.
+
+- [ ] `includes/session.php` — `session_start()`, auth guards, role checks
+- [ ] `includes/header.php` — HTML head, navbar (role-aware)
+- [ ] `includes/footer.php` — Footer, JS scripts
+- [ ] `includes/helpers.php` — `redirect()`, `sanitize()`, `isLoggedIn()`, `hasRole()`
+
+> [!TIP]
+> Create a `helpers.php` with utility functions early — you'll use `sanitize()` and `redirect()` in every controller.
+
+---
+
+## Phase 3 — Routing (index.php)
+
+Set up a simple front-controller or page-based router.
+
+- [ ] `index.php` — Route requests via `?page=login`, `?page=dashboard`, etc.
+- [ ] Default to login page if not authenticated
+- [ ] Redirect by role after login (`user` → user dashboard, `merchant` → merchant dashboard, `admin` → admin panel)
+
+---
+
+## Phase 4 — Auth System
+
+### Models
+- [ ] `models/UserModel.php` — `register()`, `login()`, `findByEmail()`, `verifyOTP()`
+
+### Controllers
+- [ ] `controllers/AuthController.php` — Handle register, login, OTP verification, logout
+
+### Views
+- [ ] `views/auth/register.php` — Registration form (name, email, phone, password)
+- [ ] `views/auth/login.php` — Login form (email + password)
+- [ ] `views/auth/otp.php` — OTP input page
+- [ ] `views/auth/logout.php` — Destroy session, redirect
+
+### OTP Logic
+- [ ] Generate 6-digit code → save to `otp_codes` table
+- [ ] Send via email (use PHP `mail()` or Mailtrap for dev)
+- [ ] Verify code + expiry on submit
+- [ ] Set `users.is_verified = TRUE` on success
+
+> [!IMPORTANT]
+> Hash passwords with `password_hash()` on register and verify with `password_verify()` on login. Never store plain text.
+
+---
+
+## Phase 5 — User Verification (KYC)
+
+### Models
+- [ ] `models/VerificationModel.php` — `submitCIN()`, `getStatus()`, `submitFinancials()`
+
+### Controllers
+- [ ] `controllers/VerificationController.php` — Handle CIN upload + financial info submission
+
+### Views
+- [ ] `views/user/verify_identity.php` — CIN number + CIN image upload form
+- [ ] `views/user/verify_financials.php` — Profession + salary form
+- [ ] `views/user/verification_status.php` — Show pending/approved/rejected
+
+> [!WARNING]
+> Validate file uploads: check MIME type, max size, rename with unique ID. Store in an `uploads/` folder outside web root if possible.
+
+---
+
+## Phase 6 — Merchant: Products & Orders
+
+### Models
+- [ ] `models/ProductModel.php` — `create()`, `getByMerchant()`, `getAll()`, `getById()`
+- [ ] `models/OrderModel.php` — `create()`, `getByUser()`, `getByMerchant()`, `updateStatus()`
+
+### Controllers
+- [ ] `controllers/ProductController.php` — CRUD for products (merchant only)
+- [ ] `controllers/OrderController.php` — Create order, view orders
+
+### Views
+- [ ] `views/merchant/add_product.php` — Product form (name, description, price, image)
+- [ ] `views/merchant/my_products.php` — List merchant's products
+- [ ] `views/merchant/orders.php` — Orders received + earnings breakdown
+- [ ] `views/user/products.php` — Browse available products
+- [ ] `views/user/product_detail.php` — Single product + "Buy Now Pay Later" button
+
+---
+
+## Phase 7 — BNPL Core: Installments
+
+This is the heart of the app.
+
+### Business Logic
+```
+total_price       = product price
+commission        = total_price × merchant.commission_rate
+merchant_earning  = total_price − commission
+installments      = split total into 3 or 4 equal monthly payments
+```
+
+### Models
+- [ ] `models/InstallmentModel.php` — `createForOrder()`, `getByOrder()`, `markPaid()`, `getOverdue()`
+
+### Controllers
+- [ ] `controllers/InstallmentController.php` — Generate installments on order, handle payment
+
+### Views
+- [ ] `views/user/my_orders.php` — List orders with installment status
+- [ ] `views/user/installment_detail.php` — Show due dates, amounts, pay button
+- [ ] `views/merchant/earnings.php` — Earnings after commission
+
+### Flow
+- [ ] User clicks "Buy Now Pay Later" → order created → installments auto-generated
+- [ ] User sees installment schedule (e.g., 3 × 333.33 DH)
+- [ ] User marks installment as paid (simulate for now)
+- [ ] Order status updates to `paid` when all installments are paid
+
+> [!IMPORTANT]
+> Eligibility check before BNPL: user must be verified (`is_verified = TRUE`) AND financial status must be `approved`.
+
+---
+
+## Phase 8 — Admin Panel
+
+### Models
+- [ ] `models/AdminModel.php` — `getAllUsers()`, `getPendingVerifications()`, `getOverview()`
+
+### Controllers
+- [ ] `controllers/AdminController.php` — Approve/reject verifications, view stats
+
+### Views
+- [ ] `views/admin/dashboard.php` — Stats overview (users, orders, revenue)
+- [ ] `views/admin/users.php` — User list with roles + verification status
+- [ ] `views/admin/verifications.php` — Pending KYC approvals (approve/reject)
+- [ ] `views/admin/orders.php` — All orders + installment status
+
+---
+
+## Phase 9 — Security & Hardening
+
+- [ ] CSRF tokens on all forms
+- [ ] Prepared statements everywhere (already using `mysqli` — use `$conn->prepare()`)
+- [ ] Input sanitization with `htmlspecialchars()` and `filter_input()`
+- [ ] Role-based access guards on every controller action
+- [ ] Rate-limit OTP requests
+- [ ] File upload validation (type, size, rename)
+- [ ] Add `.htaccess` to block direct access to `config/`, `models/`, `errors.log`
+
+> [!CAUTION]
+> Never expose `errors.log` or `config/db.php` to the web. Add an `.htaccess` deny rule or move them above the web root.
+
+---
+
+## Phase 10 — Polish & Deploy
+
+- [ ] Responsive CSS for all views
+- [ ] Form validation (client-side + server-side)
+- [ ] Flash messages (success/error feedback after actions)
+- [ ] Pagination for product lists, orders, admin tables
+- [ ] Test all error paths (wrong password, expired OTP, unverified user, etc.)
+- [ ] Production config (disable `display_errors`, secure cookies, HTTPS)
+
+---
+
+## Recommended Build Order
+
+| Step | What to build | Why |
+|------|--------------|-----|
+| 1 | ~~Config + Error Handling~~ | ✅ Done |
+| 2 | `includes/` (session, helpers, header/footer) | Everything depends on these |
+| 3 | `index.php` router | Need routing before any page works |
+| 4 | Auth (register → OTP → login → logout) | Must have users before anything else |
+| 5 | User verification (KYC) | Required before users can buy |
+| 6 | Merchant products (CRUD) | Need products for orders |
+| 7 | Orders + Installments (BNPL core) | The main feature |
+| 8 | Admin panel | Approve verifications, monitor platform |
+| 9 | Security hardening | Lock everything down |
+| 10 | Polish + deploy | Final UI, testing, production config |

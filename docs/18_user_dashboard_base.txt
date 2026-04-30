@@ -1,0 +1,21 @@
+# Basic User Dashboard (Phase 5, Step 1)
+
+We have created the foundation for the User Dashboard.
+
+## What we built:
+A refined version of `views/user/dashboard.php`.
+
+## Key Features:
+1. **Strict Protection**: Uses `requireRole("user")` to ensure only customers can see this page.
+2. **Integrated Navbar**: Included `includes/navbar.php` so the user has access to Home, Dashboard, and Logout links.
+3. **Personalized Greeting**: Uses `currentUser()` to display the user's name dynamically.
+4. **Account Overview**: Shows basic account details (Email and Role).
+
+## Why we built it:
+To provide a central "hub" for the user after they log in. It serves as the starting point for all their future actions (checking orders, payments, etc.).
+
+## How to test:
+1. Log in as a 'user'.
+2. You should be automatically redirected to this dashboard.
+3. Verify that the navbar appears and shows your name.
+4. Verify that the "Account Overview" box displays your correct email.

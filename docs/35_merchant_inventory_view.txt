@@ -1,0 +1,23 @@
+# Merchant Inventory View (Phase 8, Step 4.1)
+
+We built the interface for managing a merchant's personal inventory.
+
+## What we built:
+The `views/merchant/products.php` management page.
+
+## Why we built it:
+Listing products is only half the work. Merchants need to be able to audit their stock. This page provides a clear overview of everything they have for sale, including prices and dates.
+
+## Key Technical Features:
+
+1. **Merchant Ownership**:
+   The SQL query is strictly limited: `WHERE merchant_id = ?`. This ensures a merchant cannot see or manage another merchant's inventory, which is critical for security.
+
+2. **Formatting**:
+   Used `number_format($price, 2)` to display prices in a standard currency format (e.g., 1,500.00 DH).
+
+3. **UX Confirmation**:
+   We added `onsubmit="return confirm(...)"` to the delete button. This simple JavaScript prevents a merchant from accidentally deleting a product with a misclick.
+
+## How to use:
+This page is the central hub for Step 4 (Editing and Deleting). It serves as the jumping-off point for both actions.

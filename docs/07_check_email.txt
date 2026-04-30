@@ -1,0 +1,116 @@
+# Check Email Exists (Step 5 - Auth System)
+
+Before inserting a new user, we check if the email is already
+in the database. If it exists → error. If not → continue.
+
+File: controllers/AuthController.php
+
+Why check before inserting?
+- The users table has UNIQUE on the email column
+- If we try to insert a duplicate, MySQL throws an error
+- But that error is ugly and technical
+- Instead, we check first and show a friendly message
+
+---
+
+How we connect to the database from the controller:
+
+require_once __DIR__ . "/../config/db.php";
+$db   = new Database();
+$conn = $db->connect();
+
+__DIR__ = the folder where the current file is located
+For AuthController.php, __DIR__ = the "controllers" folder
+/../config/db.php = go up one folder, then into config
+
+---
+
+NEW CONCEPT: Prepared Statements
+
+What is it?
+A way to run SQL queries safely by separating the SQL code
+from the user data.
+
+Without prepared statement (DANGEROUS):
+$sql = "SELECT * FROM users WHERE email = '$email'";
+If a hacker types: ' OR 1=1 --
+The query becomes: SELECT * FROM users WHERE email = '' OR 1=1 --
+This returns ALL users → SQL Injection attack!
+
+With prepared statement (SAFE):
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+
+The ? is a placeholder. PHP sends the SQL and the data separately.
+Even if the user types SQL code, it's treated as plain text.
+
+---
+
+NEW FUNCTION: prepare()
+
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+
+Creates a prepared statement with ? as placeholder
+Returns a statement object ($stmt) that we use next
+
+---
+
+NEW FUNCTION: bind_param()
+
+$stmt->bind_param("s", $email);
+
+Binds the actual value to the ? placeholder
+"s" = string type
+
+Type codes:
+"s" → string
+"i" → integer
+"d" → double (decimal number)
+"b" → blob (binary data)
+
+If you have multiple placeholders:
+$stmt->bind_param("si", $email, $age);
+Two letters for two values, in order
+
+---
+
+NEW FUNCTION: execute()
+
+$stmt->execute();
+
+Runs the prepared query against the database
+
+---
+
+NEW FUNCTION: get_result()
+
+$result = $stmt->get_result();
+
+Gets the result set (the rows returned by the query)
+
+---
+
+NEW PROPERTY: num_rows
+
+$result->num_rows
+
+Returns the number of rows in the result
+If 0 → no user found with that email (available)
+If > 0 → email already taken
+
+---
+
+Cleanup:
+
+$stmt->close();  → frees the prepared statement
+$conn->close();  → closes the database connection
+
+Always clean up when you're done to free memory
+
+---
+
+Flow so far:
+Form → POST → validate → hash password → check email in DB
+→ email exists? → error
+→ email available? → continue (next: insert into DB)

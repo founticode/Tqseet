@@ -1,0 +1,26 @@
+# OTP Generation (Phase 7, Step 1)
+
+We built the core logic for the One-Time Password system.
+
+## What we built:
+A reusable function `generateOTP()` inside `includes/otp_helpers.php`.
+
+## Why we built it:
+To create unique, 6-digit codes that will be used to verify a user's identity.
+
+## Technical Details:
+
+1. **random_int(min, max)**:
+   We use this built-in PHP function because it is "cryptographically secure". This means the numbers it generates are impossible for a hacker to predict using a computer script.
+
+2. **6-Digit Constraint**:
+   By setting the range between 100,000 and 999,999, we ensure the code is always exactly 6 digits long.
+
+3. **String Conversion**:
+   The number is converted to a string `(string)` to prevent issues where a code starting with zero might be treated as a smaller number by mistake.
+
+## How to use:
+```php
+require_once "includes/otp_helpers.php";
+$code = generateOTP(); // Returns something like "582910"
+```

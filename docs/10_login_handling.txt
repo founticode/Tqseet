@@ -1,0 +1,144 @@
+# Login Handling (Steps 2-5 - Login System)
+
+We restructured AuthController.php to handle both register and login.
+The controller uses ?action= to know which action to perform.
+
+File: controllers/AuthController.php
+
+---
+
+NEW CONCEPT: One Controller, Two Actions
+
+Before: the controller only handled register
+After: the controller handles register AND login
+
+How it decides:
+$action = $_GET["action"] ?? "register";
+
+Then:
+if ($action === "register") { ... register code ... }
+elseif ($action === "login") { ... login code ... }
+
+Register form sends to: AuthController.php?action=register
+Login form sends to:    AuthController.php?action=login
+
+---
+
+NEW OPERATOR: ?? (Null Coalescing Operator)
+
+$action = $_GET["action"] ?? "register";
+
+This means:
+- If $_GET["action"] exists and is not null → use its value
+- If it doesn't exist → use "register" as default
+
+It's a shorter way to write:
+if (isset($_GET["action"])) {
+    $action = $_GET["action"];
+} else {
+    $action = "register";
+}
+
+---
+
+Login steps inside the controller:
+
+Step 1: Grab email and password from POST
+$email    = trim($_POST["email"]);
+$password = $_POST["password"];
+
+Step 2: Validate (not empty, valid email format)
+Simple checks — login only has 2 fields
+
+Step 3: Find user by email in database
+$stmt = $conn->prepare(
+    "SELECT id, name, email, password, role FROM users WHERE email = ?"
+);
+
+We select: id, name, email, password (hashed), role
+We DON'T select * (all columns) — only what we need
+
+Step 4: Check if user exists
+if ($result->num_rows === 0) → no user with this email
+
+Step 5: Verify password
+$user = $result->fetch_assoc();
+password_verify($password, $user["password"])
+
+---
+
+NEW FUNCTION: fetch_assoc()
+
+$user = $result->fetch_assoc();
+
+What it does:
+Takes one row from the result and returns it as an associative array.
+
+Example: if the query found a user, $user becomes:
+[
+    "id"       => 1,
+    "name"     => "Ahmed",
+    "email"    => "ahmed@test.com",
+    "password" => "$2y$10$xKz8r...",
+    "role"     => "user"
+]
+
+We access values like:
+$user["name"]     → "Ahmed"
+$user["role"]     → "user"
+$user["password"] → the hashed password
+
+---
+
+NEW FUNCTION: password_verify()
+
+password_verify($plainPassword, $hashedPassword)
+
+What it does:
+Compares a plain text password with a hashed password.
+Returns true if they match, false if they don't.
+
+How it works:
+- It takes the plain password
+- It reads the algorithm and salt from the hash
+- It hashes the plain password the same way
+- It compares the two hashes
+
+Example:
+password_verify("123456", "$2y$10$xKz8r...") → true
+password_verify("wrong",  "$2y$10$xKz8r...") → false
+
+Important:
+password_hash() = for STORING passwords (register)
+password_verify() = for CHECKING passwords (login)
+They always work together as a pair.
+
+---
+
+SECURITY: Same error message for wrong email AND wrong password
+
+When email is not found:
+echo userError("login_failed"); → "Email or password is incorrect"
+
+When password is wrong:
+echo userError("login_failed"); → "Email or password is incorrect"
+
+SAME message for both cases!
+
+Why?
+If we said "Email not found" → hacker knows this email doesn't exist
+If we said "Wrong password" → hacker knows the email IS valid
+By using the same message, we give no hints to attackers.
+This is called "information hiding" — a security best practice.
+
+---
+
+Flow:
+User fills login form → clicks Login
+→ POST data sent to AuthController.php?action=login
+→ Controller sees action=login
+→ Validates email + password
+→ Finds user in DB by email
+→ Verifies password with password_verify()
+→ Success → welcome message (next: session)
+→ Failure → generic error message

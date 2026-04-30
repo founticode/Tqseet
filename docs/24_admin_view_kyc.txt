@@ -1,0 +1,28 @@
+# Admin View Verifications (Phase 6, Step 4)
+
+We built the management interface for identity verification.
+
+## What we built:
+A secure admin page (`views/admin/verifications.php`) that displays a table of all pending KYC submissions.
+
+## Why we built it:
+Verification is a manual process. A human (the admin) must look at the ID card and confirm it matches the user's name. This page provides the admin with all the data they need in one place.
+
+## Key Logic:
+
+1. **SQL JOIN**:
+   ```sql
+   SELECT uv.*, u.name, u.email 
+   FROM user_verifications uv
+   JOIN users u ON uv.user_id = u.id
+   ```
+   This allows us to show the user's Name and Email (from the `users` table) along with their CIN (from the `user_verifications` table).
+
+2. **Access Control**:
+   `requireRole("admin")` ensures that customers or merchants cannot see other people's identity documents.
+
+3. **External View**:
+   We used `target="_blank"` on the image link so that the admin doesn't lose their place when they click to view a photo.
+
+## Next Steps:
+In the next step, we will add action buttons to this table so the admin can click "Approve" to officially verify the user.

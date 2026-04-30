@@ -1,0 +1,31 @@
+# Handling File Uploads (Phase 6, Step 2)
+
+We built the logic to process and store ID images on the server.
+
+## What we built:
+The `controllers/VerificationController.php` script.
+
+## Why we built it:
+To move uploaded files from the server's temporary storage to our project's permanent `uploads/kyc/` folder.
+
+## Key Logic & Functions used:
+
+1. **$_FILES array**: 
+   Used to access the file properties:
+   - `$_FILES["cin_image"]["name"]`: Original name.
+   - `$_FILES["cin_image"]["tmp_name"]`: Temporary path on server.
+
+2. **getimagesize()**:
+   A security check to verify that the file is actually an image and not a fake file or script.
+
+3. **pathinfo()**:
+   Used to extract the extension (like .jpg or .png) so we can build a new filename.
+
+4. **Unique Naming**:
+   We rename files to `user_[ID]_[TIMESTAMP].[EXT]`. This prevents two files from having the same name and overwriting each other.
+
+5. **move_uploaded_file()**:
+   The final step that transfers the file to the `uploads/kyc/` folder.
+
+## How to verify:
+Look into the `uploads/kyc/` folder in your project. If you see images there after submitting the form, Step 2 is working perfectly.

@@ -1,0 +1,29 @@
+# Verify OTP (Phase 7, Step 4)
+
+We built the logic to validate user input against the stored One-Time Passwords.
+
+## What we built:
+The `verifyOTP()` function in `includes/otp_helpers.php`.
+
+## Why we built it:
+To complete the security loop. This function ensures that the user only gets access if they have provided the exact code sent to them before it expires.
+
+## Key Logic Features:
+
+1. **Expiration Check**:
+   The SQL query includes `AND expires_at > NOW()`. This automatically invalidates codes that are more than 10 minutes old.
+
+2. **Order & Limit**:
+   We use `ORDER BY created_at DESC LIMIT 1` to always check against the *most recent* code sent to the user.
+
+3. **One-Time Use Enforcement**:
+   As soon as a code is correctly verified, we run a `DELETE` query to wipe all OTPs for that user. This is a critical security step to prevent "Replay Attacks" where a hacker might try to use an old code.
+
+## How to use:
+```php
+if (verifyOTP($conn, $userId, $_POST['otp'])) {
+    // Access granted!
+} else {
+    // Access denied (wrong code or expired)
+}
+```

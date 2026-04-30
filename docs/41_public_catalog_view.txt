@@ -1,0 +1,27 @@
+# Public Catalog View (Phase 9, Step 1)
+
+We built the main storefront for the TQSEET platform.
+
+## What we built:
+The `views/public/catalog.php` page.
+
+## Why we built it:
+A marketplace is only useful if customers can find products. This page serves as the entry point for all potential buyers, showcasing the variety of items provided by our merchants.
+
+## Key Technical Features:
+
+1. **Responsive Grid**:
+   Used `display: grid` with `auto-fill`. This automatically adjusts the number of columns based on the screen width, making the site mobile-friendly by default.
+
+2. **Clean Data Fetching**:
+   The page runs a simple `SELECT * FROM products` query. We don't filter by merchant here because we want to show *all* products on the platform.
+
+3. **Safe Previews**:
+   - `substr($row['description'], 0, 75)`: Ensures that long descriptions don't break the layout of the product cards.
+   - `htmlspecialchars()`: Protects the page from any malicious HTML injected into product names or descriptions.
+
+4. **Visual Hierarchy**:
+   The price is highlighted in a large, bold green font to immediately capture the buyer's attention.
+
+## How to use:
+Users can reach this page from the Navbar. Clicking "Details" on any product card will take them to the individual product page (to be built in Step 2).

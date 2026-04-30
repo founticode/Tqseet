@@ -1,0 +1,6 @@
+[TQSEET][2026-04-21 13:00:04] DB Connection failed: Unknown database 'wrong_db_name'
+[TQSEET][2026-04-21 13:13:01] DB Connection failed: Unknown database 'tqset_db'
+[TQSEET][2026-04-21 13:13:02] DB Connection failed: Unknown database 'tqset_db'
+[TQSEET][2026-04-23 13:18:01] DB ERROR: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[TQSEET][2026-04-24 12:47:36] DB ERROR: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[TQSEET][2026-04-28 10:50:41] DB ERROR: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée

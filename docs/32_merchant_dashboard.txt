@@ -1,0 +1,26 @@
+# Merchant Dashboard (Phase 8, Step 2)
+
+We built the central hub for seller operations.
+
+## What we built:
+The `views/merchant/dashboard.php` page.
+
+## Why we built it:
+Merchants have different needs than regular customers. They need to see their business stats, manage their stock, and fulfill orders. This dashboard organizes those specialized tools in one place.
+
+## Key Technical Features:
+
+1. **Access Control**:
+   `requireRole("merchant")` prevents customers or unverified users from accessing seller tools.
+
+2. **Action-Oriented UI**:
+   Instead of just showing data, the dashboard focuses on "Tasks":
+   - **List Product**: Quick link to the creation form.
+   - **Inventory**: Link to the management table.
+   - **Orders**: Link to the sales tracker.
+
+3. **User Context**:
+   The dashboard personalized the experience by pulling the Merchant's name from the `currentUser()` helper.
+
+## Next Steps:
+In Step 3, we will build the actual `add_product.php` page where the merchant can upload product names, prices, and images.

@@ -1,0 +1,26 @@
+# Show User Info (Phase 5, Step 2)
+
+We updated the system to show the user's full contact details on the dashboard.
+
+## What we built:
+A bridge between the database, the session, and the dashboard for the user's phone number.
+
+## Why we built it:
+Initially, only the name, email, and role were being stored in the session. To show a complete profile, we needed to fetch the phone number from the database during login and "carry" it through the session.
+
+## Changes made:
+
+1. **AuthController.php (Login Logic)**:
+   - Modified the SQL query: `SELECT ..., phone FROM users`
+   - Added to session: `$_SESSION["user_phone"] = $user["phone"];`
+
+2. **auth.php (Helper Upgrade)**:
+   - Updated `currentUser()` to include `"phone" => $_SESSION["user_phone"]`.
+
+3. **dashboard.php (Display)**:
+   - Added: `<p><strong>Phone:</strong> <?php echo $user['phone']; ?></p>`
+
+## How to test:
+1. Log out.
+2. Log in again.
+3. Check the dashboard overview box for the phone number.

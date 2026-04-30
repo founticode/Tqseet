@@ -1,0 +1,17 @@
+# Schema Synchronization: Merchants & OTP (Phase 8, Maintenance)
+
+We updated the code to match the existing `schema.sql` provided by the user.
+
+## What we fixed:
+
+1. **OTP Table Sync**:
+   The table name was changed from `user_otps` to `otp_codes`, and the column `otp_code` was changed to `code`. All helper functions in `includes/otp_helpers.php` now reflect this.
+
+2. **Merchant Hierarchy**:
+   According to the schema, `products` are linked to `merchants.id`, not `users.id`.
+   - **Upgrade Logic**: When a user upgrades, the system now inserts a row into the `merchants` table and stores that new `merchant_id` in the session.
+   - **Auth Logic**: When a merchant logs in, the system fetches their `merchant_id` from the `merchants` table and puts it in the session.
+   - **Product Logic**: The `ProductController` and Views now use `$_SESSION['merchant_id']` for all queries.
+
+## Why this matters:
+This ensures **Database Integrity**. Without these fixes, adding a product would have failed because of Foreign Key constraints (trying to insert a user ID into a column expecting a merchant ID).

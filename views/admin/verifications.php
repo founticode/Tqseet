@@ -8,63 +8,94 @@ requireRole("admin");
 $db = new Database();
 $conn = $db->connect();
 
-// Fetch users who have submitted verification (We will build the submit part in Phase 12)
-// For now, let's just list all users to see if the page works
-$query = "SELECT * FROM users WHERE role = 'user' ORDER BY created_at DESC";
-$result = $conn->query($query);
+// Queries for customers and merchants
+$query_users = "SELECT * FROM users WHERE role = 'user' ORDER BY created_at DESC";
+$res_users = $conn->query($query_users);
+
+$query_merchants = "SELECT m.*, u.name, u.email FROM merchants m JOIN users u ON m.user_id = u.id WHERE m.status = 'pending' ORDER BY m.created_at DESC";
+$res_merchants = $conn->query($query_merchants);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TQSEET Admin - User Verifications</title>
-</head>
-<body style="font-family: sans-serif; margin: 0; background: #f4f4f4;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
 
     <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
 
-    <div style="max-width: 1100px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h1 style="border-bottom: 2px solid #eee; padding-bottom: 15px;">Pending Verifications</h1>
+    <div style="max-width: 1100px; margin: 60px auto; padding: 0 20px;">
         
-        <p style="color: #666; margin-bottom: 25px;">Review the financial profiles and identity documents of users applying for BNPL credit.</p>
+        <div style="margin-bottom: 40px;">
+            <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Pending Approvals</h1>
+            <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Manage credit applications and merchant onboardings.</p>
+        </div>
 
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: #f8f9fa;">
-                <tr>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">User ID</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Name</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Email</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Contact Verified</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($result->num_rows > 0): ?>
-                    <?php while($row = $result->fetch_assoc()): ?>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px;">#<?php echo $row['id']; ?></td>
-                            <td style="padding: 12px; font-weight: bold;"><?php echo $row['name']; ?></td>
-                            <td style="padding: 12px;"><?php echo $row['email']; ?></td>
-                            <td style="padding: 12px;">
-                                <?php if ($row['is_verified']): ?>
-                                    <span style="color: green;">✅ Yes</span>
-                                <?php else: ?>
-                                    <span style="color: red;">❌ No</span>
-                                <?php endif; ?>
-                            </td>
-                            <td style="padding: 12px;">
-                                <a href="view_user.php?id=<?php echo $row['id']; ?>" style="color: #007bff; text-decoration: none; font-weight: bold;">Review Details →</a>
+        <!-- Section 1: Merchants -->
+        <h3 style="color: #2d3436; margin-bottom: 15px; font-weight: 800;">Merchant Applications</h3>
+        <div style="background: white; border-radius: 20px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 50px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #fafafa; text-align: left;">
+                    <tr>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Store Name</th>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Owner</th>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($res_merchants->num_rows === 0): ?>
+                        <tr><td colspan="3" style="padding: 30px; text-align: center; color: #b2bec3;">No pending merchant applications.</td></tr>
+                    <?php endif; ?>
+                    <?php while($m = $res_merchants->fetch_assoc()): ?>
+                        <tr style="border-bottom: 1px solid #f8f9fa;">
+                            <td style="padding: 20px; font-weight: 800;"><?php echo htmlspecialchars($m['store_name']); ?></td>
+                            <td style="padding: 20px; color: #636e72;"><?php echo htmlspecialchars($m['name']); ?></td>
+                            <td style="padding: 20px; text-align: right;">
+                                <a href="view_user.php?id=<?php echo $m['user_id']; ?>" style="color: #0984e3; text-decoration: none; font-weight: bold; font-size: 0.9rem;">Review Business →</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
-                <?php else: ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 2: Customers -->
+        <h3 style="color: #2d3436; margin-bottom: 15px; font-weight: 800;">Customer Credit Reviews</h3>
+        <div style="background: white; border-radius: 20px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #fafafa; text-align: left;">
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 50px; color: #999;">No users found.</td>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">User</th>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Status</th>
+                        <th style="padding: 15px 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Action</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php while($u = $res_users->fetch_assoc()): ?>
+                        <?php 
+                            // Fetch financial status for better badge
+                            $st = $conn->prepare("SELECT status FROM user_financials WHERE user_id = ?");
+                            $st->bind_param("i", $u['id']);
+                            $st->execute();
+                            $f_status = $st->get_result()->fetch_assoc()['status'] ?? 'none';
+                        ?>
+                        <tr style="border-bottom: 1px solid #f8f9fa;">
+                            <td style="padding: 20px;">
+                                <div style="font-weight: 800;"><?php echo htmlspecialchars($u['name']); ?></div>
+                                <div style="font-size: 0.8rem; color: #b2bec3;"><?php echo htmlspecialchars($u['email']); ?></div>
+                            </td>
+                            <td style="padding: 20px;">
+                                <?php if ($u['is_verified']): ?>
+                                    <span style="color: #00b894; font-weight: bold; font-size: 0.85rem;">✅ Verified</span>
+                                <?php elseif ($f_status === 'rejected'): ?>
+                                    <span style="color: #d63031; font-weight: bold; font-size: 0.85rem;">❌ Rejected</span>
+                                <?php else: ?>
+                                    <span style="color: #b2bec3; font-weight: bold; font-size: 0.85rem;">⏳ Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="padding: 20px; text-align: right;">
+                                <a href="view_user.php?id=<?php echo $u['id']; ?>" style="color: #0984e3; text-decoration: none; font-weight: bold; font-size: 0.9rem;">Audit Profile →</a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </body>

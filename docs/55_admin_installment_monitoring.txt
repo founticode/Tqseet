@@ -1,0 +1,23 @@
+# Admin Installment Wall (Phase 11, Step 5)
+
+We implemented a centralized debt-monitoring system that allows the Admin to oversee the risk profile of the entire platform.
+
+## What we built:
+A comprehensive monitoring dashboard that aggregates every installment from every order, across all customers.
+
+## Why we built it:
+A BNPL platform's primary risk is "Delinquency" (unpaid installments). This tool allows the Admin to see exactly who is paying on time and who is overdue, enabling proactive management of platform receivables.
+
+## Key Technical Features:
+
+1. **Complex Relational Joining**:
+   The "Installment Wall" uses a 4-table JOIN (`installments` -> `orders` -> `users` -> `products`) to provide a high-context view of every single line item in the database.
+
+2. **Automated Overdue Detection**:
+   The system compares the `due_date` against the current server time in real-time. If a payment is missed, the UI automatically triggers a high-visibility "Overdue" status badge without requiring manual input.
+
+3. **Risk Visualization**:
+   Utilizes color-coded status badges (Green/Yellow/Red) to allow the Admin to perform a "heat map" scan of platform health in seconds.
+
+## How to use:
+Admins access this via the "Installment Wall" card on the Control Tower. It is used for daily risk monitoring and debt collection tracking.

@@ -3,65 +3,71 @@ session_start();
 require_once __DIR__ . "/../includes/auth.php";
 require_once __DIR__ . "/../config/db.php";
 
-// Protect: Only users can submit verification
-requireRole("user");
+// Protect: ONLY Admins allowed!
+requireRole("admin");
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    
-    $userId = $_SESSION["user_id"];
-    $cin    = trim($_POST["cin"]);
-    $file   = $_FILES["cin_image"];
+$action = $_GET['action'] ?? '';
 
-    // 1. Basic Validation
-    if (empty($cin) || empty($file["name"])) {
-        die("Please fill all fields and select an image.");
-    }
+if ($action === "decide" && $_SERVER["REQUEST_METHOD"] === "POST") {
+    $userId = $_POST['user_id'];
+    $status = $_POST['status']; // 'approved' or 'rejected'
+    $commissionRate = $_POST['commission_rate'] ?? 0.05;
 
-    // 2. File Upload Logic
-    $targetDir = __DIR__ . "/../uploads/kyc/";
-    
-    // Create folder if it doesn't exist
-    if (!file_exists($targetDir)) {
-        mkdir($targetDir, 0777, true);
-    }
+    $db = new Database();
+    $conn = $db->connect();
 
-    // Generate a unique name for the file (to avoid overwriting)
-    $fileExt = pathinfo($file["name"], PATHINFO_EXTENSION);
-    $fileName = "user_" . $userId . "_" . time() . "." . $fileExt;
-    $targetFile = $targetDir . $fileName;
-
-    // 3. Check if it's a real image
-    $check = getimagesize($file["tmp_name"]);
-    if ($check === false) {
-        die("File is not a valid image.");
-    }
-
-    // 4. Move the file
-    if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-        
-        // 5. Save to Database
-        $db = new Database();
-        $conn = $db->connect();
-
-        $stmt = $conn->prepare("INSERT INTO user_verifications (user_id, cin, cin_image) VALUES (?, ?, ?)");
-        $stmt->bind_param("iss", $userId, $cin, $fileName);
-
-        if ($stmt->execute()) {
-            echo "<h2>✅ Verification Submitted!</h2>";
-            echo "<p>Your documents have been received and are pending review.</p>";
-            echo "<br><a href='../views/user/dashboard.php'>Go to Dashboard</a>";
-        } else {
-            echo "❌ Database Error: Could not save verification data.";
+    // Calculate Credit Limit automatically based on Salary
+    $creditLimit = 0;
+    if ($status === 'approved') {
+        $stmt_f = $conn->prepare("SELECT salary FROM user_financials WHERE user_id = ?");
+        $stmt_f->bind_param("i", $userId);
+        $stmt_f->execute();
+        $f_data = $stmt_f->get_result()->fetch_assoc();
+        if ($f_data) {
+            $creditLimit = $f_data['salary'] * 1.5; // Our professional 1.5x multiplier
         }
-
-        $stmt->close();
-        $conn->close();
-
-    } else {
-        echo "❌ Error uploading file.";
     }
 
-} else {
-    header("Location: ../views/user/verify.php");
+    // 1. Update Identity status
+    $stmt1 = $conn->prepare("UPDATE user_verifications SET status = ? WHERE user_id = ?");
+    $stmt1->bind_param("si", $status, $userId);
+    $stmt1->execute();
+
+    // 2. Update Financial status and Credit Limit
+    $stmt2 = $conn->prepare("UPDATE user_financials SET status = ?, credit_limit = ? WHERE user_id = ?");
+    $stmt2->bind_param("sdi", $status, $creditLimit, $userId);
+    $stmt2->execute();
+
+    // 3. NEW: Update Merchant status if applicable
+    $stmt_m = $conn->prepare("UPDATE merchants SET status = ?, commission_rate = ? WHERE user_id = ?");
+    $stmt_m->bind_param("sdi", $status, $commissionRate, $userId);
+    $stmt_m->execute();
+
+    // 4. Update main User table
+    $isVerified = ($status === 'approved') ? 1 : 0;
+    $stmt3 = $conn->prepare("UPDATE users SET is_verified = ? WHERE id = ?");
+    $stmt3->bind_param("ii", $isVerified, $userId);
+    $stmt3->execute();
+
+    // Redirect back with success message
+    header("Location: ../views/admin/verifications.php?status_updated=1");
+    exit;
+}
+
+if ($action === "update_commission" && $_SERVER["REQUEST_METHOD"] === "POST") {
+    $userId = $_POST['user_id'];
+    $commissionRate = $_POST['commission_rate'];
+
+    $db = new Database();
+    $conn = $db->connect();
+
+    $stmt = $conn->prepare("UPDATE merchants SET commission_rate = ? WHERE user_id = ?");
+    $stmt->bind_param("di", $commissionRate, $userId);
+    
+    if ($stmt->execute()) {
+        header("Location: ../views/admin/view_user.php?id=$userId&commission_updated=1");
+    } else {
+        header("Location: ../views/admin/view_user.php?id=$userId&error=1");
+    }
     exit;
 }

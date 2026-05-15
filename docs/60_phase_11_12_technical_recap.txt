@@ -1,0 +1,21 @@
+# TQSEET Technical Recap: Phases 11 & 12
+
+This document summarizes the transition from a simple BNPL prototype to a professional Multi-Merchant Financial Platform.
+
+## 1. Merchant Ecosystem (Phase 11)
+- **Store Management**: Merchants now have a "Store Health" dashboard tracking their commission rates and sales.
+- **Dynamic Commissions**: We moved from hardcoded fees to merchant-specific rates (e.g., Merchant A pays 5%, Merchant B pays 8%).
+- **Financial Reporting**: Built the "Revenue & Payouts" hub for Admins to calculate exactly how much is owed to each partner.
+
+## 2. Professional KYC & Credit Scoring (Phase 12)
+- **Document-Backed Trust**: Implementation of mandatory file uploads for Identity (CIN) and Income (Salary Slip/Bank Statements).
+- **Automated Credit Engine**: Removed manual guesswork. The system now uses a `Salary * 1.5` formula to set the user's buying power.
+- **Verification Workflow**: A structured 3-step audit process:
+    1. User submits data + documents.
+    2. Admin audits documents in the "Decision Center."
+    3. Admin Approves -> System calculates limit -> Checkout Unlocked.
+
+## 3. Security & Stability Upgrades
+- **Checkout Guard**: Integrated a real-time "KYC Shield" on product pages to block unverified purchases.
+- **Admin Confirmation Shield**: Added JS-level protection to prevent accidental approvals of incomplete profiles.
+- **Schema Sync**: Fully updated `schema.sql` to include all 7 core tables and their relational constraints.

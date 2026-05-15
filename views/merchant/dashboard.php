@@ -1,63 +1,104 @@
 <?php
 require_once __DIR__ . "/../../includes/auth.php";
+require_once __DIR__ . "/../../config/db.php";
 
 // Protect: ONLY Merchants allowed!
 requireRole("merchant");
-
 $user = currentUser();
+
+$db = new Database();
+$conn = $db->connect();
+
+// Fetch Merchant Status
+$stmt_m = $conn->prepare("SELECT status, commission_rate FROM merchants WHERE user_id = ?");
+$stmt_m->bind_param("i", $user['id']);
+$stmt_m->execute();
+$merchantData = $stmt_m->get_result()->fetch_assoc();
+$status = $merchantData['status'] ?? 'pending';
+$rate = $merchantData['commission_rate'] ?? 0.05;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TQSEET - Merchant Dashboard</title>
+    <title>Store Manager - TQSEET</title>
 </head>
-<body style="font-family: sans-serif; margin: 0; background: #f8f9fa;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
 
-    <!-- Navigation Bar -->
     <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
 
-    <div style="max-width: 1200px; margin: 20px auto; padding: 20px;">
+    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
         
-        <header style="background: #343a40; color: white; padding: 30px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h1 style="margin: 0;">Store Manager</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.8;">Welcome back, <strong><?php echo $user['name']; ?></strong>! Manage your inventory and sales.</p>
-        </header>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-            
-            <!-- Quick Action: Add Product -->
-            <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #dee2e6; text-align: center; transition: 0.3s;">
-                <h3 style="margin-top: 0;">List New Product</h3>
-                <p style="color: #666; margin-bottom: 25px;">Ready to sell something new? Create a listing here.</p>
-                <a href="add_product.php" style="display: block; background: #007bff; color: white; padding: 12px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                    + Add Product
-                </a>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+            <div>
+                <h1 style="margin: 0; font-size: 2.5rem; font-weight: 900; letter-spacing: -1.5px;">Store Manager</h1>
+                <p style="color: #636e72; margin: 10px 0 0 0; font-weight: 500;">Welcome back, <strong><?php echo htmlspecialchars($user['name']); ?></strong>!</p>
             </div>
-
-            <!-- Manage Products -->
-            <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #dee2e6; text-align: center;">
-                <h3 style="margin-top: 0;">Inventory Management</h3>
-                <p style="color: #666; margin-bottom: 25px;">Track, edit, or remove your current products.</p>
-                <a href="products.php" style="display: block; background: #6c757d; color: white; padding: 12px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                    Manage Products
-                </a>
-            </div>
-
-            <!-- Orders -->
-            <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #dee2e6; text-align: center;">
-                <h3 style="margin-top: 0;">Sales & Orders</h3>
-                <p style="color: #666; margin-bottom: 25px;">Check who bought your items and payment status.</p>
-                <a href="orders.php" style="display: block; background: #28a745; color: white; padding: 12px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                    View Orders
-                </a>
-            </div>
-
+            <?php if ($status === 'approved'): ?>
+                <a href="add_product.php" style="background: #222; color: white; padding: 15px 30px; text-decoration: none; border-radius: 15px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">+ List New Product</a>
+            <?php endif; ?>
         </div>
 
-        <div style="margin-top: 40px; padding: 20px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; color: #856404;">
-            <strong>Merchant Tip:</strong> High-quality product images increase sales by up to 40%!
+        <?php if ($status === 'approved'): ?>
+            <div style="background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; gap: 30px; align-items: center; margin-bottom: 40px; border: 1px solid #f1f3f5;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 0.75rem; color: #b2bec3; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Partner Agreement:</span>
+                    <span style="background: #eafaf1; color: #27ae60; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: bold;">
+                        <?php echo ($rate * 100); ?>% Platform Fee
+                    </span>
+                </div>
+                <div style="width: 1px; height: 20px; background: #eee;"></div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 0.75rem; color: #b2bec3; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Store Status:</span>
+                    <span style="color: #27ae60; font-size: 0.8rem; font-weight: bold;">✅ Verified & Active</span>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($status !== 'approved'): ?>
+            <!-- Verification Pending Card -->
+            <div style="background: white; border-radius: 25px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid #ffeeba; margin-bottom: 40px;">
+                <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
+                <h2 style="margin: 0; font-weight: 900; color: #856404;">Application Under Review</h2>
+                <p style="color: #636e72; max-width: 500px; margin: 15px auto; line-height: 1.6;">Our team is currently reviewing your merchant application. You will be able to list products and start selling as soon as your account is approved.</p>
+                <div style="display: inline-block; background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 0.9rem;">
+                    Status: <span style="text-transform: uppercase;"><?php echo $status; ?></span>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+            
+            <!-- Inventory -->
+            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s; opacity: <?php echo $status === 'approved' ? '1' : '0.5'; ?>;">
+                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Inventory</h3>
+                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Track stock levels, update prices, and manage your live product listings.</p>
+                <a href="<?php echo $status === 'approved' ? 'products.php' : '#'; ?>" 
+                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
+                   Manage Catalog
+                </a>
+            </div>
+
+            <!-- Sales -->
+            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s; opacity: <?php echo $status === 'approved' ? '1' : '0.5'; ?>;">
+                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Revenue</h3>
+                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Monitor your platform earnings, commissions, and transaction history.</p>
+                <a href="<?php echo $status === 'approved' ? 'sales.php' : '#'; ?>" 
+                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
+                   View Analytics
+                </a>
+            </div>
+
+            <!-- Profile -->
+            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s;">
+                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Store Branding</h3>
+                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Customize your shop name, description, and contact information.</p>
+                <a href="settings.php" 
+                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
+                   Edit Profile
+                </a>
+            </div>
+
         </div>
 
     </div>

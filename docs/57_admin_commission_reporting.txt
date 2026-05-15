@@ -1,0 +1,23 @@
+# Admin Commission Reporting (Phase 11, Step 6)
+
+We implemented a financial reconciliation system that allows the platform to manage merchant payouts and track platform revenue.
+
+## What we built:
+A specialized accounting ledger that aggregates sales data at the merchant level to calculate net earnings and platform fees.
+
+## Why we built it:
+In a multi-merchant BNPL ecosystem, the platform acts as the "Clearing House." You collect money from users and must payout merchants. This report ensures that the Admin knows exactly how much to wire to each merchant while keeping the platform's commission secure.
+
+## Key Technical Features:
+
+1. **Relational Aggregation**:
+   Uses advanced SQL `SUM()` and `COUNT()` with `GROUP BY` merchant IDs to consolidate thousands of transaction lines into a single, clean merchant report.
+
+2. **Payout Calculation Engine**:
+   Automatically subtracts the dynamic commission from the gross volume to generate the `total_payout` figure, reducing human error in accounting.
+
+3. **Merchant Partnership Overview**:
+   Provides a quick comparison of which merchants are generating the most platform revenue, helping the Admin identify key business partners.
+
+## How to use:
+Admins access this via the "Revenue Reports" card. It is designed for weekly or monthly financial reconciliation and merchant payout cycles.

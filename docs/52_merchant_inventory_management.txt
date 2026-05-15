@@ -1,0 +1,23 @@
+# Merchant Inventory Management (Phase 11, Step 2)
+
+We transformed the basic product list into a high-performance inventory management tool for our merchants.
+
+## What we built:
+A redesigned `views/merchant/products.php` with a focus on usability and professional aesthetics.
+
+## Why we built it:
+As a merchant grows, they need a tool that makes it easy to scan dozens of products quickly. The new layout provides high-density information (Name, ID, Category, Price, Status) without feeling cluttered.
+
+## Key Technical Features:
+
+1. **State-Driven Styling**:
+   Used CSS hover transitions and opacity-based background shifts to provide immediate visual feedback to the merchant when navigating the table.
+
+2. **Clean Data Mapping**:
+   The table now maps internal database IDs to "Human-Readable" rows, ensuring the merchant always has the "Database Reference" if they need support.
+
+3. **Safe Deletion Flow**:
+   Integrated JavaScript `confirm()` dialogs directly into the form submission to provide a final safety check before data is permanently removed.
+
+## How to use:
+Merchants use this page as their primary hub for managing what is visible to the public. If a product needs a price update or needs to be removed, it happens here.

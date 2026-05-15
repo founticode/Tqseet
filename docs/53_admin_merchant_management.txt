@@ -1,0 +1,23 @@
+# Admin Merchant Management (Phase 11, Step 3)
+
+We built a centralized authority view for the Admin to monitor the entire merchant ecosystem.
+
+## What we built:
+A specialized `views/admin/merchants.php` that serves as the master record for all business partners.
+
+## Why we built it:
+As TQSEET scales, the Admin needs a way to verify who is selling on the platform. This view provides transparency into merchant activity (product counts) and financial configuration (commission rates).
+
+## Key Technical Features:
+
+1. **Relational Data Mapping**:
+   The view performs a `JOIN` across `users` and `merchants` while simultaneously executing a correlated subquery to calculate product counts in real-time.
+
+2. **Platform Governance**:
+   By exposing the `commission_rate` and `joined_at` dates, we establish the foundation for future features like variable commission rates or merchant tiers.
+
+3. **Data Integrity**:
+   The table gracefully handles "Unnamed Stores" (for merchants who haven't set their brand name yet) by falling back to placeholder text.
+
+## How to use:
+Admins access this via the "View Merchants" card in their primary dashboard. It serves as the first step for any merchant-related auditing or support tasks.

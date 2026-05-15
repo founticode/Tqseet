@@ -1,0 +1,25 @@
+# Installment Timeline View (Phase 10, Step 5)
+
+We built a sophisticated, timeline-based repayment dashboard that mirrors the premium user experience of Klarna and Tabby.
+
+## What we built:
+The `views/user/view_installments.php` page.
+
+## Why we built it:
+A BNPL user's most frequent action is checking how much they still owe. This page provides that information with high visual clarity, reducing "bill shock" and making the repayment process feel like a journey.
+
+## Key Technical Features:
+
+1. **State-Based UI**:
+   The page iterates through the `installments` table and applies different CSS and logic based on the `status` column:
+   - `paid`: Displays a green check, a completed line, and a "Fully Paid" badge.
+   - `unpaid`: Displays a sequence number, a "Pay Now" action button, and high-contrast pricing.
+
+2. **Aggregated Financials**:
+   The script calculates the `totalPaid` and `totalRemaining` sums in real-time, providing an instant financial summary at the top of the card.
+
+3. **Product Integration**:
+   By joining with the `products` table, we maintain the visual context of the purchase (name and image) even deep within the financial dashboard.
+
+## How to use:
+Users access this page by clicking "Manage Plan" from their order history. It is the primary interface for tracking and initiating manual repayments.

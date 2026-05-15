@@ -1,0 +1,47 @@
+# TQSEET Platform: Merchant Onboarding & Financial Logic (Phase 11 Summary)
+
+This document outlines the professional architectural changes made to transform TQSEET from a simple shop into a secure, multi-merchant BNPL marketplace.
+
+## 1. Merchant Onboarding Gate (Security First)
+We implemented a dual-track registration system. 
+- Merchants register separately and are placed in a 'pending' state.
+- **Security Check**: An automated "Product Gate" was added. Unapproved merchants are physically blocked from listing products or accessing sales tools. 
+- **Admin Audit**: Admins must manually review the "Business Profile" (Store Name/Description) before a merchant can go live.
+
+## 2. Professional Financial Logic (The "Klarna Model")
+We moved away from hardcoded numbers to a dynamic, agreement-based financial engine.
+
+### A. Dynamic Commission Structure
+- **Admin-Led Pricing**: The Admin now sets the commission rate (%) individually for each merchant during the approval process.
+- **Data Integrity**: This rate is saved in the `merchants` table and is used to calculate the platform's cut for every single order.
+- **Merchant Transparency**: Approved merchants see their "Partner Agreement" fee clearly on their dashboard to ensure financial trust.
+
+### B. Gross vs. Net Earnings
+- The system now calculates:
+  1. `total_price`: What the customer pays.
+  2. `commission`: What the platform keeps.
+  3. `merchant_earning`: What the platform owes the merchant.
+
+## 3. Advanced Admin Monitoring
+We built two major "Command Centers" for platform oversight:
+
+### A. The System Analytics Dashboard
+- Provides a high-level view of **GMV (Gross Merchandise Value)** and **Net Platform Revenue**.
+- Features a **Cashflow Health** monitor that calculates "Collected" vs. "Outstanding" debt.
+- Tracks **Merchant Performance** (who is selling the most).
+
+### B. The Installment Wall
+- A master ledger of every single installment in the system.
+- Includes **Automated Overdue Detection**: If a payment date passes and status is 'unpaid', the system triggers a Red alert for the Admin.
+
+## 4. Enhanced User Experience (UX)
+- **Active vs. History**: The "My Shopping" page now intelligently splits into "Active Plans" (ongoing debt) and "Purchase History" (fully owned items).
+- **Ownership Verification**: Fully paid items get a "🛡️ OWNED" badge, providing the user with a psychological sense of completion and security.
+
+## Summary of Changed Files:
+- `views/admin/view_user.php` (Added Commission Config)
+- `controllers/VerificationController.php` (Added Rate Saving)
+- `views/merchant/dashboard.php` (Added Store Health Bar)
+- `views/user/orders.php` (Split into History/Active)
+- `views/admin/analytics.php` (New Financial Reporting)
+- `views/admin/all_installments.php` (New Debt Monitoring Wall)

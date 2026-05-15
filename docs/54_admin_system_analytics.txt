@@ -1,0 +1,23 @@
+# Admin System Analytics (Phase 11, Step 4)
+
+We implemented a financial oversight layer that transforms raw transaction data into actionable business intelligence.
+
+## What we built:
+A dual-layer analytics system consisting of a "Quick Stats" summary on the Admin Dashboard and a "Deep Analytics" report page.
+
+## Why we built it:
+A BNPL platform lives and dies by its cashflow and merchant health. The Admin needs to know exactly how much "Receivable" debt is in the system and which merchants are driving the most volume.
+
+## Key Technical Features:
+
+1. **Aggregated Financial Queries**:
+   The analytics page uses SQL aggregate functions (`SUM`, `COUNT`) combined with relational joins to calculate real-time platform revenue and GMV.
+
+2. **Cashflow Visualization**:
+   Implemented a logic-driven CSS progress bar that calculates the ratio of "Collected" vs. "Pending" capital, providing an immediate visual health check of the platform's lending risk.
+
+3. **Merchant Performance Ranking**:
+   Built a ranking engine that sorts partners by their gross contribution to the platform, allowing the Admin to identify their most valuable business partners.
+
+## How to use:
+Admins access this via the "Full System Analytics" card on their dashboard. It is used for month-end reporting, merchant performance reviews, and financial planning.

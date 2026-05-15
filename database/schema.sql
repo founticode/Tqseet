@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS tqseet_db;
 USE tqseet_db;
 
--- USERS
+-- 1. USERS
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
@@ -13,76 +13,76 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- MERCHANTS
+-- 2. MERCHANTS
 CREATE TABLE merchants (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    commission_rate DECIMAL(5,2),
+    store_name VARCHAR(150),
+    description TEXT,
+    commission_rate DECIMAL(5,2) DEFAULT 0.05, -- Upgraded: 0.05 = 5%
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- PRODUCTS
+-- 3. PRODUCTS
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    merchant_id INT,
     name VARCHAR(150),
     description TEXT,
     price DECIMAL(10,2),
     image VARCHAR(255),
-    merchant_id INT,
+    stock INT DEFAULT 10,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (merchant_id) REFERENCES merchants(id)
 );
 
--- ORDERS
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    product_id INT,
-    total_price DECIMAL(10,2),
-    commission DECIMAL(10,2),
-    merchant_earning DECIMAL(10,2),
-    status ENUM('pending','paid','cancelled') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-
--- INSTALLMENTS
-CREATE TABLE installments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT,
-    amount DECIMAL(10,2),
-    due_date DATE,
-    status ENUM('paid','unpaid') DEFAULT 'unpaid',
-    FOREIGN KEY (order_id) REFERENCES orders(id)
-);
-
--- USER VERIFICATION
+-- 4. IDENTITY VERIFICATIONS (KYC)
 CREATE TABLE user_verifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    cin VARCHAR(20),
+    cin VARCHAR(50),
     cin_image VARCHAR(255),
-    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    verified_at TIMESTAMP NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- USER FINANCIALS
+-- 5. FINANCIAL PROFILES (Credit Scoring)
 CREATE TABLE user_financials (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     profession VARCHAR(100),
     salary DECIMAL(10,2),
-    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    salary_proof VARCHAR(255), -- PDF/Image proof
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    credit_limit DECIMAL(10,2) DEFAULT 0.00, -- Automated: Salary * 1.5
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- OTP
-CREATE TABLE otp_codes (
+-- 6. ORDERS (Professional Marketplace Model)
+CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    code VARCHAR(10),
-    expires_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    product_id INT,
+    total_price DECIMAL(10,2),
+    commission DECIMAL(10,2),        -- What the platform earns
+    merchant_earning DECIMAL(10,2),  -- What the store earns
+    status ENUM('active', 'paid', 'cancelled') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- 7. INSTALLMENTS
+CREATE TABLE installments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    amount DECIMAL(10,2),
+    due_date DATE,
+    status ENUM('pending', 'paid', 'overdue') DEFAULT 'pending',
+    paid_at TIMESTAMP NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );

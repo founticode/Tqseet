@@ -1,0 +1,30 @@
+TQSEET PHASE 15-16: INDUSTRIAL HARDENING RECAP
+================================================
+
+1. CORE FINANCIAL ENGINE UPGRADES
+---------------------------------
+*   Available Credit Logic: Shifted from static limits to dynamic calculation. 
+    Formula: [Max Credit Limit] - [SUM of Unpaid Installments].
+*   Credit Guard: Implemented real-time blocking in 'place_order.php'. Users cannot initiate a purchase if the product price exceeds their available limit.
+*   Sequential Payments: Enforced chronological installment settling. Future payments (Installment 2, 3, 4) are 🔒 LOCKED until the immediately preceding installment is marked 'paid'.
+
+2. ORDER & DATA INTEGRITY
+-------------------------
+*   Ghost Order Elimination: Refined 'orders.php' to exclude orders without generated installments.
+*   Cancel Plan Logic: Created 'OrderController.php' and UI triggers to allow users to remove unwanted draft plans.
+*   Cancellation Lockdown: Implemented a 'Hard Lock'. Once ANY money is paid (e.g., Downpayment), the 'Cancel' option is permanently removed.
+*   Rejection Enforcement: Fixed a bug where rejected users remained 'Verified'. The 'VerificationController' now explicitly revokes 'is_verified' status and resets credit to zero.
+
+3. MERCHANT & USER UX REFINEMENTS
+---------------------------------
+*   Role-Aware Admin UI: 'view_user.php' now intelligently adapts warnings and buttons based on whether the subject is a Customer (Credit Limit) or a Merchant (Store Activation).
+*   Merchant Sales Analytics: Upgraded status badges to be color-coded and role-specific (Active, Pending, Paid, Processing).
+*   Profile Avatar Fix: Corrected variable initialization order in 'profile.php' to ensure avatars render immediately upon upload.
+
+4. DATABASE SECURITY
+--------------------
+*   Pre-Transaction Check: Added an 'Absolute Final Security Check' in 'process_simulated_payment.php'. If a user's status changes to 'rejected' mid-session, the payment is killed before touching the DB.
+
+================================================
+STATUS: INDUSTRIAL ENGINE STABILIZED. 🛡️🏆
+READY FOR PHASE 14: BRANDING & UI OVERHAUL.

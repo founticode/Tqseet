@@ -4,12 +4,19 @@ require_once __DIR__ . "/../../config/db.php";
 
 // Protect: ONLY Merchants allowed!
 requireRole("merchant");
-
-$merchantId = $_SESSION["merchant_id"] ?? null;
-$productId  = $_GET["id"] ?? 0;
+$user = currentUser();
 
 $db = new Database();
 $conn = $db->connect();
+
+// NEW: Lookup actual Merchant ID and Profile
+$stmt_m = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
+$stmt_m->bind_param("i", $user['id']);
+$stmt_m->execute();
+$merchantData = $stmt_m->get_result()->fetch_assoc();
+$merchantId = $merchantData['id'] ?? 0;
+
+$productId  = $_GET["id"] ?? 0;
 
 // Fetch product details and ENSURE it belongs to this merchant
 $stmt = $conn->prepare("SELECT * FROM products WHERE id = ? AND merchant_id = ?");

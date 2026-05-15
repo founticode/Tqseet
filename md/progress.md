@@ -36,7 +36,7 @@
 
 ---
 
-## Phase 4: Auth — Sessions & Protection 🔄
+## Phase 4: Auth — Sessions & Protection ✅
 - [x] Step 1: Start session on every page
 - [x] Step 2: Create auth helper function (reusable)
 - [x] Step 3: Protect pages (redirect if not logged in)
@@ -70,7 +70,7 @@
 
 ---
 
-## Phase 8: Merchant System 🔄
+## Phase 8: Merchant System ✅
 - [x] Step 1: Merchant registration / upgrade
 - [x] Step 2: Merchant dashboard
 - [x] Step 3: Add products (form + insert)
@@ -86,35 +86,55 @@
 
 ---
 
-## Phase 10: Orders & Allocation ⬜
+## Phase 10: Orders & Allocation ✅
 - [x] Step 1: User places an order
 - [x] Step 2: Calculate installments (split into payments)
 - [x] Step 3: Save order + installments to database
 - [x] Step 4: User views their orders
-- [ ] Step 5: User views their installments
-- [ ] Step 6: Mark installments as paid
+- [x] Step 5: User views their installments (Timeline)
+- [x] Step 6: Mark installments as paid (One-Click Card Simulation)
 
 ---
 
-## Phase 11: Admin Dashboard ⬜
-- [ ] Step 1: Admin dashboard (overview/stats)
-- [ ] Step 2: Manage users (view, ban)
-- [ ] Step 3: Manage merchants
-- [ ] Step 4: View all orders
-- [ ] Step 5: View all installments
-- [ ] Step 6: Commission reports
+## Phase 11: Merchants & Admins Dashboards ✅
+- [x] Step 1: Merchant views their sales
+- [x] Step 2: Merchant views their products/inventory
+- [x] Step 3: Manage merchants (Admin side)
+- [x] Step 4: System analytics for Admin
+- [x] Step 5: View all installments
+- [x] Step 6: Commission reports
 
 ---
 
-## Phase 12: User Financial Profile ⬜
-- [ ] Step 1: Financial info form (profession, salary)
-- [ ] Step 2: Save to user_financials table
-- [ ] Step 3: Admin reviews financial data
-- [ ] Step 4: Credit limit calculation
+## Phase 12: User Financial Profile ✅
+- [x] Step 1: Financial info form (profession, salary + document proof)
+- [x] Step 2: Identity Verification form (CIN card upload)
+- [x] Step 3: Admin reviews documents and financial data
+- [x] Step 4: Automated Credit scoring & Checkout Protection
 
 ---
 
-## Phase 13: UI/UX Polish ⬜
+## Phase 13: Profile & Account Management ✅
+- [x] Step 1: User Profile Settings (Personal Info & Security)
+- [x] Step 2: Merchant Store Settings (Branding & Info)
+- [x] Step 3: Admin Account Settings
+- [x] Step 4: Password Update Logic & Security
+- [x] Step 5: Real Profile page (Face of the User) with Avatar support
+
+---
+
+## Phase 15: Industrial Hardening & Debugging ✅
+- [x] Step 1: Fix Product/Merchant orphaned links
+- [x] Step 2: Dynamic Credit Limit calculation (Available vs Max)
+- [x] Step 3: Real-time Credit Limit Guards (Blocking checkout)
+- [x] Step 4: Sequential Installment Enforcement (Pay in order)
+- [x] Step 5: "Ghost Order" elimination and Draft Cancellation
+- [x] Step 6: Rejection Data Integrity (Resetting verified status)
+- [x] Step 7: Final Checkout Security Guard
+
+---
+
+## Phase 14: UI/UX Polish ⬜
 - [ ] Step 1: Design system (colors, fonts, spacing)
 - [ ] Step 2: Style auth pages (login, register)
 - [ ] Step 3: Style dashboards
@@ -124,4 +144,4 @@
 
 ---
 
-## Current Position: Phase 10, Step 5 (View Installments)
+## Current Position: READY FOR PHASE 14 (Branding & UI/UX Overhaul)

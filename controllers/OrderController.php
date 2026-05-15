@@ -5,34 +5,37 @@ require_once __DIR__ . "/../config/db.php";
 requireLogin();
 $user = currentUser();
 
-$action = $_GET['action'] ?? '';
-$orderId = $_GET['id'] ?? 0;
+$orderId = $_POST['order_id'] ?? 0;
 
-$db = new Database();
-$conn = $db->connect();
+if ($orderId > 0) {
+    $db = new Database();
+    $conn = $db->connect();
 
-if ($action === 'cancel' && $orderId > 0) {
-    // SECURITY: Ensure the order belongs to the logged-in user
-    $stmt = $conn->prepare("SELECT id FROM orders WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("ii", $orderId, $user['id']);
-    $stmt->execute();
-    
-    if ($stmt->get_result()->num_rows > 0) {
-        // 1. Delete associated installments first (Foreign Key constraint)
-        $stmt_del_ins = $conn->prepare("DELETE FROM installments WHERE order_id = ?");
-        $stmt_del_ins->bind_param("i", $orderId);
-        $stmt_del_ins->execute();
+    // Verify the order belongs to the user and ZERO installments are paid
+    $stmt_c = $conn->prepare("SELECT COUNT(*) as paid_count FROM installments WHERE order_id = ? AND status = 'paid'");
+    $stmt_c->bind_param("i", $orderId);
+    $stmt_c->execute();
+    $paidCount = $stmt_c->get_result()->fetch_assoc()['paid_count'] ?? 0;
 
-        // 2. Delete the order
-        $stmt_del_order = $conn->prepare("DELETE FROM orders WHERE id = ?");
-        $stmt_del_order->bind_param("i", $orderId);
-        $stmt_del_order->execute();
+    if ($paidCount == 0) {
+        // Safe to delete
+        // 1. Delete Installments
+        $stmt_i = $conn->prepare("DELETE FROM installments WHERE order_id = ?");
+        $stmt_i->bind_param("i", $orderId);
+        $stmt_i->execute();
+
+        // 2. Delete Order
+        $stmt_o = $conn->prepare("DELETE FROM orders WHERE id = ?");
+        $stmt_o->bind_param("i", $orderId);
+        $stmt_o->execute();
 
         header("Location: ../views/user/orders.php?cancelled=1");
+        exit;
     } else {
-        die("Unauthorized action.");
+        header("Location: ../views/user/orders.php?error=already_paid");
+        exit;
     }
 }
 
-$conn->close();
-?>
+header("Location: ../views/user/orders.php?error=cancel_failed");
+exit;

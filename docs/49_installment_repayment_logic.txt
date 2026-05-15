@@ -1,0 +1,23 @@
+# Installment Repayment Logic (Phase 10, Step 6)
+
+We implemented the "Pay Now" feature, allowing users to manually complete their installments.
+
+## What we built:
+The `views/user/pay_installment.php` processing script.
+
+## Why we built it:
+While BNPL systems often have automatic collection, allowing users to "Pay Early" or manually settle an installment is a standard feature of apps like Tabby and Klarna. It gives the user control over their balance.
+
+## Key Technical Features:
+
+1. **Simulated Transaction UX**:
+   To prevent the action from feeling "cheap" or "instant," we implemented a 2-second loading animation. This mimics the latency of a real-world payment gateway (Stripe/Paypal) and increases the user's perceived security.
+
+2. **Cross-Table Security**:
+   Before updating an installment, the script joins the `installments` table with the `orders` table to verify that the `user_id` of the order matches the logged-in user. This prevents "ID Injection" attacks where a user might try to pay someone else's installment.
+
+3. **Status Synchronization**:
+   Once the status is updated to `paid`, all downstream views (Orders, Timeline, Merchant Sales) automatically reflect the new financial state.
+
+## How to use:
+The user clicks "Pay Now" on any unpaid installment in their timeline. The system processes the change and returns them to the dashboard with a success state.

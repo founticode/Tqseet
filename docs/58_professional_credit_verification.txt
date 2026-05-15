@@ -1,0 +1,30 @@
+# Professional Credit Scoring & Verification (Phase 12 Upgrade)
+
+We upgraded the credit engine from a "trust-based" system to a "verification-based" system, mirroring the standards of Klarna and Tabby.
+
+## What we built:
+A secure intake and auditing pipeline for user financial data.
+
+## Why we built it:
+A BNPL platform is essentially a lender. Lending money based on unverified text is high-risk. By requiring physical proof of income and automating the limit calculation, we reduce platform risk and increase professional credibility.
+
+## Key Technical Features:
+
+1. **Document Intake Pipeline**:
+   Users must upload a PDF or image of their salary slip. The system handles the file storage and links it to their unique financial profile.
+
+2. **Automated Credit Algorithm**:
+   Implemented a `1.5x` salary multiplier logic. 
+   - *Logic*: If user earns `X`, their buying power is `1.5 * X`.
+   - This removes human bias from the credit assignment process.
+
+3. **Admin Audit Center**:
+   The Admin UI was upgraded to act as a document viewer. Admins can cross-reference the uploaded paper against the user's claims before granting approval.
+
+## Business Rule:
+The Admin does not set the limit. The Admin verifies the **truth** of the data. The **system** sets the limit.
+
+## Files Updated:
+- `views/user/financial_profile.php` (Added Upload UI)
+- `views/admin/view_user.php` (Added Document Viewer & Auto-Preview)
+- `controllers/VerificationController.php` (Implemented the Multiplier Logic)

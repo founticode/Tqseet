@@ -1,0 +1,21 @@
+# TQSEET Technical Recap: Phases 11, 12 & 13
+
+This recap details the transformation of TQSEET into a complete, secure, and user-centric BNPL platform.
+
+## 1. Merchant Ecosystem & Revenue (Phase 11)
+- **Multi-Merchant Core**: Enabled unique commission rates per store.
+- **Revenue Logic**: Automated calculation of platform earnings vs. merchant payouts.
+- **Admin Reconciliation**: Built reports to track exactly how much the platform makes per order.
+
+## 2. Professional KYC Gate (Phase 12)
+- **Hardened Verification**: Introduced mandatory CIN (Identity) and Salary Proof (Financial) uploads.
+- **Automated Scoring**: Replaced manual credit limits with a "1.5x Salary" automated logic.
+- **Buying Guard**: Implemented a real-time lock on the checkout process. Users cannot shop until both Identity and Financials are approved.
+
+## 3. Profile & Account Management (Phase 13)
+- **Unified Identity**: Created the "Real Profile" page with custom Avatar support.
+- **Universal Settings**: Built specialized management pages for all roles:
+    - User Settings: Personal & KYC data.
+    - Merchant Settings: Store branding & Partnership status.
+    - Admin Settings: Platform credentials.
+- **Security Engine**: Implemented a role-aware password update system with current-password verification.

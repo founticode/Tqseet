@@ -4,11 +4,24 @@ require_once __DIR__ . "/../../config/db.php";
 
 // Protect: ONLY Merchants allowed!
 requireRole("merchant");
-
-$merchantId = $_SESSION["merchant_id"] ?? null;
+$user = currentUser();
 
 $db = new Database();
 $conn = $db->connect();
+
+// NEW: Lookup actual Merchant ID and Profile
+$stmt_m = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
+$stmt_m->bind_param("i", $user['id']);
+$stmt_m->execute();
+$merchantData = $stmt_m->get_result()->fetch_assoc();
+$merchantId = $merchantData['id'] ?? 0;
+$merchantStatus = $merchantData['status'] ?? 'pending';
+
+// SECURITY GATE
+if ($merchantStatus !== 'approved') {
+    header("Location: dashboard.php?error=pending_approval");
+    exit;
+}
 
 // Fetch products for THIS merchant only
 $stmt = $conn->prepare("SELECT * FROM products WHERE merchant_id = ? ORDER BY created_at DESC");
@@ -23,64 +36,73 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TQSEET - Manage My Products</title>
 </head>
-<body style="font-family: sans-serif; margin: 0; background: #f8f9fa;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
 
     <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
 
-    <div style="max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <div style="max-width: 1100px; margin: 60px auto; padding: 0 20px;">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-            <h1 style="margin: 0;">My Inventory</h1>
-            <a href="add_product.php" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+            <div>
+                <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">My Inventory</h1>
+                <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Manage your product catalog and listings.</p>
+            </div>
+            <a href="add_product.php" style="background: #222; color: white; padding: 15px 30px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s;">
                 + Add New Product
             </a>
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead style="background: #f1f1f1;">
-                <tr>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Image</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Product Details</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Price</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($result->num_rows > 0): ?>
+        <!-- Inventory Table Container -->
+        <div style="background: white; border-radius: 25px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
+            
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; background: #fafafa; border-bottom: 1px solid #f1f1f1;">
+                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Product</th>
+                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Category</th>
+                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Price</th>
+                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Status</th>
+                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($result->num_rows === 0): ?>
+                        <tr>
+                            <td colspan="5" style="padding: 60px; text-align: center; color: #b2bec3; font-style: italic;">Your inventory is empty. Start adding products!</td>
+                        </tr>
+                    <?php endif; ?>
+
                     <?php while($row = $result->fetch_assoc()): ?>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px;">
-                                <img src="../../uploads/products/<?php echo $row['image']; ?>" alt="Product" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        <tr style="border-bottom: 1px solid #f8f9fa; transition: 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                            <td style="padding: 20px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="../../uploads/products/<?php echo $row['image']; ?>" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 1px solid #f1f1f1;">
+                                    <div>
+                                        <div style="font-weight: 800; color: #2d3436; font-size: 1rem;"><?php echo htmlspecialchars($row['name']); ?></div>
+                                        <div style="font-size: 0.8rem; color: #b2bec3; margin-top: 4px;">ID: #<?php echo $row['id']; ?></div>
+                                    </div>
+                                </div>
                             </td>
-                            <td style="padding: 12px;">
-                                <div style="font-weight: bold; font-size: 1.1rem;"><?php echo $row['name']; ?></div>
-                                <div style="color: #666; font-size: 0.85rem; margin-top: 5px;">Added on: <?php echo date("M d, Y", strtotime($row['created_at'])); ?></div>
+                            <td style="padding: 20px; color: #636e72; font-size: 0.9rem;">Electronics</td> <!-- Hardcoded for now -->
+                            <td style="padding: 20px; font-weight: 900; color: #2d3436;"><?php echo number_format($row['price'], 2); ?> DH</td>
+                            <td style="padding: 20px;">
+                                <span style="background: rgba(0, 184, 148, 0.1); color: #00b894; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">Active</span>
                             </td>
-                            <td style="padding: 12px; font-weight: bold; color: #28a745;">
-                                <?php echo number_format($row['price'], 2); ?> DH
-                            </td>
-                            <td style="padding: 12px;">
-                                <!-- Edit Button -->
-                                <a href="edit_product.php?id=<?php echo $row['id']; ?>" style="color: #007bff; text-decoration: none; font-weight: bold; margin-right: 20px; font-size: 0.9rem;">Edit</a>
-                                
-                                <!-- Delete Form -->
-                                <form action="../../controllers/ProductController.php?action=delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                    <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
-                                    <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer; font-weight: bold; padding: 0; font-size: 0.9rem;">Delete</button>
-                                </form>
+                            <td style="padding: 20px; text-align: right;">
+                                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                    <a href="edit_product.php?id=<?php echo $row['id']; ?>" style="padding: 8px 15px; border-radius: 8px; background: #f1f3f5; color: #495057; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s;">Edit</a>
+                                    
+                                    <form action="../../controllers/ProductController.php?action=delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this product?')" style="display: inline;">
+                                        <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
+                                        <button type="submit" style="padding: 8px 15px; border-radius: 8px; background: rgba(214, 48, 49, 0.05); color: #d63031; border: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s;">Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     <?php endwhile; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 60px; color: #666;">
-                            <p style="font-size: 1.2rem; margin-bottom: 10px;">You haven't listed any products yet.</p>
-                            <a href="add_product.php" style="color: #007bff; font-weight: bold;">Start selling now!</a>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

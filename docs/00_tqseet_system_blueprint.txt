@@ -1,0 +1,40 @@
+# TQSEET SYSTEM BLUEPRINT (The Internal Logic)
+
+This document explains the architecture, function calls, and the "Buying Machine" of TQSEET.
+
+## 1. Core Architecture (MVC-Style)
+The project is built using a clean separation of concerns:
+- **`includes/`**: Global helpers (Auth, Errors, Logs).
+- **`controllers/`**: The "Brain." Handles form logic (Login, Verification, Orders).
+- **`views/`**: The "Face." Displays the UI to Users, Merchants, and Admins.
+- **`config/`**: System settings (DB connections, error handling).
+
+## 2. Global Function Library (`includes/auth.php`)
+These functions protect the entire platform:
+- `isLoggedIn()`: Checks if a session is active.
+- `requireRole($role)`: The "Bouncer." Blocks access to unauthorized areas (e.g., stops a user from seeing the Admin Dashboard).
+- `currentUser()`: Returns all data for the active user.
+
+## 3. The "Money Flow" Logic
+- **GMV (Gross Merchandise Volume)**: Calculated as `Order Total Price`.
+- **Platform Revenue**: `Order Price * Merchant Commission Rate`.
+- **Merchant Net**: `Order Price - Platform Revenue`.
+- **Installment Logic**: Orders are divided into 4 payments (1st at checkout, 3 following).
+
+## 4. The KYC & Verification Pipeline
+1. **`IdentityVerification`**: Stores CIN data in `user_verifications`.
+2. **`FinancialProfile`**: Stores Profession/Salary/Proof in `user_financials`.
+3. **`VerificationController`**: 
+    - Validates Admin decision.
+    - Updates User status.
+    - **Calculates Credit Limit**: `salary * 1.5`.
+
+## 5. Security Protocols
+- **SQL Protection**: Every database call uses `prepare()` and `bind_param()` to prevent SQL Injection.
+- **Password Safety**: Passwords are never stored as text; they use `password_hash()`.
+- **File Security**: Uploaded documents are renamed with timestamps and stored outside the public document root where possible.
+- **Role-Based Access Control (RBAC)**: Every page verifies the user's role before rendering content.
+
+## 6. Order Lifecycle
+`Active` (Installments pending) -> `Paid` (All 4 installments paid) -> `Completed`.
+If an installment is not paid by the due date, the system marks it as `Overdue` (Visual Alert).

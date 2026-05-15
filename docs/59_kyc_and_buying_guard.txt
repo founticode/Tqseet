@@ -1,0 +1,28 @@
+# Full KYC & Buying Guard (Phase 12 Extension)
+
+We implemented a mandatory KYC (Know Your Customer) workflow that blocks transactions until a user is fully audited and verified.
+
+## What we built:
+A multi-step verification gate that connects user identity and financials to their ability to use BNPL credit.
+
+## Why we built it:
+To protect the platform from fraud. By requiring both a physical ID (CIN) and a salary proof, we ensure that every active shopper is a real, traceable person with verified repayment capacity.
+
+## Key Technical Features:
+
+1. **KYC State Machine**:
+   The system now tracks a "Full Verification" state across multiple tables (`user_verifications` and `user_financials`). Only when both are `approved` does the system unlock the "Proceed to Checkout" action.
+
+2. **Dynamic CTA (Call to Action)**:
+   The product page uses a state-aware UI that guides the user through the missing steps rather than just showing an error after they click buy.
+
+3. **Identity Auditing**:
+   Admins can now view the CIN document directly alongside the financial papers in the "Review Profile" page, providing a 360-degree view of the applicant.
+
+## Logic Flow:
+1. User registers.
+2. User must upload CIN (Identity).
+3. User must upload Salary Proof (Financials).
+4. Admin reviews both.
+5. Admin approves -> Credit Limit is auto-calculated.
+6. Checkout is UNLOCKED.

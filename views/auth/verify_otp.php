@@ -26,8 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->bind_param("i", $userId);
         $stmt->execute();
 
-        // 2. Redirect to dashboard
-        header("Location: ../user/dashboard.php?verified=1");
+        // 2. Update session status
+        $_SESSION["user_verified"] = 1;
+
+        // 3. Role-Aware Redirect
+        $role = $_SESSION["user_role"] ?? 'user';
+        header("Location: ../{$role}/dashboard.php?verified=1");
         exit;
     } else {
         $error = "Invalid or expired code. Please check your log file and try again.";
@@ -68,7 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
 
         <p style="margin-top: 20px; font-size: 0.9rem;">
-            <a href="../user/dashboard.php" style="color: #666; text-decoration: none;">← Cancel and go back</a>
+            <?php $role = $_SESSION['user_role'] ?? 'user'; ?>
+            <a href="../<?php echo $role; ?>/dashboard.php" style="color: #666; text-decoration: none;">← Cancel and go back</a>
         </p>
     </div>
 

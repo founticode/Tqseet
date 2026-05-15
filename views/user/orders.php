@@ -32,91 +32,112 @@ $result = $stmt->get_result();
 
     <div style="max-width: 900px; margin: 60px auto; padding: 0 20px;">
         
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
-            <div>
-                <h1 style="font-weight: 900; font-size: 2.5rem; margin: 0; letter-spacing: -1px;">My Shopping</h1>
-                <p style="color: #7f8c8d; margin-top: 8px; font-size: 1.1rem;">Track your installments and active plans.</p>
-            </div>
-            <?php if (isset($_GET['success'])): ?>
-                <div style="background: #d4edda; color: #155724; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; border: 1px solid #c3e6cb;">
-                    ✅ Order Placed Successfully!
-                </div>
-            <?php endif; ?>
+        <div style="margin-bottom: 50px;">
+            <h1 style="font-weight: 900; font-size: 2.5rem; margin: 0; letter-spacing: -1px;">My Shopping</h1>
+            <p style="color: #7f8c8d; margin-top: 8px; font-size: 1.1rem;">Track your installments and active plans.</p>
         </div>
 
-        <?php if ($result->num_rows > 0): ?>
-            <?php while($order = $result->fetch_assoc()): ?>
-                <div style="background: white; padding: 30px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); transition: transform 0.2s ease;">
-                    
-                    <!-- Left Side: Product Info -->
+        <?php 
+        $ordersArray = [];
+        while($row = $result->fetch_assoc()) { $ordersArray[] = $row; }
+        
+        $activeOrders = array_filter($ordersArray, function($o) { return $o['status'] !== 'paid'; });
+        $paidOrders = array_filter($ordersArray, function($o) { return $o['status'] === 'paid'; });
+        ?>
+
+        <!-- SECTION 1: ACTIVE PLANS -->
+        <h2 style="font-weight: 900; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #222; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">🚀</span> 
+            Active Plans
+        </h2>
+
+        <?php if (count($activeOrders) > 0): ?>
+            <?php foreach($activeOrders as $order): ?>
+                <div style="background: white; padding: 30px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);">
+                    <!-- Same card layout as before -->
                     <div style="display: flex; align-items: center; gap: 25px;">
-                        <div style="width: 100px; height: 100px; overflow: hidden; border-radius: 15px; background: #f0f0f0;">
-                            <img src="../../uploads/<?php echo htmlspecialchars($order['product_image']); ?>" 
+                        <div style="width: 80px; height: 80px; overflow: hidden; border-radius: 12px; background: #f0f0f0;">
+                            <img src="/uploads/products/<?php echo htmlspecialchars($order['product_image']); ?>" 
                                  style="width: 100%; height: 100%; object-fit: cover;"
-                                 onerror="this.src='https://via.placeholder.com/100?text=Product'">
+                                 onerror="this.src='https://via.placeholder.com/80?text=P'">
                         </div>
                         <div>
-                            <div style="font-size: 1.3rem; font-weight: 800; color: #2c3e50;"><?php echo htmlspecialchars($order['product_name']); ?></div>
-                            <div style="color: #95a5a6; font-size: 0.9rem; margin-top: 6px; font-weight: 500;">
-                                Order #<?php echo $order['id']; ?> • <?php echo date('d M Y', strtotime($order['created_at'])); ?>
-                            </div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #2c3e50;"><?php echo htmlspecialchars($order['product_name']); ?></div>
+                            <div style="color: #95a5a6; font-size: 0.8rem; margin-top: 4px;">Order #<?php echo $order['id']; ?></div>
                             
-                            <!-- Professional Status Badges -->
                             <?php 
-                                if ($order['status'] === 'active') {
-                                    $statusColor = '#27ae60';
-                                    $statusBg = '#eafaf1';
-                                    $labelText = 'Active Plan';
-                                } elseif ($order['status'] === 'pending') {
-                                    $statusColor = '#f39c12';
-                                    $statusBg = '#fef9e7';
-                                    $labelText = 'Payment Pending';
-                                } else {
-                                    $statusColor = '#7f8c8d';
-                                    $statusBg = '#f4f6f7';
-                                    $labelText = ucfirst($order['status']);
-                                }
-                            ?>
-                            <div style="display: inline-block; margin-top: 15px; padding: 5px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: <?php echo $statusColor; ?>; background: <?php echo $statusBg; ?>;">
-                                <?php echo $labelText; ?>
-                            </div>
+                                // Check if installments exist
+                                $st_check = $conn->prepare("SELECT COUNT(*) as count FROM installments WHERE order_id = ?");
+                                $st_check->bind_param("i", $order['id']);
+                                $st_check->execute();
+                                $hasInstallments = $st_check->get_result()->fetch_assoc()['count'] > 0;
+                                
+                                if ($hasInstallments): ?>
+                                    <div style="display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 30px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; background: #eafaf1; color: #27ae60;">Active</div>
+                                <?php else: ?>
+                                    <div style="display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 30px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; background: #fff4e5; color: #ff9800;">Draft</div>
+                                <?php endif; ?>
                         </div>
                     </div>
-
-                    <!-- Right Side: Price & Action -->
                     <div style="text-align: right;">
-                        <div style="font-size: 0.85rem; color: #95a5a6; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Total Value</div>
-                        <div style="font-size: 1.6rem; font-weight: 900; color: #222;"><?php echo number_format($order['total_price'], 2); ?> <span style="font-size: 0.9rem;">DH</span></div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #222;"><?php echo number_format($order['total_price'], 2); ?> DH</div>
                         
-                        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                            <a href="../public/product_detail.php?id=<?php echo $order['product_id']; ?>" 
-                               style="color: #007bff; text-decoration: none; font-size: 0.85rem; font-weight: bold;">View Details</a>
-                            
-                            <?php if ($order['status'] !== 'cancelled'): ?>
-                                <a href="../../controllers/OrderController.php?action=cancel&id=<?php echo $order['id']; ?>" 
-                                   onclick="return confirm('Are you sure you want to cancel this plan?')"
-                                   style="color: #d9534f; text-decoration: none; font-size: 0.85rem; font-weight: bold;">Cancel Plan</a>
-                            <?php endif; ?>
-                        </div>
-
-                        <a href="view_installments.php?order_id=<?php echo $order['id']; ?>" 
-                           style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #222; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 0.85rem;">
-                            Manage Plan →
-                        </a>
+                        <?php if ($hasInstallments): ?>
+                            <a href="view_installments.php?order_id=<?php echo $order['id']; ?>" 
+                               style="display: inline-block; margin-top: 10px; padding: 8px 16px; background: #222; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">
+                                Manage Plan →
+                            </a>
+                        <?php else: ?>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                                <a href="calculate_installments.php?order_id=<?php echo $order['id']; ?>" 
+                                   style="display: inline-block; padding: 8px 16px; background: #ff9800; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.8rem;">
+                                    Finish Plan Setup →
+                                </a>
+                                <form action="../../controllers/OrderController.php" method="POST" style="margin: 0;" onsubmit="return confirm('Remove this draft from your shopping?')">
+                                    <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                    <button type="submit" style="background: none; border: none; color: #ff7675; cursor: pointer; font-size: 0.8rem; font-weight: bold; text-decoration: underline;">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        <?php endif; ?>
                     </div>
-
                 </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         <?php else: ?>
-            <div style="text-align: center; padding: 120px 20px; background: white; border-radius: 30px; border: 2px dashed #eee;">
-                <div style="font-size: 4rem; margin-bottom: 20px;">🛍️</div>
-                <h2 style="color: #2c3e50; font-weight: 900;">Your shopping bag is empty</h2>
-                <p style="color: #95a5a6; margin-bottom: 30px;">Start your BNPL journey by choosing a product from our catalog.</p>
-                <a href="../public/catalog.php" style="display: inline-block; padding: 15px 35px; background: #007bff; color: white; text-decoration: none; border-radius: 15px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,123,255,0.2);">
-                    Explore Catalog
-                </a>
-            </div>
+            <p style="color: #bdc3c7; margin-bottom: 50px;">No active installment plans.</p>
         <?php endif; ?>
+
+        <!-- SECTION 2: PURCHASE HISTORY -->
+        <h2 style="font-weight: 900; margin-top: 60px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #0984e3; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">✅</span> 
+            Purchase History
+        </h2>
+
+        <?php if (count($paidOrders) > 0): ?>
+            <?php foreach($paidOrders as $order): ?>
+                <div style="background: #fdfdfd; padding: 25px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border: 1px solid #f1f1f1; opacity: 0.85;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 10px; filter: grayscale(1);">
+                            <img src="/uploads/products/<?php echo htmlspecialchars($order['product_image']); ?>" 
+                                 style="width: 100%; height: 100%; object-fit: cover;"
+                                 onerror="this.src='https://via.placeholder.com/60?text=P'">
+                        </div>
+                        <div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50;"><?php echo htmlspecialchars($order['product_name']); ?></div>
+                            <div style="color: #95a5a6; font-size: 0.75rem;">Paid off on <?php echo date('d M Y', strtotime($order['created_at'])); ?></div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 900; color: #95a5a6;"><?php echo number_format($order['total_price'], 2); ?> DH</div>
+                        <div style="color: #3498db; font-size: 0.75rem; font-weight: bold; margin-top: 5px;">🛡️ OWNED</div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p style="color: #bdc3c7;">Your fully paid orders will appear here.</p>
+        <?php endif; ?>
+
     </div>
 
 </body>

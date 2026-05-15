@@ -23,8 +23,14 @@ $base = "";
                 
                 <!-- Merchant Specific Links -->
                 <?php if ($user['role'] === 'merchant'): ?>
-                    <a href="<?php echo $base; ?>/views/merchant/products.php" style="margin-right: 15px; text-decoration: none; color: #007bff;">My Inventory</a>
-                    <a href="<?php echo $base; ?>/views/merchant/orders.php" style="margin-right: 15px; text-decoration: none; color: #007bff;">My Sales</a>
+                    <a href="<?php echo $base; ?>/views/merchant/products.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Inventory</a>
+                    <a href="<?php echo $base; ?>/views/merchant/sales.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Sales</a>
+                    <a href="<?php echo $base; ?>/views/merchant/settings.php" style="margin-right: 15px; text-decoration: none; color: #555;">Store Settings</a>
+                <?php endif; ?>
+
+                <!-- User Specific Links -->
+                <?php if ($user['role'] === 'user'): ?>
+                    <a href="<?php echo $base; ?>/views/user/orders.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Shopping</a>
                 <?php endif; ?>
 
                 <!-- Admin Specific Links -->
@@ -32,7 +38,10 @@ $base = "";
                     <a href="<?php echo $base; ?>/views/admin/verifications.php" style="margin-right: 15px; text-decoration: none; color: #856404;">Verifications</a>
                 <?php endif; ?>
 
-                <a href="<?php echo $base; ?>/views/user/orders.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Shopping</a>
+                <a href="<?php echo $base; ?>/views/user/profile.php" style="margin-right: 15px; text-decoration: none; color: #636e72;">
+                    👋 <?php echo htmlspecialchars($user['name']); ?>
+                </a>
+
                 <a href="<?php echo $base; ?>/views/<?php echo $user['role']; ?>/dashboard.php" style="margin-right: 15px; text-decoration: none; color: #333; font-weight: bold;">Dashboard</a>
                 <a href="<?php echo $base; ?>/controllers/AuthController.php?action=logout" style="text-decoration: none; color: #d9534f; font-weight: bold;">Logout</a>
             <?php else: ?>

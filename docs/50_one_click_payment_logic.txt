@@ -1,0 +1,27 @@
+# One-Click Saved Payment Logic (Phase 10, Final Polish)
+
+We implemented a "Saved Card" feature that allows users to bypass the full payment form after their first successful transaction.
+
+## What we built:
+1.  **Database Table**: `payment_methods` to store masked card info (`last_four`, `expiry`).
+2.  **Persistence Logic**: `process_simulated_payment.php` now captures card details on first use.
+3.  **Conditional UI**: `checkout_payment.php` detects saved cards and offers a "One-Click" simplified view.
+
+## Why we built it:
+Friction is the enemy of conversion. By allowing a user to pay with a single click, we increase the likelihood of them completing their installments on time and making repeat purchases. This is the industry standard for BNPL apps.
+
+## Key Technical Features:
+
+1.  **Masked Storage**: 
+    We never store the full card number (PCI Compliance simulation). We only store the `last_four` digits to identify the card to the user.
+    
+2.  **User Experience (UX)**:
+    -   Dynamic button text in `calculate_installments.php`.
+    -   "Use a different card" bypass logic for flexibility.
+    -   Double-confirmation pop-ups for "One-Click" actions to prevent accidents.
+
+3.  **Seamless Integration**:
+    The system works identically for the initial downpayment and subsequent installment repayments.
+
+## How to use:
+Once a user has completed one payment, all future payment requests will default to their saved card. They simply click "Confirm" and the transaction is processed instantly.

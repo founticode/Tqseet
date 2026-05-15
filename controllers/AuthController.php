@@ -19,13 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $email    = trim($_POST["email"]);
         $phone    = trim($_POST["phone"]);
         $password = $_POST["password"];
-        $confirm  = $_POST["confirm_password"];
+        $role     = $_POST["role"] ?? "user"; 
 
         // --- Step 3: Validate ---
         $errors = [];
 
         // 1. Check if any field is empty
-        if (empty($name) || empty($email) || empty($phone) || empty($password) || empty($confirm)) {
+        if (empty($name) || empty($email) || empty($phone) || empty($password)) {
             $errors[] = "All fields are required.";
         } else {
 
@@ -42,11 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // 4. Check password length (minimum 6 characters)
             if (strlen($password) < 6) {
                 $errors[] = "Password must be at least 6 characters.";
-            }
-
-            // 5. Check if passwords match
-            if ($password !== $confirm) {
-                $errors[] = "Passwords do not match.";
             }
         }
 
@@ -93,12 +88,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 // --- Step 6: Insert user into database ---
                 $stmt2 = $conn->prepare(
-                    "INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)"
                 );
-                $stmt2->bind_param("ssss", $name, $email, $hashedPassword, $phone);
+                $stmt2->bind_param("sssss", $name, $email, $hashedPassword, $phone, $role);
 
                 if ($stmt2->execute()) {
                     $newUserId = $conn->insert_id;
+
+                    // --- NEW: If Merchant, create profile ---
+                    if ($role === 'merchant') {
+                        $stmt_m = $conn->prepare("INSERT INTO merchants (user_id, store_name, status) VALUES (?, ?, 'pending')");
+                        $shopName = $name . "'s Store";
+                        $stmt_m->bind_param("is", $newUserId, $shopName);
+                        $stmt_m->execute();
+                        $stmt_m->close();
+                    }
 
                     // --- NEW: Generate & Send OTP ---
                     require_once __DIR__ . "/../includes/otp_helpers.php";

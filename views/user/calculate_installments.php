@@ -11,6 +11,12 @@ $orderId = $_GET['order_id'] ?? 0;
 $db = new Database();
 $conn = $db->connect();
 
+// NEW: Check for saved card (Tabby style)
+$stmt_card = $conn->prepare("SELECT last_four FROM payment_methods WHERE user_id = ? LIMIT 1");
+$stmt_card->bind_param("i", $user['id']);
+$stmt_card->execute();
+$savedCard = $stmt_card->get_result()->fetch_assoc();
+
 // 1. Fetch Order and Product Details
 $stmt = $conn->prepare("SELECT o.*, p.name as product_name 
                         FROM orders o 
@@ -24,6 +30,38 @@ if (!$order) {
     die("<div style='font-family:sans-serif; text-align:center; padding:50px;'>
             <h1>Order session expired or not found.</h1>
             <a href='../public/catalog.php'>Return to Catalog</a>
+         </div>");
+}
+
+// --- NEW: CREDIT GUARD (RESUME CHECK) ---
+$stmt_f = $conn->prepare("SELECT credit_limit FROM user_financials WHERE user_id = ? AND status = 'approved'");
+$stmt_f->bind_param("i", $user['id']);
+$stmt_f->execute();
+$fin = $stmt_f->get_result()->fetch_assoc();
+
+if (!$fin) {
+    die("<div style='font-family:sans-serif; text-align:center; padding:50px;'>
+            <h1>Action Required: Setup your credit profile.</h1>
+            <a href='financial_profile.php'>Complete Profile</a>
+         </div>");
+}
+
+$maxLimit = $fin['credit_limit'];
+
+// Calculate Debt (excluding THIS order if it already has installments - but drafts don't)
+$stmt_debt = $conn->prepare("SELECT SUM(amount) as debt FROM installments i JOIN orders o ON i.order_id = o.id WHERE o.user_id = ? AND i.status = 'unpaid' AND o.id != ?");
+$stmt_debt->bind_param("ii", $user['id'], $orderId);
+$stmt_debt->execute();
+$totalDebt = $stmt_debt->get_result()->fetch_assoc()['debt'] ?? 0;
+
+$availableCredit = $maxLimit - $totalDebt;
+
+if ($order['total_price'] > $availableCredit) {
+    die("<div style='font-family:sans-serif; text-align:center; padding:50px;'>
+            <h1 style='color:#e74c3c;'>Credit Limit Exceeded</h1>
+            <p>Your available credit is <strong>" . number_format($availableCredit, 2) . " DH</strong>, but this order is <strong>" . number_format($order['total_price'], 2) . " DH</strong>.</p>
+            <p>Please pay off other plans first or cancel this draft.</p>
+            <a href='orders.php'>Back to Shopping</a>
          </div>");
 }
 
@@ -90,11 +128,12 @@ $dates = [
             ℹ️ By confirming, you agree to pay these installments on or before the due dates listed above.
         </div>
 
-        <!-- Confirm Form -->
-        <form action="save_installments.php" method="POST">
+        <!-- Confirm Form (Redirects to Credit Card Entry) -->
+        <form action="checkout_payment.php" method="GET">
             <input type="hidden" name="order_id" value="<?php echo $orderId; ?>">
+            <input type="hidden" name="amount" value="<?php echo $installmentAmount; ?>">
             <button type="submit" style="width: 100%; background: #222; color: white; padding: 20px; border: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.3s;">
-                Confirm My Plan & Finalize Order
+                <?php echo $savedCard ? "Pay with card ending in " . $savedCard['last_four'] : "Confirm & Authorize Payment"; ?>
             </button>
         </form>
 

@@ -27,6 +27,28 @@ if (!$product) {
 
 // Pay in 4 Model: Split into 4 payments
 $monthlyPayment = $product['price'] / 4;
+
+// KYC Check for logged in users
+$is_fully_verified = false;
+if (isLoggedIn() && currentUser()['role'] === 'user') {
+    $userId = currentUser()['id'];
+    
+    // Check Identity
+    $stmt_i = $conn->prepare("SELECT status FROM user_verifications WHERE user_id = ?");
+    $stmt_i->bind_param("i", $userId);
+    $stmt_i->execute();
+    $id_status = $stmt_i->get_result()->fetch_assoc()['status'] ?? 'none';
+    
+    // Check Financials
+    $stmt_f = $conn->prepare("SELECT status FROM user_financials WHERE user_id = ?");
+    $stmt_f->bind_param("i", $userId);
+    $stmt_f->execute();
+    $fin_status = $stmt_f->get_result()->fetch_assoc()['status'] ?? 'none';
+    
+    if ($id_status === 'approved' && $fin_status === 'approved') {
+        $is_fully_verified = true;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,12 +103,29 @@ $monthlyPayment = $product['price'] / 4;
 
                 <!-- Call to Action -->
                 <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <a href="../user/place_order.php?id=<?php echo $product['id']; ?>" 
-                       style="background: #222; color: white; text-align: center; padding: 18px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; transition: 0.2s;">
-                        Proceed to Checkout
-                    </a>
+                    <?php if (!isLoggedIn()): ?>
+                        <a href="../auth/login.php" 
+                           style="background: #222; color: white; text-align: center; padding: 18px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
+                            Login to Buy Now
+                        </a>
+                    <?php elseif (!$is_fully_verified): ?>
+                        <div style="background: #fff9db; border: 1px solid #ffeeba; padding: 20px; border-radius: 12px;">
+                            <div style="font-weight: 800; color: #856404; margin-bottom: 5px; font-size: 0.9rem;">⚠️ Verification Required</div>
+                            <p style="margin: 0 0 15px 0; font-size: 0.8rem; color: #856404; line-height: 1.5;">To use TQSEET installments, you must complete your Identity and Financial profile.</p>
+                            <a href="../user/dashboard.php" 
+                               style="display: block; background: #f39c12; color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">
+                                Complete Verification →
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <a href="../user/place_order.php?id=<?php echo $product['id']; ?>" 
+                           style="background: #222; color: white; text-align: center; padding: 18px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                            Proceed to Checkout
+                        </a>
+                    <?php endif; ?>
+                    
                     <div style="text-align: center; font-size: 0.85rem; color: #999;">
-                        Secure Payment Powered by TQSEET
+                        🛡️ 100% Secure & Regulated BNPL
                     </div>
                 </div>
 

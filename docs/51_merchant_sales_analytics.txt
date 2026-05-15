@@ -1,0 +1,26 @@
+# Merchant Sales Analytics (Phase 11, Step 1)
+
+We built a comprehensive financial dashboard for merchants to track their performance on the TQSEET platform.
+
+## What we built:
+The `views/merchant/sales.php` analytics page.
+
+## Why we built it:
+Merchants need transparency. By providing real-time data on sales volume and net revenue (after platform commissions), we build trust with our business partners.
+
+## Key Technical Features:
+
+1. **Aggregated SQL Queries**:
+   We use `SUM()` and `COUNT()` in a single query to calculate the merchant's lifetime performance without loading thousands of individual records into memory.
+
+2. **Cross-Table Visibility**:
+   The dashboard joins `orders`, `products`, and `users` to provide the merchant with a full "Order Context"—knowing exactly who bought what.
+
+3. **Dynamic Commission Simulation**:
+   The script calculates a 5% platform fee on the fly. This ensures that the merchant is never surprised by payout amounts.
+
+4. **Status-Driven UI**:
+   The transaction list uses status-dependent color palettes (Green for Active, Red for Cancelled) to help merchants focus on successful sales.
+
+## How to use:
+Merchants access this page to monitor their daily sales and calculate their upcoming payouts from the TQSEET platform.

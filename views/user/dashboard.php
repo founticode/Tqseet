@@ -1,46 +1,137 @@
 <?php
 require_once __DIR__ . "/../../includes/auth.php";
+require_once __DIR__ . "/../../config/db.php";
 
-// Protect the page: Only "user" role allowed
+// Protect: ONLY "user" role allowed
 requireRole("user");
-
 $user = currentUser();
+
+$db = new Database();
+$conn = $db->connect();
+
+// Fetch Credit Info
+$stmt_f = $conn->prepare("SELECT * FROM user_financials WHERE user_id = ?");
+$stmt_f->bind_param("i", $user['id']);
+$stmt_f->execute();
+$financial = $stmt_f->get_result()->fetch_assoc();
+
+// Fetch Identity Info
+$stmt_i = $conn->prepare("SELECT * FROM user_verifications WHERE user_id = ?");
+$stmt_i->bind_param("i", $user['id']);
+$stmt_i->execute();
+$identity = $stmt_i->get_result()->fetch_assoc();
+
+$status = $financial['status'] ?? 'none';
+$maxLimit = $financial['credit_limit'] ?? 0;
+$id_status = $identity['status'] ?? 'none';
+
+// --- NEW: Calculate Available Credit (Limit - Unpaid installments) ---
+$stmt_debt = $conn->prepare("
+    SELECT SUM(amount) as debt 
+    FROM installments i 
+    JOIN orders o ON i.order_id = o.id 
+    WHERE o.user_id = ? AND i.status = 'unpaid'
+");
+$stmt_debt->bind_param("i", $user['id']);
+$stmt_debt->execute();
+$debtResult = $stmt_debt->get_result()->fetch_assoc();
+$totalDebt = $debtResult['debt'] ?? 0;
+
+$availableLimit = $maxLimit - $totalDebt;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TQSEET - My Dashboard</title>
+    <title>Dashboard - TQSEET</title>
 </head>
-<body style="font-family: sans-serif; margin: 0; background: #fafafa;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
 
-    <!-- This is our dynamic navbar -->
     <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
 
-    <div style="max-width: 1200px; margin: auto; padding: 20px;">
-        <h1>Welcome to TQSEET, <?php echo $user['name']; ?>!</h1>
-        <p>This is your personal dashboard where you can manage your installments and orders.</p>
+    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+        
+        <div style="margin-bottom: 40px;">
+            <h1 style="margin: 0; font-size: 2.5rem; font-weight: 900; letter-spacing: -1.5px;">My Dashboard</h1>
+            <p style="color: #636e72; margin: 10px 0 0 0; font-weight: 500;">Welcome back, <strong><?php echo htmlspecialchars($user['name']); ?></strong>!</p>
+        </div>
 
-        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-top: 20px;">
-            <h3>Account Overview</h3>
-            <p><strong>Email:</strong> <?php echo $user['email']; ?></p>
-            <p><strong>Phone:</strong> <?php echo $user['phone']; ?></p>
-            <p><strong>Account Type:</strong> <?php echo ucfirst($user['role']); ?></p>
-            <p>
-                <strong>Contact Status:</strong> 
-                <?php if ($user['is_verified']): ?>
-                    <span style="color: green; font-weight: bold;">✅ Verified (OTP)</span>
-                <?php else: ?>
-                    <span style="color: #d9534f; font-weight: bold;">❌ Missing OTP Verification</span>
-                <?php endif; ?>
-            </p>
-            <p>
-                <strong>BNPL Account Status:</strong> 
-                <span style="color: #8a6d3b; background: #fcf8e3; padding: 2px 8px; border-radius: 4px; font-weight: bold;">
-                    ⏳ Pending Financial Profile
-                </span>
-            </p>
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px;">
+            
+            <!-- Credit Card Section -->
+            <div style="background: #222; color: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; overflow: hidden;">
+                <div style="position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.03); border-radius: 50%; top: -150px; right: -100px;"></div>
+                
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; opacity: 0.5; margin-bottom: 10px;">Available Credit Limit</div>
+                <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"><?php echo number_format($availableLimit, 2); ?> <span style="font-size: 1rem; opacity: 0.5;">DH</span></div>
+                
+                <div style="display: flex; gap: 40px; margin-bottom: 40px;">
+                    <div>
+                        <div style="font-size: 0.6rem; opacity: 0.5; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px;">Status</div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">
+                            <?php if ($status === 'approved'): ?>
+                                ✅ Approved
+                            <?php elseif ($status === 'pending'): ?>
+                                ⏳ Under Review
+                            <?php else: ?>
+                                ❌ Incomplete
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.6rem; opacity: 0.5; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px;">Member Since</div>
+                        <div style="font-weight: bold; font-size: 0.9rem;"><?php echo isset($user['created_at']) ? date('Y', strtotime($user['created_at'])) : '2024'; ?></div>
+                    </div>
+                </div>
+
+                <a href="financial_profile.php" style="display: block; background: rgba(255,255,255,0.1); color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                    <?php echo ($status === 'none') ? 'Setup Credit Profile' : 'Update Info'; ?>
+                </a>
+            </div>
+
+            <!-- Profile Info Section -->
+            <div style="background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
+                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Account Details</h3>
+                <hr style="border: 0; border-top: 1px solid #f1f3f5; margin: 25px 0;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div>
+                        <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Full Name</label>
+                        <div style="font-weight: 700;"><?php echo htmlspecialchars($user['name']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Email Address</label>
+                        <div style="font-weight: 700;"><?php echo htmlspecialchars($user['email']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Phone Number</label>
+                        <div style="font-weight: 700;"><?php echo htmlspecialchars($user['phone']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">OTP Verified</label>
+                        <div style="font-weight: 700; color: #00b894;">✅ Yes</div>
+                    </div>
+                <!-- Verification Checklist -->
+                <h3 style="margin: 30px 0 15px 0; font-weight: 900; letter-spacing: -0.5px;">Verification Status</h3>
+                <div style="display: flex; gap: 15px;">
+                    <a href="identity_verification.php" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: bold; font-size: 0.85rem; color: #2d3436;">Identity (CIN)</span>
+                        <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; 
+                              <?php echo ($id_status === 'approved') ? 'background: #eafaf1; color: #27ae60;' : 'background: #fff4e6; color: #d9480f;'; ?>">
+                            <?php echo ($id_status === 'approved') ? 'Verified' : 'Required'; ?>
+                        </span>
+                    </a>
+                    <a href="financial_profile.php" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: bold; font-size: 0.85rem; color: #2d3436;">Income Proof</span>
+                        <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; 
+                              <?php echo ($status === 'approved') ? 'background: #eafaf1; color: #27ae60;' : 'background: #fff4e6; color: #d9480f;'; ?>">
+                            <?php echo ($status === 'approved') ? 'Verified' : 'Required'; ?>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 

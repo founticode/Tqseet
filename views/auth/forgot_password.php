@@ -10,7 +10,7 @@ unset($_SESSION['success']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TQSEET - Login</title>
+    <title>TQSEET - Forgot Password</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
@@ -19,7 +19,6 @@ unset($_SESSION['success']);
         <!-- Logo & Header -->
         <div class="auth-header">
             <div class="auth-logo-box">
-                <!-- Premium Geometric Hexagon/Cube SVG Logo -->
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
@@ -28,10 +27,10 @@ unset($_SESSION['success']);
             <p class="auth-subtitle">Precision. Agility. Security.</p>
         </div>
 
-        <!-- Login Card -->
+        <!-- Forgot Password Card -->
         <div class="auth-card">
-            <h2 class="auth-card-title">Welcome back</h2>
-            <p class="auth-card-subtitle">Enter your credentials to continue</p>
+            <h2 class="auth-card-title">Reset password</h2>
+            <p class="auth-card-subtitle">Enter your email and we'll send you a verification code</p>
 
             <!-- Error and Success Banners -->
             <?php if ($error): ?>
@@ -46,34 +45,25 @@ unset($_SESSION['success']);
                 </div>
             <?php endif; ?>
 
-            <form action="../../controllers/AuthController.php?action=login" method="POST">
+            <form action="../../controllers/AuthController.php?action=forgot_password" method="POST">
                 <!-- Email Field -->
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 25px;">
                     <label for="email" class="form-label">Email Address</label>
                     <input type="email" id="email" name="email" class="form-input" placeholder="alex.vance@techcorp.com" required>
                 </div>
 
-                <!-- Password Field -->
-                <div class="form-group">
-                    <div class="form-label-row">
-                        <label for="password" class="form-label">Password</label>
-                        <a href="forgot_password.php" style="font-size: 0.7rem; color: #005a4e; font-weight: 700;">Forgot?</a>
-                    </div>
-                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••••••" required>
-                </div>
-
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-block" style="gap: 8px; margin-top: 10px;">
-                    Continue to Dashboard
+                <button type="submit" class="btn btn-primary btn-block" style="gap: 8px;">
+                    Send Reset Code
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: #003a31; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
                         <path d="M3 8h10M8 3l5 5-5 5"/>
                     </svg>
                 </button>
             </form>
 
-            <!-- Alternative Navigation -->
+            <!-- Back to Login Link -->
             <p style="margin-top: 25px; font-size: 0.85rem; color: #64748b; font-weight: 500;">
-                Don't have an account? <a href="register.php" style="color: #005a4e; font-weight: 700; margin-left: 4px;">Register here</a>
+                <a href="login.php" style="color: #005a4e; font-weight: 700;">← Back to Login</a>
             </p>
         </div>
 

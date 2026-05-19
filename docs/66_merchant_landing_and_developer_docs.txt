@@ -1,0 +1,30 @@
+# Phase 15 Upgrade: B2B Merchant Landing Page & API Docs Portal
+
+## Overview
+This document summarizes the changes and additions made to introduce the premium B2B merchant landing page and developer API portal for the TQSEET Buy Now Pay Later platform.
+
+## 1. High-Fidelity Merchant Landing Page
+- **File Created**: `views/public/business.php`
+- **What Changed**:
+  - Designed an Outfit-based premium layout with a dark green background hero (`#005a4e`) containing a CSS smartphone frame showing an active purchase split breakdown (total 1,800 MAD, 4 payments of 450 MAD/mo).
+  - Integrated a stats bar outlining compliant consumer benefits and trust values.
+  - Added an omnichannel checkout highlight section outlining online checkout, in-store QR codes, and SMS/WhatsApp payment link shares next to a billing radio-selector mockup.
+  - Integrated an interactive tab panel allowing prospective stores to dynamically switch views between **Split in 4**, **Pay in 30 Days**, and **Monthly Financing** via vanilla JS.
+  - Built a 3-column conversions-booster visual grid demonstrating One-Click OTP Authentication, Product Catalog widgets, and Native Checkout badges.
+  - Placed double CTA buttons directing merchants to sign up or review dev docs.
+
+## 2. Developer Documentation Portal
+- **File Created**: `views/public/business_docs.php`
+- **What Changed**:
+  - Implemented a Stripe-like developer documentation layout with sticky sidebar sections (Getting Started, Checkout API, Widgets & SDK).
+  - Outlined the `POST /api/v1/checkout/create` endpoint including parameters table (`amount`, `order_id`, `success_url`, `cancel_url`), request JSON models, and successful responses.
+  - Removed outdated references to non-existent layout templates (e.g. `footer.php`) to fix PHP stream warnings.
+
+## 3. Navbar Updates & Safe Routing
+- **File Edited**: `includes/navbar.php`
+- **What Changed**:
+  - Replaced the placeholder link for guest visitors `For Business` (which previously linked to `/views/auth/login.php`) to point to the new marketing page `/views/public/business.php`.
+  - Replaced the placeholder link for logged-in merchants `Integration Docs` (which previously fired a javascript alert dialog) to link directly to `/views/public/business_docs.php`.
+
+## Summary
+The business side of the platform is now supported by a conversion-focused landing page and a clean developer integration portal, completely error-free and cohesive with TQSEET's design system.

@@ -1,70 +1,15 @@
 <?php
-require_once __DIR__ . "/../../includes/auth.php";
-require_once __DIR__ . "/../../includes/otp_helpers.php";
-require_once __DIR__ . "/../../config/db.php";
+session_start();
+$error = $_SESSION['error'] ?? null;
+unset($_SESSION['error']);
+$success = $_SESSION['success'] ?? null;
+unset($_SESSION['success']);
 
-// Try to get user from session (if logged in) or from temp session (if just registered)
-$userId = $_SESSION["user_id"] ?? $_SESSION["temp_user_id"] ?? null;
-
-if (!$userId) {
-    header("Location: login.php");
+// Ensure we have a valid reset session
+if (!isset($_SESSION["reset_user_id"])) {
+    $_SESSION['error'] = "Please submit your email first.";
+    header("Location: forgot_password.php");
     exit;
-}
-
-$error = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "GET") {
-    // Auto-generate a fresh OTP if none is currently primed to show (e.g. landing here directly from dashboard)
-    if (empty($_SESSION["show_otp_popup"])) {
-        $db = new Database();
-        $conn = $db->connect();
-        
-        $stmt_u = $conn->prepare("SELECT email FROM users WHERE id = ?");
-        $stmt_u->bind_param("i", $userId);
-        $stmt_u->execute();
-        $res_u = $stmt_u->get_result()->fetch_assoc();
-        $email = $res_u['email'] ?? ($_SESSION["temp_user_email"] ?? 'user@tqseet.com');
-        $stmt_u->close();
-        
-        // Generate, save and simulate send
-        $otp = generateOTP();
-        saveOTP($conn, $userId, $otp);
-        sendOTP($email, $otp);
-        
-        $_SESSION["show_otp_popup"] = [
-            'code' => $otp,
-            'type' => 'email'
-        ];
-        
-        $conn->close();
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $inputCode = $_POST["otp_code"];
-
-    $db = new Database();
-    $conn = $db->connect();
-
-    if (verifyOTP($conn, $userId, $inputCode)) {
-        // SUCCESS! 
-        // 1. Mark user as verified in the database
-        $stmt = $conn->prepare("UPDATE users SET is_verified = 1 WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-
-        // 2. Update session status
-        $_SESSION["user_verified"] = 1;
-
-        // 3. Role-Aware Redirect
-        $role = $_SESSION["user_role"] ?? 'user';
-        header("Location: ../{$role}/dashboard.php?verified=1");
-        exit;
-    } else {
-        $error = "Invalid or expired code. Please check your log file and try again.";
-    }
-
-    $conn->close();
 }
 ?>
 <!DOCTYPE html>
@@ -72,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TQSEET - Verify OTP</title>
+    <title>TQSEET - Reset Password</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
@@ -89,41 +34,55 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <p class="auth-subtitle">Precision. Agility. Security.</p>
         </div>
 
-        <!-- Verify OTP Card -->
+        <!-- Reset Password Card -->
         <div class="auth-card">
-            <h2 class="auth-card-title">Verification Required</h2>
-            <p class="auth-card-subtitle">Enter the 6-digit code we just sent to your email</p>
+            <h2 class="auth-card-title">New Credentials</h2>
+            <p class="auth-card-subtitle">Verify your code and enter your new password</p>
 
-            <!-- Error Banner -->
+            <!-- Error and Success Banners -->
             <?php if ($error): ?>
                 <div class="badge badge-danger" style="display: block; padding: 12px; margin-bottom: 20px; border-radius: 12px; font-size: 0.85rem; text-align: center; text-transform: none; font-weight: 500; line-height: 1.4;">
                     <?php echo $error; ?>
                 </div>
             <?php endif; ?>
 
-            <form method="POST">
-                <!-- Numeric OTP Input -->
+            <?php if ($success): ?>
+                <div class="badge badge-success" style="display: block; padding: 12px; margin-bottom: 20px; border-radius: 12px; font-size: 0.85rem; text-align: center; text-transform: none; font-weight: 500; line-height: 1.4;">
+                    <?php echo $success; ?>
+                </div>
+            <?php endif; ?>
+
+            <form action="../../controllers/AuthController.php?action=reset_password" method="POST">
+                <!-- Verification Code -->
+                <div class="form-group">
+                    <label for="code" class="form-label">Verification Code (OTP)</label>
+                    <input type="text" id="code" name="code" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 1.4rem; letter-spacing: 4px;" required>
+                </div>
+
+                <!-- New Password Field -->
+                <div class="form-group">
+                    <label for="password" class="form-label">New Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••••••" required>
+                </div>
+
+                <!-- Confirm Password Field -->
                 <div class="form-group" style="margin-bottom: 25px;">
-                    <label for="otp_code" class="form-label">6-Digit Verification Code</label>
-                    <input type="text" id="otp_code" name="otp_code" maxlength="6" required 
-                           placeholder="000000" 
-                           class="form-input"
-                           style="font-size: 2.2rem; width: 100%; text-align: center; letter-spacing: 8px; padding: 12px; font-weight: 700;">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input" placeholder="••••••••••••" required>
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary btn-block" style="gap: 8px;">
-                    Confirm Code
+                    Reset Password
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: #003a31; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
                         <path d="M3 8h10M8 3l5 5-5 5"/>
                     </svg>
                 </button>
             </form>
 
-            <!-- Go back Link -->
+            <!-- Back link -->
             <p style="margin-top: 25px; font-size: 0.85rem; color: #64748b; font-weight: 500;">
-                <?php $role = $_SESSION['user_role'] ?? 'user'; ?>
-                <a href="../<?php echo $role; ?>/dashboard.php" style="color: #005a4e; font-weight: 700;">← Cancel and go back</a>
+                <a href="forgot_password.php" style="color: #005a4e; font-weight: 700;">← Cancel and go back</a>
             </p>
         </div>
 
@@ -147,15 +106,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div id="otp-toast-notification" style="position: fixed; top: 20px; right: 20px; z-index: 99999; width: 360px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.06); padding: 22px; transform: translateY(-50px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-family: 'Outfit', sans-serif; text-align: left;">
             <div style="display: flex; align-items: start; gap: 15px;">
                 <div style="font-size: 2rem; line-height: 1; padding-top: 2px;">
-                    <?php echo ($toast['type'] === 'phone') ? '💬' : '📧'; ?>
+                    📧
                 </div>
                 <div style="flex-grow: 1;">
                     <div style="font-weight: 800; font-size: 0.95rem; color: #1e272e; margin: 0 0 5px 0; display: flex; align-items: center; justify-content: space-between;">
-                        <span><?php echo ($toast['type'] === 'phone') ? 'Simulated SMS' : 'Simulated Email'; ?></span>
+                        <span>Simulated Reset Email</span>
                         <span style="font-size: 0.65rem; color: #aaa; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">now</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #57606f; line-height: 1.45; margin-bottom: 15px;">
-                        Your TQSEET verification code is: <strong style="font-family: monospace; font-size: 1.15rem; color: #005a4e; background: rgba(0,90,78,0.08); padding: 2px 6px; border-radius: 6px;"><?php echo $toast['code']; ?></strong>
+                        Your TQSEET password reset code is: <strong style="font-family: monospace; font-size: 1.15rem; color: #005a4e; background: rgba(0,90,78,0.08); padding: 2px 6px; border-radius: 6px;"><?php echo $toast['code']; ?></strong>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button onclick="autofillOTP('<?php echo $toast['code']; ?>')" style="background: #005a4e; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s;">
@@ -199,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             function autofillOTP(code) {
-                var input = document.getElementById('otp_code');
+                var input = document.getElementById('code');
                 if (input) {
                     input.value = code;
                     input.focus();

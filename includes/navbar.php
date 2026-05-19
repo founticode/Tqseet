@@ -1,52 +1,115 @@
 <?php
 require_once __DIR__ . "/auth.php"; // Make sure we have access to helpers
 
-// Define the base path of the project (Leave empty if project is at root)
-$base = ""; 
+$logoText = "TQSEET";
+$logoLink = "/index.php";
+if (isLoggedIn()) {
+    $currUser = currentUser();
+    if ($currUser['role'] === 'merchant') {
+        $logoText = "TQSEET Business";
+        $logoLink = "/views/merchant/dashboard.php";
+    } elseif ($currUser['role'] === 'admin') {
+        $logoText = "TQSEET Control Tower";
+        $logoLink = "/views/admin/dashboard.php";
+    }
+}
 ?>
+<!-- Centralized style sheet for the entire platform -->
+<link rel="stylesheet" href="/assets/css/style.css">
 
-<nav style="background: #f4f4f4; padding: 10px; margin-bottom: 20px; border-bottom: 1px solid #ccc;">
-    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto;">
+<nav class="navbar">
+    <div class="navbar-container">
         
-        <!-- Logo / Brand -->
-        <div>
-            <a href="<?php echo $base; ?>/index.php" style="font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #333;">TQSEET</a>
-        </div>
+        <!-- Logo / Brand (Dynamic Context based on Role) -->
+        <a href="<?php echo $logoLink; ?>" class="navbar-brand">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <?php echo $logoText; ?>
+        </a>
 
-        <!-- Links -->
-        <div>
-            <a href="<?php echo $base; ?>/index.php" style="margin-right: 15px; text-decoration: none; color: #555;">Home</a>
-            <a href="<?php echo $base; ?>/views/public/catalog.php" style="margin-right: 15px; text-decoration: none; color: #555;">Shop Catalog</a>
-
+        <!-- Center Links (Aesthetic Cleanliness, role-segregated) -->
+        <div class="navbar-links">
             <?php if (isLoggedIn()): ?>
                 <?php $user = currentUser(); ?>
                 
-                <!-- Merchant Specific Links -->
                 <?php if ($user['role'] === 'merchant'): ?>
-                    <a href="<?php echo $base; ?>/views/merchant/products.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Inventory</a>
-                    <a href="<?php echo $base; ?>/views/merchant/sales.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Sales</a>
-                    <a href="<?php echo $base; ?>/views/merchant/settings.php" style="margin-right: 15px; text-decoration: none; color: #555;">Store Settings</a>
+                    <!-- Merchant Portal Links -->
+                    <a href="/views/merchant/dashboard.php" class="navbar-link">Dashboard</a>
+                    <a href="/views/merchant/settings.php" class="navbar-link">Store Settings</a>
+                    <a href="/views/public/business_docs.php" class="navbar-link">Integration Docs</a>
+                    
+                <?php elseif ($user['role'] === 'admin'): ?>
+                    <!-- Admin Control Links -->
+                    <a href="/views/admin/dashboard.php" class="navbar-link">Dashboard</a>
+                    <a href="/views/admin/verifications.php" class="navbar-link">Verifications Hub</a>
+                    
+                <?php else: ?>
+                    <!-- Regular Consumer Links -->
+                    <a href="/index.php" class="navbar-link">Home</a>
+                    <a href="/views/public/shop.php" class="navbar-link">Shop</a>
+                    <a href="/views/user/orders.php" class="navbar-link">My Shopping</a>
+                    <a href="/index.php#why-tqseet" class="navbar-link">How It Works</a>
                 <?php endif; ?>
-
-                <!-- User Specific Links -->
-                <?php if ($user['role'] === 'user'): ?>
-                    <a href="<?php echo $base; ?>/views/user/orders.php" style="margin-right: 15px; text-decoration: none; color: #555;">My Shopping</a>
-                <?php endif; ?>
-
-                <!-- Admin Specific Links -->
-                <?php if ($user['role'] === 'admin'): ?>
-                    <a href="<?php echo $base; ?>/views/admin/verifications.php" style="margin-right: 15px; text-decoration: none; color: #856404;">Verifications</a>
-                <?php endif; ?>
-
-                <a href="<?php echo $base; ?>/views/user/profile.php" style="margin-right: 15px; text-decoration: none; color: #636e72;">
-                    👋 <?php echo htmlspecialchars($user['name']); ?>
-                </a>
-
-                <a href="<?php echo $base; ?>/views/<?php echo $user['role']; ?>/dashboard.php" style="margin-right: 15px; text-decoration: none; color: #333; font-weight: bold;">Dashboard</a>
-                <a href="<?php echo $base; ?>/controllers/AuthController.php?action=logout" style="text-decoration: none; color: #d9534f; font-weight: bold;">Logout</a>
+                
             <?php else: ?>
-                <a href="<?php echo $base; ?>/views/auth/login.php" style="margin-right: 15px; text-decoration: none; color: #555;">Login</a>
-                <a href="<?php echo $base; ?>/views/auth/register.php" style="text-decoration: none; background: #007bff; color: white; padding: 5px 10px; border-radius: 4px;">Register</a>
+                <!-- Not Logged In Public Links -->
+                <a href="/index.php" class="navbar-link">Home</a>
+                <a href="/views/public/shop.php" class="navbar-link">Shop</a>
+                <a href="/index.php#why-tqseet" class="navbar-link">How It Works</a>
+                <a href="/views/public/business.php" class="navbar-link">For Business</a>
+            <?php endif; ?>
+        </div>
+
+        <!-- Right Side: Session Actions (Sign In / Capsule Dropdown Menu) -->
+        <div class="navbar-right">
+            <?php if (isLoggedIn()): ?>
+                <?php $user = currentUser(); ?>
+                <div class="navbar-dropdown-wrapper">
+                    <button class="navbar-user-capsule">
+                        <span>👋 <?php echo htmlspecialchars(explode(" ", $user['name'])[0]); ?></span>
+                        <span class="navbar-user-role-badge"><?php echo htmlspecialchars($user['role']); ?></span>
+                        <span style="font-size: 0.65rem; margin-left: 2px; opacity: 0.7;">▼</span>
+                    </button>
+                    
+                    <div class="navbar-dropdown-menu">
+                        <a href="/views/<?php echo $user['role']; ?>/dashboard.php" class="navbar-dropdown-item">
+                            <span>📊</span> Dashboard
+                        </a>
+                        
+                        <?php if ($user['role'] === 'user'): ?>
+                            <a href="/views/user/profile.php" class="navbar-dropdown-item">
+                                <span>⚙️</span> Settings & KYC
+                            </a>
+                            <a href="/views/user/orders.php" class="navbar-dropdown-item">
+                                <span>💳</span> My Installments
+                            </a>
+                        <?php elseif ($user['role'] === 'merchant'): ?>
+                            <a href="/views/merchant/settings.php" class="navbar-dropdown-item">
+                                <span>⚙️</span> Store Settings
+                            </a>
+                            <a href="/views/merchant/products.php" class="navbar-dropdown-item">
+                                <span>📦</span> Products Inventory
+                            </a>
+                            <a href="/views/merchant/sales.php" class="navbar-dropdown-item">
+                                <span>💰</span> Sales Ledger
+                            </a>
+                        <?php elseif ($user['role'] === 'admin'): ?>
+                            <a href="/views/admin/verifications.php" class="navbar-dropdown-item">
+                                <span>🛡️</span> Verifications Hub
+                            </a>
+                        <?php endif; ?>
+                        
+                        <div class="navbar-dropdown-divider"></div>
+                        
+                        <a href="/controllers/AuthController.php?action=logout" class="navbar-dropdown-item" style="color: #ef4444;">
+                            <span>🚪</span> Logout
+                        </a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <a href="/views/auth/login.php" class="navbar-login-link">Login</a>
+                <a href="/views/auth/register.php" class="navbar-signup-btn">Get Started</a>
             <?php endif; ?>
         </div>
 

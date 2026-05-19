@@ -1,0 +1,59 @@
+# Phase 15 Upgrade: BNPL Payment Methods & TQSEET Backend Architecture
+
+This document explains the three industry-standard Buy Now Pay Later (BNPL) payment methods displayed on our merchant marketing page, analyzes how they map to TQSEET's current codebase, and presents integration strategies.
+
+---
+
+## 1. How the Three BNPL Methods Work (General Industry Standards)
+
+1. **Split in 4 (Pay in 4)**
+   - **Consumer Flow**: Cart total is divided into 4 equal parts. The first 25% is paid immediately at checkout. The remaining three 25% payments are automatically billed to the user's card every 14 days (or monthly). Zero interest/fees.
+   - **Merchant Flow**: Merchant is paid the full cart amount upfront (minus a small 2-5% commission fee) within 24-48 hours. The BNPL platform absorbs default risk.
+   - **Best Suited For**: Fashion, cosmetics, small electronics, everyday retail (500 MAD - 8,000 MAD).
+
+2. **Pay in 30 Days**
+   - **Consumer Flow**: Shopper pays nothing upfront. The order ships immediately. The shopper has 30 days to try the goods, then pays the invoice balance or returns the goods. Zero interest/fees.
+   - **Merchant Flow**: Merchant is paid upfront upon order shipment. The BNPL platform handles collection risk.
+   - **Best Suited For**: Apparel/shoes (high return rate products), boutique items (200 MAD - 5,000 MAD).
+
+3. **Monthly Financing**
+   - **Consumer Flow**: Total cost is split over 3, 6, or 12 months with structured fixed monthly installments. May include a low interest rate (APR) depending on buyer risk.
+   - **Merchant Flow**: Merchant gets paid upfront in full. BNPL platform receives monthly installments from the user.
+   - **Best Suited For**: Furniture, high-end electronics, appliances, travel bookings (4,000 MAD - 30,000 MAD).
+
+---
+
+## 2. TQSEET's Current Backend Implementation
+
+Our current codebase exclusively supports the "Split in 4" (Pay in 4) mechanism. Here is how it is structured:
+
+- **Database Schema (installments table)**:
+  Stores installments with `id` (Primary), `order_id` (Foreign key), `amount`, `due_date`, and `status` (Enum: 'paid', 'unpaid').
+  
+- **Hardcoded Calculation Logic**:
+  In `views/user/save_installments.php` and `views/user/process_simulated_payment.php`, the split is computed as follows:
+  ```php
+  $installmentAmount = $total / 4;
+  $dates = [
+      date('Y-m-d'), // First payment: Today (paid immediately)
+      date('Y-m-d', strtotime('+1 month')), // Second payment
+      date('Y-m-d', strtotime('+2 months')), // Third payment
+      date('Y-m-d', strtotime('+3 months'))  // Fourth payment
+  ];
+  ```
+  This divides the order total into exactly four parts, marks the first part as 'paid' immediately, and leaves the remaining three as 'unpaid' due at monthly intervals.
+
+---
+
+## 3. Implementation Plan & Current Status
+
+### Option A Selected (Launched Phase)
+As of May 2026, the decision has been finalized to proceed with **Option A**: focusing purely on **Split in 4** as our primary operational payment option.
+
+#### Frontend Updates Made:
+1. **Interactive Tabs Integration**:
+   - The left menu button titles for **Pay in 30 Days** and **Monthly Financing** now explicitly display a light grey `Coming Soon` badge inline.
+2. **Dynamic Offering Status Card**:
+   - The Terms summary card displays a new `Offering Status` field.
+   - It shows a bold green `Active Offering` state for **Split in 4** and a neutral grey `Coming Soon` state for the other two options when selected.
+

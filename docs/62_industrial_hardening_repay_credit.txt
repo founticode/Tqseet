@@ -1,0 +1,16 @@
+# TQSEET Technical Recap: Industrial Hardening, Repayments & Credit (Phase 15)
+
+This recap details the hardening, checkout flow guardrails, and dynamic financial rules implemented in Phase 15.
+
+## 1. Dynamic Credit Limit Management
+- **Available vs. Max Credit**: Rather than treating the maximum limit as a static spending allowance, TQSEET now calculates available credit in real-time.
+- **Outstanding Debt Calculations**: Available Credit = `Approved Credit Limit` - `Sum of Unpaid Installments`.
+- **Checkout Guard**: Integrated this check inside `place_order.php` and `calculate_installments.php` to prevent users from starting or finishing plans that exceed their available balance.
+
+## 2. Ghost Order & Double-Payment Protection
+- **Session Reuse**: Added checks to see if a pending order for the same product exists, reusing the draft instead of cluttering the database.
+- **Card Security & Repayments**: Hardened the payment forms so that users cannot double-submit transactions or initiate multiple repayments concurrently.
+
+## 3. Sequential Installment Repayments
+- **Chronological Rule**: To ensure proper financial reporting, consumers are required to pay their installments in chronological order.
+- **Enforcement Logic**: When attempting to pay an installment, the system checks if there are any earlier unpaid installments belonging to the same order. If so, checkout is blocked and the user is guided to pay the oldest one first.

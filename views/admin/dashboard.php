@@ -12,7 +12,11 @@ $conn = $db->connect();
 $totalUsers = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'user'")->fetch_row()[0];
 $totalMerchants = $conn->query("SELECT COUNT(*) FROM merchants")->fetch_row()[0];
 $totalSales = $conn->query("SELECT SUM(total_price) FROM orders WHERE status = 'paid'")->fetch_row()[0] ?? 0;
-$pendingVerif = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'user' AND is_verified = 0")->fetch_row()[0];
+
+// Action Required: Count of actual pending Customer KYC documents + pending Merchant store onboardings
+$pendingCustomers = $conn->query("SELECT COUNT(DISTINCT user_id) FROM (SELECT user_id FROM user_verifications WHERE status = 'pending' UNION SELECT user_id FROM user_financials WHERE status = 'pending') AS p")->fetch_row()[0];
+$pendingMerchants = $conn->query("SELECT COUNT(*) FROM merchants WHERE status = 'pending'")->fetch_row()[0];
+$pendingVerif = $pendingCustomers + $pendingMerchants;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +53,9 @@ $pendingVerif = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'user' AND
             <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
                 <div style="color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 10px;">Action Required</div>
                 <div style="font-size: 1.8rem; font-weight: 900; color: #d63031;"><?php echo $pendingVerif; ?> <span style="font-size: 1rem; color: #b2bec3;">Reviews</span></div>
+                <div style="font-size: 0.75rem; color: #636e72; margin-top: 5px; font-weight: 600;">
+                    <?php echo $pendingCustomers; ?> Customer KYC • <?php echo $pendingMerchants; ?> Merchant
+                </div>
             </div>
         </div>
 

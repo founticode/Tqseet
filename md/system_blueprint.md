@@ -49,3 +49,13 @@ These are the "Bouncers" of the system:
 - **Sequential Payments**: Chronic chronological enforcement; future installments (2, 3, 4) are locked until the immediate predecessor is 'paid'.
 - **Hard Lockdown**: Orders cannot be cancelled or deleted once the first payment (downpayment) is processed.
 - **Role-Aware Approval**: Distinct validation logic for Merchants (Store activation) vs Users (Credit limit allocation).
+
+## 8. Integrated Compliance & 2FA Security Hub
+- **Unified Settings KYC Section**: Replaced legacy standalone credit and identity pages with a consolidated profile settings hub (`settings.php#verification-section`).
+- **Sealed Integrity Protection**: Once approved, identity data (CIN) and salary/statement inputs are instantly sealed (disabled & read-only) with visual credentials to protect verified records.
+- **2FA Cross-Verification**: To prevent unauthorized takeovers, a phone number update requires verification via code sent to the email address, while an email update requires verification via code sent to the phone number.
+- **Push Notification Simulator**: Employs real-time iOS/SaaS slide-down simulated push notifications with instant "⚡ Autofill Code" buttons on both Settings and Registration Verification pages for seamless testing.
+
+## 9. Admin Control Tower & Operational Telemetry
+- **Dynamic "Action Required" Queue**: The dashboard abandons simplistic total counts (which trigger on unverified emails/phones) in favor of tracking true operational backlog. The queue strictly tallies customers pending document review + merchants pending store approval.
+- **Dual-Stacked Verification Matrix**: The Admin Verification hub splits monolithic statuses into segregated badges, instantly distinguishing between `📱 OTP Verification` (2FA auth) and `💼 KYC/Business Hub` (manual credit or merchant reviews) to provide perfect clarity.

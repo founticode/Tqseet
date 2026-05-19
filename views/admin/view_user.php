@@ -39,6 +39,33 @@ if ($user['role'] === 'merchant') {
     $stmt_m->execute();
     $merchant = $stmt_m->get_result()->fetch_assoc();
 }
+
+// Check verification requirements
+$hasCIN = ($verification !== null && !empty($verification['cin']));
+$hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
+
+$isStrictMissing = false;
+$warningMessage = "";
+
+if ($user['role'] === 'merchant') {
+    // Merchants require a CIN. Financials are optional.
+    if (!$hasCIN) {
+        $isStrictMissing = true;
+        $warningMessage = "⚠️ Identity (CIN) Card is missing. (Bypass enabled for sandbox testing)";
+    }
+} else {
+    // Customers (users) require both CIN and Financial papers.
+    if (!$hasCIN || !$hasFinancial) {
+        $isStrictMissing = true;
+        if (!$hasCIN && !$hasFinancial) {
+            $warningMessage = "⚠️ Identity (CIN) & Financial papers are missing. (Bypass enabled for sandbox testing)";
+        } elseif (!$hasCIN) {
+            $warningMessage = "⚠️ Identity (CIN) Card is missing. (Bypass enabled for sandbox testing)";
+        } else {
+            $warningMessage = "⚠️ Financial papers are missing. (Bypass enabled for sandbox testing)";
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -122,17 +149,23 @@ if ($user['role'] === 'merchant') {
 
                 <!-- Financial Section -->
                 <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                    <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #b2bec3;">Financial Profile</h3>
+                    <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #b2bec3;">
+                        <?php echo $user['role'] === 'merchant' ? 'Business Financials' : 'Financial Profile'; ?>
+                    </h3>
                     <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 20px 0;">
                     
                     <?php if ($financial): ?>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div>
-                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">Profession</label>
+                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
+                                    <?php echo $user['role'] === 'merchant' ? 'Business Structure' : 'Profession'; ?>
+                                </label>
                                 <div style="font-weight: 700; color: #2d3436;"><?php echo htmlspecialchars($financial['profession']); ?></div>
                             </div>
                             <div>
-                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">Monthly Salary</label>
+                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
+                                    <?php echo $user['role'] === 'merchant' ? 'Estimated Monthly Revenue' : 'Monthly Salary'; ?>
+                                </label>
                                 <div style="font-weight: 900; color: #00b894; font-size: 1.1rem;"><?php echo number_format($financial['salary'], 2); ?> DH</div>
                             </div>
                         </div>
@@ -141,7 +174,9 @@ if ($user['role'] === 'merchant') {
                             <div style="margin-top: 25px; padding: 20px; background: #fafafa; border-radius: 15px; border: 1px solid #eee;">
                                 <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;">Verification Document</label>
                                 <a href="../../uploads/financials/<?php echo $financial['salary_proof']; ?>" target="_blank" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0984e3; font-weight: bold;">
-                                    <span>📄 View Salary Slip / Bank Statement</span>
+                                    <span>
+                                        <?php echo $user['role'] === 'merchant' ? '📄 View Business Bank Statement / Tax Document' : '📄 View Salary Slip / Bank Statement'; ?>
+                                    </span>
                                 </a>
                             </div>
                         <?php endif; ?>
@@ -183,12 +218,26 @@ if ($user['role'] === 'merchant') {
                             </div>
                         <?php endif; ?>
 
+                        <!-- Dynamic Verification Banners & Sandbox Bypass Info -->
+                        <?php if ($isStrictMissing): ?>
+                            <div style="margin-bottom: 25px; background: rgba(230, 126, 34, 0.1); padding: 18px; border-radius: 15px; border: 1px solid rgba(230, 126, 34, 0.3);">
+                                <div style="font-size: 0.85rem; font-weight: bold; color: #e67e22; line-height: 1.5;">
+                                    <?php echo $warningMessage; ?>
+                                </div>
+                            </div>
+                        <?php elseif ($user['role'] === 'merchant' && !$hasFinancial): ?>
+                            <div style="margin-bottom: 25px; background: rgba(9, 132, 227, 0.1); padding: 18px; border-radius: 15px; border: 1px solid rgba(9, 132, 227, 0.3);">
+                                <div style="font-size: 0.85rem; font-weight: bold; color: #74b9ff; line-height: 1.5;">
+                                    💡 Note: No financial documents submitted. (This is optional for Merchants - they can be approved with CIN only).
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div style="margin-bottom: 15px;">
-                                <button type="submit" name="status" value="approved" 
-                                        onclick="return confirmApproval(<?php echo ($financial || $merchant) ? 'true' : 'false'; ?>, '<?php echo $user['role']; ?>')"
-                                        style="width: 100%; padding: 15px; background: #00b894; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;">
-                                    ✅ <?php echo ($user['role'] === 'merchant') ? 'Approve Merchant' : 'Approve User'; ?>
-                                </button>
+                            <button type="submit" name="status" value="approved" 
+                                    style="width: 100%; padding: 15px; background: #00b894; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;">
+                                ✅ <?php echo ($user['role'] === 'merchant') ? 'Approve Merchant' : 'Approve User'; ?>
+                            </button>
                         </div>
                         
                         <button type="submit" name="status" value="rejected" 
@@ -204,22 +253,28 @@ if ($user['role'] === 'merchant') {
     </div>
 
     <script>
-    function confirmApproval(hasData, role) {
-        if (!hasData) {
-            let entity = (role === 'merchant') ? 'MERCHANT' : 'USER';
-            let warning = `⚠️ WARNING: This ${entity} has NOT submitted their financial info or identity documents.\n\n`;
-            
-            if (role === 'user') {
-                warning += "Approving them now will grant a 0.00 DH credit limit.\n\n";
-            } else {
-                warning += "Approving them now will activate their store with default settings.\n\n";
+    // Simple verification check to confirm before final actions
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let action = e.submitter ? e.submitter.value : '';
+        const isStrictMissing = <?php echo $isStrictMissing ? 'true' : 'false'; ?>;
+        const role = '<?php echo $user['role']; ?>';
+
+        if (action === 'approved') {
+            if (isStrictMissing) {
+                let warning = `⚠️ WARNING: This ${role === 'merchant' ? 'Merchant' : 'Customer'} has NOT uploaded all required verification documents.\n\n`;
+                if (role === 'merchant') {
+                    warning += "Approving them now will activate their store for testing without a government CIN card.\n\n";
+                } else {
+                    warning += "Approving them now will grant them a 0.00 DH credit limit since no salary slips exist.\n\n";
+                }
+                warning += "Are you sure you want to bypass validation and approve them anyway?";
+                return confirm(warning);
             }
-            
-            warning += "Are you sure you want to proceed for testing?";
-            return confirm(warning);
+            return confirm("Are you sure you want to approve this profile?");
+        } else if (action === 'rejected') {
+            return confirm("Are you sure you want to reject this application?");
         }
-        return true;
-    }
+    });
     </script>
 
 </body>

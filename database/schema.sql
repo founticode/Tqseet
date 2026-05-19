@@ -22,7 +22,7 @@ CREATE TABLE merchants (
     commission_rate DECIMAL(5,2) DEFAULT 0.05, -- Upgraded: 0.05 = 5%
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 3. PRODUCTS
@@ -35,7 +35,7 @@ CREATE TABLE products (
     image VARCHAR(255),
     stock INT DEFAULT 10,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE
 );
 
 -- 4. IDENTITY VERIFICATIONS (KYC)
@@ -46,7 +46,7 @@ CREATE TABLE user_verifications (
     cin_image VARCHAR(255),
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     verified_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 5. FINANCIAL PROFILES (Credit Scoring)
@@ -59,7 +59,7 @@ CREATE TABLE user_financials (
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     credit_limit DECIMAL(10,2) DEFAULT 0.00, -- Automated: Salary * 1.5
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 6. ORDERS (Professional Marketplace Model)
@@ -72,8 +72,8 @@ CREATE TABLE orders (
     merchant_earning DECIMAL(10,2),  -- What the store earns
     status ENUM('active', 'paid', 'cancelled') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 -- 7. INSTALLMENTS
@@ -84,5 +84,15 @@ CREATE TABLE installments (
     due_date DATE,
     status ENUM('pending', 'paid', 'overdue') DEFAULT 'pending',
     paid_at TIMESTAMP NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id)
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+-- 8. OTP CODES (Cross-Device 2FA Verification)
+CREATE TABLE otp_codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    code VARCHAR(10) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

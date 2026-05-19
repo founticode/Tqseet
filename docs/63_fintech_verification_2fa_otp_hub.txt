@@ -1,0 +1,17 @@
+# TQSEET Technical Recap: Unified Fintech Compliance & 2FA OTP Security Hub (Phase 16)
+
+This recap details the transition to a consolidated account compliance layout and the dynamic 2FA OTP verification features.
+
+## 1. Unified Settings Compliance Hub
+- **Card-Based Verification**: Embedded the Identity Verification (CIN) and Financial & Salary Proof documents as a side-by-side card module directly inside `settings.php#verification-section`.
+- **Sealed Status Badge**: Forms and input fields are dynamically replaced by sealed success checkmarks and green banners once verified by administrators, preventing users from altering active compliance data.
+- **Standalone Files Retiral**: Overwrote separate legacy files (`identity_verification.php` and `financial_profile.php`) to execute automated redirects to the integrated settings section, maintaining backward compatibility.
+
+## 2. Dynamic 2FA Phone & Email Updates
+- **Security Checkpoints**: Restructured settings updates so that users changing their email must verify via their mobile phone, and users updating their phone number must verify via their email.
+- **Simulated OTPs**: Generates real 6-digit codes saved in the database under `otps` table and logged in `otp_sent.log`.
+
+## 3. Real-Time Push Notification Toast Pop-ups
+- **iOS/SaaS Notification Theme**: Added a beautiful, responsive sliding push notification toast simulating real-time SMS/Email delivery on the screen.
+- **⚡ Autofill Helper**: Clicking the "⚡ Autofill Code" button instantly populates the active verification input box and places focus, allowing users to verify their registration or updates in just one click.
+- **Universal Registration Onboarding**: Connected the sign-up process straight to the OTP verification screen (`verify_otp.php`) complete with the push notification pop-up.

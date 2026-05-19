@@ -42,7 +42,7 @@ $fin = $stmt_f->get_result()->fetch_assoc();
 if (!$fin) {
     die("<div style='font-family:sans-serif; text-align:center; padding:50px;'>
             <h1>Action Required: Setup your credit profile.</h1>
-            <a href='financial_profile.php'>Complete Profile</a>
+            <a href='settings.php#verification-section'>Complete Profile</a>
          </div>");
 }
 

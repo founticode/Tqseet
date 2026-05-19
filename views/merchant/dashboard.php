@@ -16,6 +16,19 @@ $stmt_m->execute();
 $merchantData = $stmt_m->get_result()->fetch_assoc();
 $status = $merchantData['status'] ?? 'pending';
 $rate = $merchantData['commission_rate'] ?? 0.05;
+
+// Fetch validation status for merchant checklist
+$stmt_v = $conn->prepare("SELECT * FROM user_verifications WHERE user_id = ?");
+$stmt_v->bind_param("i", $user['id']);
+$stmt_v->execute();
+$verification = $stmt_v->get_result()->fetch_assoc();
+$hasCIN = ($verification !== null && !empty($verification['cin']));
+
+$stmt_f = $conn->prepare("SELECT * FROM user_financials WHERE user_id = ?");
+$stmt_f->bind_param("i", $user['id']);
+$stmt_f->execute();
+$financial = $stmt_f->get_result()->fetch_assoc();
+$hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,13 +69,80 @@ $rate = $merchantData['commission_rate'] ?? 0.05;
         <?php endif; ?>
 
         <?php if ($status !== 'approved'): ?>
-            <!-- Verification Pending Card -->
+            <!-- Verification Pending Card (Strict Onboarding Checklist) -->
             <div style="background: white; border-radius: 25px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid #ffeeba; margin-bottom: 40px;">
                 <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
-                <h2 style="margin: 0; font-weight: 900; color: #856404;">Application Under Review</h2>
-                <p style="color: #636e72; max-width: 500px; margin: 15px auto; line-height: 1.6;">Our team is currently reviewing your merchant application. You will be able to list products and start selling as soon as your account is approved.</p>
+                <h2 style="margin: 0; font-weight: 900; color: #856404; letter-spacing: -0.5px;">Store Pending Activation</h2>
+                <p style="color: #636e72; max-width: 500px; margin: 15px auto; line-height: 1.6; font-size: 0.95rem;">To activate your store and begin listing products, you must complete your business verification documents below.</p>
+                
+                <!-- Onboarding Checklist -->
+                <div style="max-width: 450px; margin: 30px auto; text-align: left; background: #fafafa; border-radius: 20px; padding: 25px; border: 1px dashed #ffeeba;">
+                    <h4 style="margin: 0 0 15px 0; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: #856404; font-weight: 800;">Verification Checklist</h4>
+                    
+                    <!-- 1. CIN Card Check -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f1f3f5;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 0.9rem; color: #2d3436;">Identity Card (CIN) <span style="color: #d63031; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;">[Required]</span></div>
+                            <div style="font-size: 0.75rem; color: #b2bec3;">Required for official government verification.</div>
+                        </div>
+                        <?php if ($hasCIN): ?>
+                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">✅ Uploaded</span>
+                        <?php else: ?>
+                            <a href="settings.php" style="background: #ff7675; color: white; text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">Upload Now</a>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- 2. Financial Info Check -->
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 0.9rem; color: #2d3436;">Financial Statements <span style="color: #74b9ff; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;">[Optional]</span></div>
+                            <div style="font-size: 0.75rem; color: #b2bec3;">Highly recommended to speed up trust & payout limits.</div>
+                        </div>
+                        <?php if ($hasFinancial): ?>
+                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">✅ Uploaded</span>
+                        <?php else: ?>
+                            <a href="settings.php" style="background: #f1f3f5; color: #636e72; text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">Upload Info</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <div style="display: inline-block; background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 0.9rem;">
-                    Status: <span style="text-transform: uppercase;"><?php echo $status; ?></span>
+                    Store Review Status: <span style="text-transform: uppercase;"><?php echo htmlspecialchars($status); ?></span>
+                </div>
+            </div>
+        <?php else: ?>
+            <!-- Verification Center (Rendered beautifully for APPROVED active merchants!) -->
+            <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid #f1f3f5; margin-bottom: 40px;">
+                <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #2d3436; font-weight: 900;">📋 Store Credentials Checklist</h3>
+                <p style="color: #636e72; font-size: 0.85rem; margin-top: 5px; margin-bottom: 25px; font-weight: 500;">Review your active government verification papers and optional credentials.</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    
+                    <!-- 1. CIN Card Check (Approved) -->
+                    <div style="background: #fafafa; padding: 20px; border-radius: 15px; border: 1px solid #f1f3f5; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 800; font-size: 0.9rem; color: #2d3436;">Identity Card (CIN) <span style="color: #00b894; font-size: 0.65rem; font-weight: 900; text-transform: uppercase;">[Required]</span></div>
+                            <div style="font-size: 0.75rem; color: #b2bec3; margin-top: 2px;">Official government identification.</div>
+                        </div>
+                        <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 1px solid #c3fae8;">✅ Verified & Active</span>
+                    </div>
+
+                    <!-- 2. Financial Info Check (Approved) -->
+                    <div style="background: #fafafa; padding: 20px; border-radius: 15px; border: 1px solid #f1f3f5; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 800; font-size: 0.9rem; color: #2d3436;">Financial Statements <span style="color: #74b9ff; font-size: 0.65rem; font-weight: 900; text-transform: uppercase;">[Optional]</span></div>
+                            <div style="font-size: 0.75rem; color: #b2bec3; margin-top: 2px;">Used to expedite trust and payouts.</div>
+                        </div>
+                        <?php if ($hasFinancial): ?>
+                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 1px solid #c3fae8;">✅ Uploaded</span>
+                        <?php else: ?>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="background: #f1f3f5; color: #636e72; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">Not Uploaded</span>
+                                <a href="settings.php" style="color: #0984e3; font-weight: bold; font-size: 0.75rem; text-decoration: underline;">Upload Info</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
                 </div>
             </div>
         <?php endif; ?>

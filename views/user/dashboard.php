@@ -21,6 +21,14 @@ $stmt_i->bind_param("i", $user['id']);
 $stmt_i->execute();
 $identity = $stmt_i->get_result()->fetch_assoc();
 
+// Fetch Real-time Verification Status
+$stmt_u = $conn->prepare("SELECT is_verified FROM users WHERE id = ?");
+$stmt_u->bind_param("i", $user['id']);
+$stmt_u->execute();
+$userData = $stmt_u->get_result()->fetch_assoc();
+$isVerified = $userData['is_verified'] ?? 0;
+$stmt_u->close();
+
 $status = $financial['status'] ?? 'none';
 $maxLimit = $financial['credit_limit'] ?? 0;
 $id_status = $identity['status'] ?? 'none';
@@ -85,7 +93,7 @@ $availableLimit = $maxLimit - $totalDebt;
                     </div>
                 </div>
 
-                <a href="financial_profile.php" style="display: block; background: rgba(255,255,255,0.1); color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                <a href="settings.php#verification-section" style="display: block; background: rgba(255,255,255,0.1); color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
                     <?php echo ($status === 'none') ? 'Setup Credit Profile' : 'Update Info'; ?>
                 </a>
             </div>
@@ -108,21 +116,27 @@ $availableLimit = $maxLimit - $totalDebt;
                         <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Phone Number</label>
                         <div style="font-weight: 700;"><?php echo htmlspecialchars($user['phone']); ?></div>
                     </div>
-                    <div>
+                     <div>
                         <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">OTP Verified</label>
-                        <div style="font-weight: 700; color: #00b894;">✅ Yes</div>
+                        <div style="font-weight: 700; color: <?php echo ($isVerified == 1) ? '#00b894' : '#e74c3c'; ?>;">
+                            <?php if ($isVerified == 1): ?>
+                                ✅ Yes
+                            <?php else: ?>
+                                ❌ No <a href="../auth/verify_otp.php" style="color: #0984e3; text-decoration: none; font-size: 0.8rem; margin-left: 5px; font-weight: bold;">(Verify Now)</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <!-- Verification Checklist -->
                 <h3 style="margin: 30px 0 15px 0; font-weight: 900; letter-spacing: -0.5px;">Verification Status</h3>
                 <div style="display: flex; gap: 15px;">
-                    <a href="identity_verification.php" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+                    <a href="settings.php#verification-section" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
                         <span style="font-weight: bold; font-size: 0.85rem; color: #2d3436;">Identity (CIN)</span>
                         <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; 
                               <?php echo ($id_status === 'approved') ? 'background: #eafaf1; color: #27ae60;' : 'background: #fff4e6; color: #d9480f;'; ?>">
                             <?php echo ($id_status === 'approved') ? 'Verified' : 'Required'; ?>
                         </span>
                     </a>
-                    <a href="financial_profile.php" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+                    <a href="settings.php#verification-section" style="flex: 1; text-decoration: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
                         <span style="font-weight: bold; font-size: 0.85rem; color: #2d3436;">Income Proof</span>
                         <span style="font-size: 0.7rem; font-weight: 900; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; 
                               <?php echo ($status === 'approved') ? 'background: #eafaf1; color: #27ae60;' : 'background: #fff4e6; color: #d9480f;'; ?>">

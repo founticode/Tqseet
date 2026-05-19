@@ -1,0 +1,31 @@
+# Phase 16 Complete: Admin Control Tower & Verification Hub Upgrades
+
+## Overview
+This document summarizes the final enhancements made to the Admin Control Tower and Verifications Dashboard, aligning the platform with premium BNPL operational standards like Klarna and Tabby.
+
+## 1. Upgraded Dynamic "Action Required" Stats
+- **File Edited**: `views/admin/dashboard.php`
+- **What Changed**: We completely rewrote the logic for the "Action Required" dashboard card. Previously, it incorrectly counted any user with `is_verified = 0` (even if they hadn't uploaded any documents).
+- **The Upgrade**: The query now mathematically calculates the true operational backlog by summing:
+  1. Customers who have successfully submitted their KYC documents (Identity/Income) and are actively waiting for an admin decision (`status = 'pending'`).
+  2. Merchants who have registered their stores and are waiting for onboarding approval (`status = 'pending'`).
+- **Visual Result**: The card now correctly shows `1 Reviews` instead of `2`, and features a sleek sub-detail breakdown (`0 Customer KYC • 1 Merchant`) directly under the total count.
+
+## 2. Segregated Dual-Stacked Status Badges for Customers
+- **File Edited**: `views/admin/verifications.php` (Customer Credit Reviews table)
+- **What Changed**: We split the monolithic verification status into two highly distinct, professional badges.
+- **The Upgrade**:
+  - Badge 1: Tracks the **📱 OTP Verification** status (Green if verified, Red if pending).
+  - Badge 2: Tracks the **💼 KYC / Credit Hub** status (Green if approved, Amber if under review, Red if rejected, Grey if not started).
+- **Why**: This gives the admin crystal-clear insight into exactly what type of verification the user has completed at a glance.
+
+## 3. Segregated Dual-Stacked Status Badges for Merchants
+- **File Edited**: `views/admin/verifications.php` (Merchant Applications & Approved Partners tables)
+- **What Changed**: We applied the exact same dual-badge logic to the merchant tracking tables.
+- **The Upgrade**:
+  - The queries were updated to pull `u.is_verified` into the merchant results.
+  - Badge 1: Tracks the **📱 Owner OTP Verification** status.
+  - Badge 2: Tracks the **🏬 Store Business** status (Pending Approval or Approved).
+
+## Summary
+The system now offers an absolutely airtight, fully dynamic, and incredibly transparent Admin Control Tower. The stats are perfectly accurate and reflect true operational pending queues, exactly as a high-end enterprise Fintech dashboard should.

@@ -115,9 +115,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $_SESSION["temp_user_id"] = $newUserId;
                         $_SESSION["temp_user_email"] = $email;
 
-                        echo "<h2 style='color:green;'>✅ Account created!</h2>";
-                        echo "<p>A verification code has been sent to your email (Simulated in otp_sent.log).</p>";
-                        echo "<a href='../views/auth/verify_otp.php' style='display:inline-block; padding:10px 20px; background:#007bff; color:white; text-decoration:none; border-radius:5px;'>→ Verify My Account</a>";
+                        // Trigger OTP pop-up on verify_otp.php screen
+                        $_SESSION["show_otp_popup"] = [
+                            'code' => $otp,
+                            'type' => 'email'
+                        ];
+
+                        header("Location: ../views/auth/verify_otp.php");
+                        exit;
                     } else {
                         echo "Account created, but could not send verification code.";
                     }

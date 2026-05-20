@@ -1,0 +1,38 @@
+========================================
+# 70_merchant_settlements_ledger.txt
+# Feature: Merchant Settlements Dashboard & Payout System
+========================================
+
+## 1. Concept & Business Logic
+In a standard BNPL architecture, the Merchant is paid upfront by the platform, while the platform collects installments from the customer.
+The "Settlements Ledger" is the financial accounting engine that manages these payouts.
+When a customer sale is "approved" (i.e. the first installment is paid), the Merchant's cut of the sale (`merchant_earning`) is credited to their "Available for Payout" balance. The Merchant can then batch these earnings and request a payout (Settlement) to their bank account.
+
+## 2. Database Schema Updates
+To rigidly track financial flow without losing transaction history, two major schema changes were made:
+
+A. Created a new `settlements` tracking table:
+- `id` (INT, Primary Key)
+- `merchant_id` (INT, Foreign Key referencing merchants.id)
+- `amount` (DECIMAL)
+- `status` (ENUM: 'pending', 'paid')
+- `created_at` (TIMESTAMP)
+
+B. Altered the existing `orders` table:
+- Added `settlement_id` (INT NULL, Foreign Key referencing settlements.id).
+- When a payout is requested, all cleared `orders` are securely linked to the specific `settlement_id` batch. This permanently locks the order and prevents it from being double-paid to the merchant.
+
+## 3. Backend Processing
+Location: `controllers/SettlementController.php`
+- **Balance Calculation**: Runs a strict SQL JOIN between `orders` and `products` to calculate the exact `SUM(merchant_earning)` for orders that belong to the merchant, are marked as 'approved', and where `settlement_id IS NULL`.
+- **Batch Linking**: If funds are available, the controller dynamically generates an `IN (...)` SQL clause to instantly update all eligible orders, stamping them with the newly generated `settlement_id`. 
+- **Security**: The backend rigorously enforces the `merchantId` ownership check to prevent cross-account fund requests.
+
+## 4. Merchant Dashboard Integration
+Location: `views/merchant/settlements.php`
+- **Dynamic Ledger Interface**: Built three primary financial cards tracking the merchant's exact monetary state:
+  1. Available to Payout (Green - cleared funds)
+  2. Pending Bank Transfer (Yellow - requested but processing)
+  3. Total Settled Lifetime (Black - historical success metric)
+- **1-Click Payout Engine**: A secure `POST` form that triggers the Settlement batching process. The button is dynamically disabled if the merchant has a `0.00` balance.
+- **Payout History Matrix**: A clean data grid showing all past settlement requests, their unique generated Batch ID, and their real-time processing status.

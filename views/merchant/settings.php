@@ -124,138 +124,151 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Settings - TQSEET</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
-
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
-
-    <div style="max-width: 800px; margin: 60px auto; padding: 0 20px;">
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
+    <style>
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.05em; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        .form-input:focus { border-color: var(--primary-black); box-shadow: 0 0 0 3px rgba(17,24,39,0.1); }
+        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; font-weight: 600; font-size: 0.9rem; }
+        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
         
-        <div style="margin-bottom: 40px;">
-            <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Store Management</h1>
-            <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Branding and business information for your shop.</p>
-        </div>
+        .settings-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+        @media (max-width: 900px) { .settings-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/merchant_sidebar.php"; ?>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <header class="page-header">
+            <h1>Store Settings</h1>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-muted);">
+                Manage your profile, compliance, and security.
+            </div>
+        </header>
 
         <?php if ($message): ?>
-            <div style="background: #eafaf1; color: #27ae60; padding: 15px 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #d4edda; font-weight: bold;">
-                ✅ <?php echo htmlspecialchars($message); ?>
-            </div>
+            <div class="alert alert-success">✅ <?php echo htmlspecialchars($message); ?></div>
         <?php endif; ?>
 
         <?php if ($error): ?>
-            <div style="background: #fdf2f2; color: #de350b; padding: 15px 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #fde8e8; font-weight: bold;">
-                ❌ <?php echo htmlspecialchars($error); ?>
-            </div>
+            <div class="alert alert-error">❌ <?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+        <div class="settings-grid">
             
             <!-- Left: Store Form -->
-            <div style="background: white; border-radius: 25px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; font-weight: 900; margin-bottom: 25px;">Store Identity</h3>
+            <div class="card">
+                <h2 class="card-title" style="margin-bottom: 24px;">Store Identity</h2>
                 
                 <form action="" method="POST">
                     <input type="hidden" name="action" value="update_profile">
                     
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Public Store Name</label>
-                        <input type="text" name="store_name" value="<?php echo htmlspecialchars($merchant['store_name']); ?>" required
-                               style="width: 100%; padding: 15px; border: 2px solid #f1f3f5; border-radius: 12px; font-size: 0.95rem; outline: none;">
+                    <div class="form-group">
+                        <label class="form-label">Public Store Name</label>
+                        <input type="text" name="store_name" class="form-input" value="<?php echo htmlspecialchars($merchant['store_name']); ?>" required placeholder="e.g. Zara Morocco">
                     </div>
                     
-                    <div style="margin-bottom: 30px;">
-                        <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Store Description</label>
-                        <textarea name="description" rows="5" required
-                                  style="width: 100%; padding: 15px; border: 2px solid #f1f3f5; border-radius: 12px; font-size: 0.95rem; outline: none; resize: none;"><?php echo htmlspecialchars($merchant['description']); ?></textarea>
-                        <small style="color: #b2bec3; margin-top: 5px; display: block;">This will be visible on your product pages.</small>
+                    <div class="form-group">
+                        <label class="form-label">Store Description</label>
+                        <textarea name="description" class="form-input" rows="4" required placeholder="Describe your store..." style="resize: none;"><?php echo htmlspecialchars($merchant['description']); ?></textarea>
+                        <small style="color: var(--text-muted); margin-top: 6px; display: block; font-size: 0.8rem;">This will be visible on your checkout pages.</small>
                     </div>
 
-                    <button type="submit" style="background: #222; color: white; padding: 15px 30px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer;">
-                        Update Store Profile
+                    <button type="submit" class="btn-black" style="padding: 12px 24px;">
+                        Save Profile
                     </button>
                 </form>
             </div>
 
-            <!-- Right: Account Info -->
+            <!-- Right: Account Info & Security -->
             <div>
-                <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); margin-bottom: 30px;">
-                    <h3 style="margin-top: 0; font-weight: 900; margin-bottom: 20px; font-size: 1rem;">Partner Agreement</h3>
+                <div class="card" style="margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: none;">
+                    <h2 class="card-title" style="font-size: 1rem; margin-bottom: 16px;">Partner Agreement</h2>
                     
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.85rem; font-weight: bold; color: #636e72;">Commission Rate</span>
-                            <span style="font-size: 0.75rem; font-weight: 900; color: #2d3436; background: #f1f3f5; padding: 4px 10px; border-radius: 8px;">
-                                <?php echo ($merchant['commission_rate'] * 100); ?>%
-                            </span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.85rem; font-weight: bold; color: #636e72;">Status</span>
-                            <span style="font-size: 0.65rem; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: #eafaf1; color: #27ae60;">
-                                <?php echo $merchant['status']; ?>
-                            </span>
-                        </div>
+                    <div class="checklist-row" style="padding: 12px 0;">
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Commission Rate</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-black); background: #f3f4f6; padding: 4px 10px; border-radius: 8px;">
+                            <?php echo ($merchant['commission_rate'] * 100); ?>%
+                        </span>
+                    </div>
+                    <div class="checklist-row" style="padding: 12px 0; border-bottom: none;">
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Status</span>
+                        <?php 
+                            $statusClass = 'pending';
+                            if ($merchant['status'] === 'approved') $statusClass = 'success';
+                        ?>
+                        <span class="status-badge <?php echo $statusClass; ?>">
+                            <?php echo ucfirst($merchant['status']); ?>
+                        </span>
                     </div>
                 </div>
 
-                <div style="background: #222; border-radius: 25px; padding: 30px; color: white;">
-                    <h3 style="margin-top: 0; font-weight: 900; margin-bottom: 15px; font-size: 1rem;">Security</h3>
-                    <p style="font-size: 0.8rem; opacity: 0.6; line-height: 1.5; margin-bottom: 20px;">Protect your credentials and update contact details.</p>
-                    <a href="../user/update_password.php" style="display: block; background: rgba(255,255,255,0.1); color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 10px; font-size: 0.85rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+                <div class="card" style="background: var(--primary-black); color: white;">
+                    <h2 class="card-title" style="font-size: 1rem; margin-bottom: 12px;">Security</h2>
+                    <p style="font-size: 0.85rem; color: #9ca3af; line-height: 1.5; margin-bottom: 20px;">Protect your credentials and update contact details.</p>
+                    <a href="../user/update_password.php" style="display: block; background: rgba(255,255,255,0.1); color: white; text-align: center; padding: 10px; text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; margin-bottom: 12px;">
                         Change Password
                     </a>
-                    <a href="../user/settings.php" style="display: block; background: rgba(255,255,255,0.05); color: #00b894; text-align: center; padding: 12px; text-decoration: none; border-radius: 10px; font-size: 0.85rem; font-weight: bold; border: 1px solid rgba(0,184,148,0.2);">
-                        Change Email / Phone (2FA)
+                    <a href="../user/settings.php" style="display: block; background: rgba(16,185,129,0.1); color: #34d399; text-align: center; padding: 10px; text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: background 0.2s;">
+                        Two-Factor / Email Settings
                     </a>
                 </div>
             </div>
 
         </div>
 
-        <!-- Section: Business Verification & Credentials (Klarna / Tabby Style) -->
-        <div style="background: white; border-radius: 25px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); margin-top: 40px;">
-            <h3 style="margin-top: 0; font-weight: 900; margin-bottom: 8px;">Business Verification & Documents</h3>
-            <p style="color: #636e72; font-size: 0.9rem; margin: 0 0 35px 0;">Submit compliance credentials to activate store trust features.</p>
+        <!-- Section: Business Verification & Credentials -->
+        <div class="card" style="margin-top: 24px;">
+            <h2 class="card-title">Business Verification</h2>
+            <p class="card-desc">Submit compliance credentials to activate store trust features and unlock live checkouts.</p>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px;">
                 
                 <!-- Left Column: Identity Card (CIN) -->
-                <div style="padding-right: 20px; border-right: 1px solid #f1f3f5;">
-                    <h4 style="margin-top: 0; font-size: 1.1rem; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <div>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px;">
                         <span>🪪</span> Identity Verification (CIN)
-                    </h4>
+                    </h3>
                     
                     <?php if ($cinApproved): ?>
-                        <div style="background: #eafaf1; color: #27ae60; padding: 20px; border-radius: 15px; border: 1px solid #d4edda; margin-bottom: 20px;">
-                            <div style="font-weight: 900; font-size: 0.95rem;">✅ ID Verified & Sealed</div>
-                            <p style="margin: 5px 0 0 0; font-size: 0.8rem; line-height: 1.4;">CIN: <strong><?php echo htmlspecialchars($verification['cin']); ?></strong></p>
+                        <div class="alert alert-success">
+                            <div style="font-weight: 700; margin-bottom: 4px;">✅ ID Verified & Sealed</div>
+                            <div style="font-size: 0.85rem; font-weight: 500;">CIN: <?php echo htmlspecialchars($verification['cin']); ?></div>
                         </div>
                         <?php if (!empty($verification['cin_image'])): ?>
-                            <img src="../../uploads/verifications/<?php echo $verification['cin_image']; ?>" style="max-width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #eee;">
+                            <img src="../../uploads/verifications/<?php echo $verification['cin_image']; ?>" style="max-width: 100%; border-radius: 8px; margin-top: 12px; border: 1px solid var(--border-color);">
                         <?php endif; ?>
                     <?php else: ?>
                         <?php if ($verification && $verification['status'] === 'pending'): ?>
-                            <div style="background: #fff9db; color: #856404; padding: 15px; border-radius: 12px; border: 1px solid #ffeeba; margin-bottom: 20px; font-size: 0.85rem; font-weight: bold;">
+                            <div class="alert alert-pending">
                                 ⏳ Review in progress: Identity document submitted.
                             </div>
                         <?php endif; ?>
                         
                         <form action="" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="upload_cin">
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">CIN Number</label>
-                                <input type="text" name="cin" required value="<?php echo htmlspecialchars($verification['cin'] ?? ''); ?>" 
-                                       placeholder="e.g. AB123456"
-                                       style="width: 100%; padding: 12px; border: 2px solid #f1f3f5; border-radius: 10px; font-size: 0.9rem; outline: none;">
+                            <div class="form-group">
+                                <label class="form-label">CIN Number</label>
+                                <input type="text" name="cin" class="form-input" required value="<?php echo htmlspecialchars($verification['cin'] ?? ''); ?>" placeholder="e.g. AB123456">
                             </div>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Upload CIN Document (Photo/PDF)</label>
-                                <input type="file" name="cin_image" <?php echo $verification ? '' : 'required'; ?> style="font-size: 0.85rem; color: #636e72;">
+                            <div class="form-group">
+                                <label class="form-label">Upload CIN Document (Photo/PDF)</label>
+                                <input type="file" name="cin_image" <?php echo $verification ? '' : 'required'; ?> style="font-size: 0.9rem; color: var(--text-muted); width: 100%; padding: 8px 0;">
                                 <?php if ($verification && $verification['cin_image']): ?>
-                                    <small style="display: block; margin-top: 5px; color: #0984e3; font-weight: bold;">📄 Current: <?php echo htmlspecialchars($verification['cin_image']); ?></small>
+                                    <small style="display: block; margin-top: 6px; color: #3b82f6; font-weight: 600;">📄 Current: <?php echo htmlspecialchars($verification['cin_image']); ?></small>
                                 <?php endif; ?>
                             </div>
-                            <button type="submit" style="background: #222; color: white; padding: 12px 25px; border: none; border-radius: 10px; font-weight: bold; font-size: 0.85rem; cursor: pointer;">
+                            <button type="submit" class="btn-black">
                                 Submit Identity Card
                             </button>
                         </form>
@@ -263,49 +276,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
 
                 <!-- Right Column: Business Financials -->
-                <div>
-                    <h4 style="margin-top: 0; font-size: 1.1rem; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <div style="border-left: 1px solid var(--border-color); padding-left: 32px;">
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px;">
                         <span>📈</span> Business Financials
-                    </h4>
+                    </h3>
                     
                     <?php if ($financialApproved): ?>
-                        <div style="background: #eafaf1; color: #27ae60; padding: 20px; border-radius: 15px; border: 1px solid #d4edda; margin-bottom: 20px;">
-                            <div style="font-weight: 900; font-size: 0.95rem;">✅ Financials Verified & Sealed</div>
-                            <p style="margin: 5px 0 0 0; font-size: 0.8rem; line-height: 1.4;">
-                                Structure: <strong><?php echo htmlspecialchars($financial['profession']); ?></strong><br>
-                                Est. Monthly Revenue: <strong><?php echo number_format($financial['salary'], 2); ?> DH</strong>
-                            </p>
+                        <div class="alert alert-success">
+                            <div style="font-weight: 700; margin-bottom: 4px;">✅ Financials Verified & Sealed</div>
+                            <div style="font-size: 0.85rem; font-weight: 500; line-height: 1.5;">
+                                Structure: <?php echo htmlspecialchars($financial['profession']); ?><br>
+                                Est. Revenue: <?php echo number_format($financial['salary'], 2); ?> DH
+                            </div>
                         </div>
                     <?php else: ?>
                         <?php if ($financial && $financial['status'] === 'pending'): ?>
-                            <div style="background: #fff9db; color: #856404; padding: 15px; border-radius: 12px; border: 1px solid #ffeeba; margin-bottom: 20px; font-size: 0.85rem; font-weight: bold;">
+                            <div class="alert alert-pending">
                                 ⏳ Review in progress: Store financials submitted.
                             </div>
                         <?php endif; ?>
                         
                         <form action="" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="upload_financials">
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Legal Business Structure</label>
-                                <input type="text" name="profession" required value="<?php echo htmlspecialchars($financial['profession'] ?? ''); ?>" 
-                                       placeholder="e.g. LLC, SARL, Sole Proprietorship"
-                                       style="width: 100%; padding: 12px; border: 2px solid #f1f3f5; border-radius: 10px; font-size: 0.9rem; outline: none;">
+                            <div class="form-group">
+                                <label class="form-label">Legal Business Structure</label>
+                                <input type="text" name="profession" class="form-input" required value="<?php echo htmlspecialchars($financial['profession'] ?? ''); ?>" placeholder="e.g. LLC, SARL, Sole Proprietorship">
                             </div>
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Estimated Monthly Revenue (DH)</label>
-                                <input type="number" name="salary" required value="<?php echo htmlspecialchars($financial['salary'] ?? ''); ?>" 
-                                       placeholder="e.g. 50000"
-                                       style="width: 100%; padding: 12px; border: 2px solid #f1f3f5; border-radius: 10px; font-size: 0.9rem; outline: none;">
+                            <div class="form-group">
+                                <label class="form-label">Estimated Monthly Revenue (DH)</label>
+                                <input type="number" name="salary" class="form-input" required value="<?php echo htmlspecialchars($financial['salary'] ?? ''); ?>" placeholder="e.g. 50000">
                             </div>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #b2bec3; margin-bottom: 8px;">Upload Bank Statement / Tax Paper</label>
-                                <input type="file" name="salary_proof" <?php echo $financial ? '' : 'required'; ?> style="font-size: 0.85rem; color: #636e72;">
+                            <div class="form-group">
+                                <label class="form-label">Upload Bank Statement / Tax Paper</label>
+                                <input type="file" name="salary_proof" <?php echo $financial ? '' : 'required'; ?> style="font-size: 0.9rem; color: var(--text-muted); width: 100%; padding: 8px 0;">
                                 <?php if ($financial && $financial['salary_proof']): ?>
-                                    <small style="display: block; margin-top: 5px; color: #0984e3; font-weight: bold;">📄 Current: <?php echo htmlspecialchars($financial['salary_proof']); ?></small>
+                                    <small style="display: block; margin-top: 6px; color: #3b82f6; font-weight: 600;">📄 Current: <?php echo htmlspecialchars($financial['salary_proof']); ?></small>
                                 <?php endif; ?>
                             </div>
-                            <button type="submit" style="background: #222; color: white; padding: 12px 25px; border: none; border-radius: 10px; font-weight: bold; font-size: 0.85rem; cursor: pointer;">
-                                Submit Business Financials
+                            <button type="submit" class="btn-black">
+                                Submit Financials
                             </button>
                         </form>
                     <?php endif; ?>
@@ -314,7 +323,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </div>
 
-    </div>
+    </main>
 
 </body>
 </html>

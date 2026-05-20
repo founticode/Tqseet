@@ -103,21 +103,27 @@ if ($action === "add" && $_SERVER["REQUEST_METHOD"] === "POST") {
         $imageName = $row['image'];
 
         // 2. Delete from Database
-        $stmt_del = $conn->prepare("DELETE FROM products WHERE id = ?");
-        $stmt_del->bind_param("i", $productId);
-        
-        if ($stmt_del->execute()) {
-            // 3. Delete the physical image file from the server
-            $imagePath = __DIR__ . "/../uploads/products/" . $imageName;
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+        try {
+            $stmt_del = $conn->prepare("DELETE FROM products WHERE id = ?");
+            $stmt_del->bind_param("i", $productId);
+            
+            if ($stmt_del->execute()) {
+                // 3. Delete the physical image file from the server
+                $imagePath = __DIR__ . "/../uploads/products/" . $imageName;
+                if (file_exists($imagePath) && $imageName !== 'default_product.png') {
+                    unlink($imagePath);
+                }
+                header("Location: ../views/merchant/products.php?deleted=1");
+                exit;
+            } else {
+                echo "❌ Error: Could not delete product from database.";
             }
-            header("Location: ../views/merchant/products.php?deleted=1");
+            $stmt_del->close();
+        } catch (mysqli_sql_exception $e) {
+            // This happens if the product has active orders attached to it (foreign key block)
+            header("Location: ../views/merchant/products.php?error=product_has_orders");
             exit;
-        } else {
-            echo "❌ Error: Could not delete product from database.";
         }
-        $stmt_del->close();
     } else {
         die("❌ Error: Unauthorized action or product not found.");
     }

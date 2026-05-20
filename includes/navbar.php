@@ -85,14 +85,20 @@ if (isLoggedIn()) {
                                 <span>💳</span> My Installments
                             </a>
                         <?php elseif ($user['role'] === 'merchant'): ?>
-                            <a href="/views/merchant/settings.php" class="navbar-dropdown-item">
-                                <span>⚙️</span> Store Settings
-                            </a>
                             <a href="/views/merchant/products.php" class="navbar-dropdown-item">
-                                <span>📦</span> Products Inventory
+                                <span>📦</span> Catalog
                             </a>
                             <a href="/views/merchant/sales.php" class="navbar-dropdown-item">
-                                <span>💰</span> Sales Ledger
+                                <span>🛒</span> Orders
+                            </a>
+                            <a href="#" class="navbar-dropdown-item">
+                                <span>🔗</span> Payment Links
+                            </a>
+                            <a href="#" class="navbar-dropdown-item">
+                                <span>🏦</span> Settlements
+                            </a>
+                            <a href="/views/merchant/settings.php" class="navbar-dropdown-item">
+                                <span>⚙️</span> Store Settings
                             </a>
                         <?php elseif ($user['role'] === 'admin'): ?>
                             <a href="/views/admin/verifications.php" class="navbar-dropdown-item">

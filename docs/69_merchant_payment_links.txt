@@ -1,0 +1,49 @@
+========================================
+# 69_merchant_payment_links.txt
+# Feature: Merchant Payment Links & Dynamic Checkout
+========================================
+
+## 1. Concept & Business Logic
+The Payment Links feature allows merchants to generate secure, custom URLs for instant BNPL checkout. This is essential for:
+- Social Media Sales (Instagram/WhatsApp DMs)
+- Custom B2B Services & Invoicing
+- In-store / Point of Sale (POS) transactions
+Instead of forcing customers to browse a catalog, merchants can instantly lock in a sale with a custom amount, description, and product image.
+
+## 2. Database Schema Update
+A new `payment_links` table was added to handle these dynamic transactions. 
+Columns:
+- `id` (INT, Primary Key)
+- `merchant_id` (INT, Foreign Key referencing merchants.id)
+- `link_hash` (VARCHAR, Unique 16-character secure hash)
+- `title` (VARCHAR)
+- `description` (TEXT, Optional)
+- `image` (VARCHAR, Optional)
+- `amount` (DECIMAL)
+- `status` (ENUM: 'active', 'paid', 'expired')
+- `created_at` (TIMESTAMP)
+
+## 3. Merchant Dashboard Integration
+Location: `views/merchant/payment_links.php`
+- **Link Generation Form**: Added a responsive grid-based form allowing merchants to input Title, Amount, Description, and an Image upload.
+- **Data Table**: Added a real-time data table displaying active links with quick actions.
+- **Copy Link Mechanism**: Implemented a JS clipboard function (`copyToClipboard`) for instant sharing.
+- **Action Security**: Migrated all actionable commands (create, delete) to strictly use hidden `$_POST` variables to prevent URL hijacking and ensure cross-browser compatibility.
+
+## 4. Backend Processing
+Location: `controllers/PaymentLinkController.php`
+- **Hash Generation**: Utilizes `bin2hex(random_bytes(8))` to generate cryptographically secure URLs.
+- **Image Handling**: Processes image uploads and maps them uniquely to the merchant.
+- **Catalog Filtration**: `ProductController.php` and `views/merchant/products.php` were updated to explicitly filter out `Payment for %` items so temporary payment link products do not clutter the merchant's public or private catalog.
+
+## 5. Dynamic Checkout Redirection
+Location: `views/public/pay_link.php`
+- Displays the custom item title, uploaded image, description, and price breakdown in a high-fidelity, mobile-responsive card.
+- **Authentication Gateway**: Enforces a strict `session_start()` at line 1. If the user is unauthenticated, the "Continue to Payment" button seamlessly routes them to `login.php` with a `redirect` query parameter.
+- **Role Verification**: `PaymentLinkController.php` includes a hard-coded security block preventing merchants from purchasing their own payment links.
+- **Order Wrapping**: Upon continuing, the controller dynamically wraps the custom payment link data into a hidden product listing and forcefully injects the user into the standard `place_order.php` BNPL flow.
+
+## 6. Financial Guardrails
+Location: `controllers/ProductController.php`
+- Wrapped the product deletion logic in a strict `try/catch` block handling `mysqli_sql_exception`.
+- If a merchant attempts to delete a product that has active pending or paid customer orders tied to it, the database constraint blocks it. The backend gracefully catches this and alerts the merchant instead of crashing the system.

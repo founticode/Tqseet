@@ -168,5 +168,10 @@
 
 ---
 
-## Current Position: READY FOR PHASE 14 (Branding & UI/UX Overhaul)
+## Phase 18: Advanced Merchant Tools (Upcoming) ⬜
+- [ ] Step 1: Build Payment Links logic (Generate unique URL for dynamic amount to send via WhatsApp/Email)
+- [ ] Step 2: Build Settlements dashboard and tracking logic (Track platform payouts to the merchant's bank)
 
+---
+
+## Current Position: Working on Merchant Portal UI (Catalog & Orders Redesign)

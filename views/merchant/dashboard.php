@@ -34,154 +34,117 @@ $hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Store Manager - TQSEET</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Dashboard - TQSEET</title>
+    <!-- Use the centralized portal stylesheet -->
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+    <!-- Dynamically include the Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/merchant_sidebar.php"; ?>
 
-    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+    <!-- Main Content -->
+    <main class="main-content">
         
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
-            <div>
-                <h1 style="margin: 0; font-size: 2.5rem; font-weight: 900; letter-spacing: -1.5px;">Store Manager</h1>
-                <p style="color: #636e72; margin: 10px 0 0 0; font-weight: 500;">Welcome back, <strong><?php echo htmlspecialchars($user['name']); ?></strong>!</p>
+        <header class="page-header">
+            <h1>Home</h1>
+            <div style="display: flex; gap: 12px;">
+                <?php if ($status === 'approved'): ?>
+                    <a href="add_product.php" class="btn-black" style="background: white; color: var(--primary-black); border: 1px solid var(--border-color);">
+                        Add product
+                    </a>
+                    <a href="#" class="btn-black">
+                        Create payment link
+                    </a>
+                <?php endif; ?>
             </div>
-            <?php if ($status === 'approved'): ?>
-                <a href="add_product.php" style="background: #222; color: white; padding: 15px 30px; text-decoration: none; border-radius: 15px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">+ List New Product</a>
-            <?php endif; ?>
-        </div>
-
-        <?php if ($status === 'approved'): ?>
-            <div style="background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; gap: 30px; align-items: center; margin-bottom: 40px; border: 1px solid #f1f3f5;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 0.75rem; color: #b2bec3; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Partner Agreement:</span>
-                    <span style="background: #eafaf1; color: #27ae60; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: bold;">
-                        <?php echo ($rate * 100); ?>% Platform Fee
-                    </span>
-                </div>
-                <div style="width: 1px; height: 20px; background: #eee;"></div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 0.75rem; color: #b2bec3; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Store Status:</span>
-                    <span style="color: #27ae60; font-size: 0.8rem; font-weight: bold;">✅ Verified & Active</span>
-                </div>
-            </div>
-        <?php endif; ?>
+        </header>
 
         <?php if ($status !== 'approved'): ?>
-            <!-- Verification Pending Card (Strict Onboarding Checklist) -->
-            <div style="background: white; border-radius: 25px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid #ffeeba; margin-bottom: 40px;">
-                <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
-                <h2 style="margin: 0; font-weight: 900; color: #856404; letter-spacing: -0.5px;">Store Pending Activation</h2>
-                <p style="color: #636e72; max-width: 500px; margin: 15px auto; line-height: 1.6; font-size: 0.95rem;">To activate your store and begin listing products, you must complete your business verification documents below.</p>
+            <div class="card" style="border: 1px solid #fde68a;">
+                <h2 class="card-title" style="color: #92400e;">Finish store setup</h2>
+                <p class="card-desc">Complete your business verification to unlock live checkouts and start accepting split payments.</p>
                 
-                <!-- Onboarding Checklist -->
-                <div style="max-width: 450px; margin: 30px auto; text-align: left; background: #fafafa; border-radius: 20px; padding: 25px; border: 1px dashed #ffeeba;">
-                    <h4 style="margin: 0 0 15px 0; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: #856404; font-weight: 800;">Verification Checklist</h4>
-                    
-                    <!-- 1. CIN Card Check -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f1f3f5;">
-                        <div>
-                            <div style="font-weight: bold; font-size: 0.9rem; color: #2d3436;">Identity Card (CIN) <span style="color: #d63031; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;">[Required]</span></div>
-                            <div style="font-size: 0.75rem; color: #b2bec3;">Required for official government verification.</div>
-                        </div>
-                        <?php if ($hasCIN): ?>
-                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">✅ Uploaded</span>
-                        <?php else: ?>
-                            <a href="settings.php" style="background: #ff7675; color: white; text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">Upload Now</a>
-                        <?php endif; ?>
+                <div class="checklist-row">
+                    <div class="checklist-info">
+                        <h4>Identity Card (CIN)</h4>
+                        <p>Required for official government verification.</p>
                     </div>
-
-                    <!-- 2. Financial Info Check -->
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: bold; font-size: 0.9rem; color: #2d3436;">Financial Statements <span style="color: #74b9ff; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;">[Optional]</span></div>
-                            <div style="font-size: 0.75rem; color: #b2bec3;">Highly recommended to speed up trust & payout limits.</div>
-                        </div>
-                        <?php if ($hasFinancial): ?>
-                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">✅ Uploaded</span>
-                        <?php else: ?>
-                            <a href="settings.php" style="background: #f1f3f5; color: #636e72; text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">Upload Info</a>
-                        <?php endif; ?>
-                    </div>
+                    <?php if ($hasCIN): ?>
+                        <span class="status-badge success">✓ Uploaded</span>
+                    <?php else: ?>
+                        <a href="settings.php" class="status-badge action">Upload</a>
+                    <?php endif; ?>
                 </div>
 
-                <div style="display: inline-block; background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 0.9rem;">
-                    Store Review Status: <span style="text-transform: uppercase;"><?php echo htmlspecialchars($status); ?></span>
+                <div class="checklist-row">
+                    <div class="checklist-info">
+                        <h4>Financial Statements (Optional)</h4>
+                        <p>Highly recommended to speed up trust & payout limits.</p>
+                    </div>
+                    <?php if ($hasFinancial): ?>
+                        <span class="status-badge success">✓ Uploaded</span>
+                    <?php else: ?>
+                        <a href="settings.php" class="status-badge action">Upload</a>
+                    <?php endif; ?>
+                </div>
+
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <span class="status-badge pending">Store Status: <?php echo ucfirst(htmlspecialchars($status)); ?></span>
                 </div>
             </div>
         <?php else: ?>
-            <!-- Verification Center (Rendered beautifully for APPROVED active merchants!) -->
-            <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid #f1f3f5; margin-bottom: 40px;">
-                <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #2d3436; font-weight: 900;">📋 Store Credentials Checklist</h3>
-                <p style="color: #636e72; font-size: 0.85rem; margin-top: 5px; margin-bottom: 25px; font-weight: 500;">Review your active government verification papers and optional credentials.</p>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                    
-                    <!-- 1. CIN Card Check (Approved) -->
-                    <div style="background: #fafafa; padding: 20px; border-radius: 15px; border: 1px solid #f1f3f5; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 800; font-size: 0.9rem; color: #2d3436;">Identity Card (CIN) <span style="color: #00b894; font-size: 0.65rem; font-weight: 900; text-transform: uppercase;">[Required]</span></div>
-                            <div style="font-size: 0.75rem; color: #b2bec3; margin-top: 2px;">Official government identification.</div>
-                        </div>
-                        <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 1px solid #c3fae8;">✅ Verified & Active</span>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-title">Platform Fee</div>
+                    <div class="stat-value" style="color: #10b981;"><?php echo ($rate * 100); ?>%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Store Status</div>
+                    <div class="stat-value">Active</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Integration</div>
+                    <div class="stat-value" style="font-size: 1.2rem; display: flex; align-items: center; height: 100%;">
+                        <a href="../public/business_docs.php" style="color: var(--primary-black); text-decoration: underline;">View API Keys</a>
                     </div>
-
-                    <!-- 2. Financial Info Check (Approved) -->
-                    <div style="background: #fafafa; padding: 20px; border-radius: 15px; border: 1px solid #f1f3f5; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 800; font-size: 0.9rem; color: #2d3436;">Financial Statements <span style="color: #74b9ff; font-size: 0.65rem; font-weight: 900; text-transform: uppercase;">[Optional]</span></div>
-                            <div style="font-size: 0.75rem; color: #b2bec3; margin-top: 2px;">Used to expedite trust and payouts.</div>
-                        </div>
-                        <?php if ($hasFinancial): ?>
-                            <span style="background: #e3faf2; color: #087f5b; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 1px solid #c3fae8;">✅ Uploaded</span>
-                        <?php else: ?>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: #f1f3f5; color: #636e72; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">Not Uploaded</span>
-                                <a href="settings.php" style="color: #0984e3; font-weight: bold; font-size: 0.75rem; text-decoration: underline;">Upload Info</a>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
                 </div>
             </div>
+
+            <div class="card">
+                <h2 class="card-title">Getting Started</h2>
+                <p class="card-desc">Your store is approved. Here are the best ways to start generating sales.</p>
+
+                <div class="checklist-row">
+                    <div class="checklist-info">
+                        <h4>Add Products to Catalog</h4>
+                        <p>List your inventory on the TQSEET marketplace for instant visibility.</p>
+                    </div>
+                    <a href="add_product.php" class="status-badge action">Create Product</a>
+                </div>
+
+                <div class="checklist-row">
+                    <div class="checklist-info">
+                        <h4>Create Payment Link <span class="badge-new">New</span></h4>
+                        <p>Generate a secure link to send to a customer via WhatsApp or email.</p>
+                    </div>
+                    <a href="#" class="status-badge action">Create Link</a>
+                </div>
+                
+                <div class="checklist-row">
+                    <div class="checklist-info">
+                        <h4>Integrate API</h4>
+                        <p>Connect your WooCommerce or custom storefront to our checkout gateway.</p>
+                    </div>
+                    <a href="../public/business_docs.php" class="status-badge action">Read Docs</a>
+                </div>
+            </div>
+
         <?php endif; ?>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
-            
-            <!-- Inventory -->
-            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s; opacity: <?php echo $status === 'approved' ? '1' : '0.5'; ?>;">
-                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Inventory</h3>
-                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Track stock levels, update prices, and manage your live product listings.</p>
-                <a href="<?php echo $status === 'approved' ? 'products.php' : '#'; ?>" 
-                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
-                   Manage Catalog
-                </a>
-            </div>
-
-            <!-- Sales -->
-            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s; opacity: <?php echo $status === 'approved' ? '1' : '0.5'; ?>;">
-                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Revenue</h3>
-                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Monitor your platform earnings, commissions, and transaction history.</p>
-                <a href="<?php echo $status === 'approved' ? 'sales.php' : '#'; ?>" 
-                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
-                   View Analytics
-                </a>
-            </div>
-
-            <!-- Profile -->
-            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: 0.3s;">
-                <h3 style="margin-top: 0; font-weight: 900; letter-spacing: -0.5px;">Store Branding</h3>
-                <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">Customize your shop name, description, and contact information.</p>
-                <a href="settings.php" 
-                   style="display: block; background: #f1f3f5; color: #2d3436; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center;">
-                   Edit Profile
-                </a>
-            </div>
-
-        </div>
-
-    </div>
+    </main>
 
 </body>
 </html>

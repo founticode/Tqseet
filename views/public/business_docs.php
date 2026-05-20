@@ -205,6 +205,17 @@ require_once __DIR__ . "/../../includes/auth.php";
 
         <!-- Main Documentation Content -->
         <main class="docs-content">
+
+            <!-- Sandbox Beta Notice banner -->
+            <div style="background-color: #f8fafc; border-left: 4px solid #005a4e; border-radius: 8px; padding: 20px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.01); border: 1px solid #e2e8f0; border-left-width: 4px;">
+                <div style="display: flex; gap: 15px; align-items: flex-start;">
+                    <div style="font-size: 1.5rem; line-height: 1;">🛠️</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: #005a4e; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">API Sandbox Beta Preview</h4>
+                        <p style="margin: 0; font-size: 0.9rem; color: #475569; line-height: 1.6;">Our REST API is currently in developer sandbox preview. Production checkout endpoints and private API secrets will be enabled in your business workspace settings console soon. Use these models to plan custom integrations.</p>
+                    </div>
+                </div>
+            </div>
             
             <!-- Intro Section -->
             <section id="introduction" class="docs-section">
@@ -216,7 +227,7 @@ require_once __DIR__ . "/../../includes/auth.php";
             <!-- Auth Section -->
             <section id="authentication" class="docs-section">
                 <h2>API Authentication</h2>
-                <p>Every call to TQSEET REST endpoints must contain your unique client token inside the request header. You can locate your private and public credentials in the <strong>Store Settings</strong> workspace.</p>
+                <p>Every call to TQSEET REST endpoints must contain your unique client token inside the request header. You can locate your private and public credentials in the <strong>Store Settings</strong> workspace (Coming Soon).</p>
                 
                 <div class="docs-code-box">
 Authorization: Bearer tq_live_8f3d1e9aa35e07bd6a218f2f

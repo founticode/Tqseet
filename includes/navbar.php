@@ -43,6 +43,7 @@ if (isLoggedIn()) {
                     <!-- Admin Control Links -->
                     <a href="/views/admin/dashboard.php" class="navbar-link">Dashboard</a>
                     <a href="/views/admin/verifications.php" class="navbar-link">Verifications Hub</a>
+                    <a href="/views/admin/settlements.php" class="navbar-link">Settlements</a>
                     
                 <?php else: ?>
                     <!-- Regular Consumer Links -->

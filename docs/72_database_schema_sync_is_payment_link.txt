@@ -1,0 +1,24 @@
+# Database Schema Sync: Product Payment Link Flag
+
+## 1. Issue Description
+When accessing the public catalog page (`views/public/shop.php`), the application encountered a PHP fatal error:
+`Fatal error: Uncaught mysqli_sql_exception: Unknown column 'p.is_payment_link' in 'where clause' in C:\xampp\htdocs\Tqseet\views\public\shop.php:102`
+
+## 2. Root Cause Analysis
+- During recent updates (specifically related to the B2B Merchant Landing & Payment Links integration), a new column `is_payment_link` was added to the `products` table.
+- This column is used to distinguish standard catalog products from custom, merchant-generated direct payment links.
+- When cloning the repository fresh onto a new development system (home laptop) and importing the baseline database schema (`database/schema.sql`), the database lacks this newly added column, as the baseline schema file had not been updated with the database patch.
+- Consequently, the SQL query in `views/public/shop.php` that filters out payment links (`p.is_payment_link = FALSE`) failed.
+
+## 3. Resolution Details
+- Executed the developer patch script `patch_db.php` on the local database environment.
+- The script performed the following actions:
+  1. Ran an `ALTER TABLE` query to add the missing `is_payment_link` column to the `products` table:
+     `ALTER TABLE products ADD COLUMN is_payment_link BOOLEAN DEFAULT FALSE`
+  2. Executed a retroactive query to mark old dummy/direct products accordingly:
+     `UPDATE products SET is_payment_link = TRUE WHERE description LIKE 'Payment for %'`
+- This successfully brought the local MySQL database schema in sync with the codebase queries.
+
+## 4. Verification
+- A verification script was executed to run the catalog query against the database.
+- The query now successfully compiles and executes without exceptions.

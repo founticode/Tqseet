@@ -27,63 +27,68 @@ $result = $conn->query($sql);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Merchants - TQSEET Admin</title>
+    <!-- Tap into the premium CSS engine -->
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+    <!-- Premium Admin Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/admin_sidebar.php"; ?>
 
-    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+    <main class="main-content">
         
-        <div style="margin-bottom: 40px;">
-            <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Platform Merchants</h1>
-            <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Review and manage all business partners on the TQSEET network.</p>
-        </div>
+        <header class="page-header" style="justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1>Platform Merchants</h1>
+                <p style="color: #6b7280; font-size: 0.95rem; margin-top: 8px;">Review and manage all business partners on the TQSEET network.</p>
+            </div>
+        </header>
 
         <!-- Merchants Table -->
-        <div style="background: white; border-radius: 25px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
-            
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="portal-table-wrapper" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <table class="portal-table">
                 <thead>
-                    <tr style="text-align: left; background: #fafafa; border-bottom: 1px solid #f1f1f1;">
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Merchant / Store</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Owner Details</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Commission</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Inventory</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Joined</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; text-align: right;">Status</th>
+                    <tr>
+                        <th>Merchant / Store</th>
+                        <th>Owner Details</th>
+                        <th>Commission</th>
+                        <th>Inventory</th>
+                        <th>Joined</th>
+                        <th style="text-align: center;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ($result->num_rows === 0): ?>
                         <tr>
-                            <td colspan="6" style="padding: 60px; text-align: center; color: #b2bec3; font-style: italic;">No merchants registered yet.</td>
+                            <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-muted);">No merchants registered yet.</td>
                         </tr>
                     <?php endif; ?>
 
                     <?php while($row = $result->fetch_assoc()): ?>
-                        <tr style="border-bottom: 1px solid #f8f9fa; transition: 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 800; color: #2d3436; font-size: 1rem;"><?php echo htmlspecialchars($row['store_name'] ?: 'Unnamed Store'); ?></div>
-                                <div style="font-size: 0.8rem; color: #b2bec3; margin-top: 4px;">Merchant ID: #<?php echo $row['merchant_id']; ?></div>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600; color: #111827;"><?php echo htmlspecialchars($row['store_name'] ?: 'Unnamed Store'); ?></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">Merchant ID: #<?php echo $row['merchant_id']; ?></div>
                             </td>
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 600; color: #2d3436;"><?php echo htmlspecialchars($row['owner_name']); ?></div>
-                                <div style="font-size: 0.85rem; color: #636e72;"><?php echo htmlspecialchars($row['email']); ?></div>
+                            <td>
+                                <div style="font-weight: 600; color: #4b5563;"><?php echo htmlspecialchars($row['owner_name']); ?></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;"><?php echo htmlspecialchars($row['email']); ?></div>
                             </td>
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 900; color: #0984e3;"><?php echo number_format($row['commission_rate'], 2); ?>%</div>
-                                <div style="font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; font-weight: bold;">Platform Cut</div>
+                            <td>
+                                <div style="font-weight: 800; color: #3b82f6;"><?php echo number_format($row['commission_rate'] * 100, 2); ?>%</div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600;">PLATFORM CUT</div>
                             </td>
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 800; color: #2d3436;"><?php echo $row['product_count']; ?> Items</div>
-                                <div style="font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; font-weight: bold;">Listed Products</div>
+                            <td>
+                                <div style="font-weight: 700; color: #111827;"><?php echo $row['product_count']; ?> Items</div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600;">LISTED</div>
                             </td>
-                            <td style="padding: 20px; color: #636e72; font-size: 0.9rem;">
+                            <td style="color: #6b7280; font-size: 0.9rem;">
                                 <?php echo date("M d, Y", strtotime($row['joined_at'])); ?>
                             </td>
-                            <td style="padding: 20px; text-align: right;">
-                                <span style="background: rgba(0, 184, 148, 0.1); color: #00b894; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">Active Business</span>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <span class="status-badge status-active">Active Business</span>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -91,7 +96,7 @@ $result = $conn->query($sql);
             </table>
         </div>
 
-    </div>
+    </main>
 
 </body>
 </html>

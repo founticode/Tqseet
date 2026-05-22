@@ -168,10 +168,22 @@
 
 ---
 
-## Phase 18: Advanced Merchant Tools (Upcoming) ⬜
-- [ ] Step 1: Build Payment Links logic (Generate unique URL for dynamic amount to send via WhatsApp/Email)
-- [ ] Step 2: Build Settlements dashboard and tracking logic (Track platform payouts to the merchant's bank)
+## Phase 18: Premium Checkout & Admin UX Overhaul ✅
+- [x] Step 1: Upgraded `calculate_installments.php` to an enterprise "Checkout Wall" with a dynamic timeline.
+- [x] Step 2: Redesigned `checkout_payment.php` with a live-updating credit card mockup and auto-formatting JS.
+- [x] Step 3: Upgraded Admin `view_user.php` to a premium two-column audit dashboard integrated into the Control Tower sidebar.
+- [x] Step 4: Transformed Admin `analytics.php` into a dark-mode infused system analytics panel with fixed SQL calculations for true GMV and revenue.
+- [x] Step 5: Enhanced Admin `settings.php` into a robust two-column Enterprise Control panel containing global platform configurations.
+- [x] Step 6: Upgraded `place_order.php` crash screens to beautiful, styled fintech UI error cards.
+- [x] Step 7: Wired dashboard credit card buttons to logical anchor links with global native smooth-scrolling.
 
 ---
 
-## Current Position: Working on Merchant Portal UI (Catalog & Orders Redesign)
+## Phase 19: Advanced Merchant Tools (Upcoming) ⬜
+- [ ] Step 1: Build the core Merchant Portal Dashboard (Sales, Orders, API Settings) for store owners.
+- [ ] Step 2: Build Payment Links logic (Generate unique URL for dynamic amount to send via WhatsApp/Email)
+- [ ] Step 3: Build Settlements dashboard and tracking logic (Track platform payouts to the merchant's bank)
+
+---
+
+## Current Position: Ready to build the Merchant Portal Dashboard (`views/merchant/dashboard.php`)

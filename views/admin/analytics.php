@@ -9,13 +9,13 @@ $db = new Database();
 $conn = $db->connect();
 
 // 1. Financial Analytics
-// GMV = Sum of all orders that aren't cancelled
-$totalVolume = $conn->query("SELECT SUM(total_price) FROM orders WHERE status != 'cancelled'")->fetch_row()[0] ?? 0;
+// GMV = Sum of all orders that are successfully active or completed
+$totalVolume = $conn->query("SELECT SUM(total_price) FROM orders WHERE status IN ('active', 'paid')")->fetch_row()[0] ?? 0;
 
 // Net Revenue = Sum of the actual commission stored in the orders table
-$totalRevenue = $conn->query("SELECT SUM(commission) FROM orders WHERE status != 'cancelled'")->fetch_row()[0] ?? 0;
+$totalRevenue = $conn->query("SELECT SUM(commission) FROM orders WHERE status IN ('active', 'paid')")->fetch_row()[0] ?? 0;
 
-$totalOrders = $conn->query("SELECT COUNT(*) FROM orders WHERE status != 'cancelled'")->fetch_row()[0];
+$totalOrders = $conn->query("SELECT COUNT(*) FROM orders WHERE status IN ('active', 'paid')")->fetch_row()[0];
 
 // 2. Installment Health
 $pendingInstallments = $conn->query("SELECT SUM(amount) FROM installments WHERE status = 'unpaid'")->fetch_row()[0] ?? 0;
@@ -27,7 +27,7 @@ $topMerchants = $conn->query("
     FROM orders o
     JOIN products p ON o.product_id = p.id
     JOIN merchants m ON p.merchant_id = m.id
-    WHERE o.status != 'cancelled'
+    WHERE o.status IN ('active', 'paid')
     GROUP BY m.id
     ORDER BY total_revenue DESC
     LIMIT 5
@@ -37,65 +37,105 @@ $topMerchants = $conn->query("
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Analytics - TQSEET Admin</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
-
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
-
-    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
+    <style>
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .data-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: start; }
+        @media (max-width: 1024px) {
+            .data-grid { grid-template-columns: 1fr; }
+        }
+        .metric-card {
+            background: white; padding: 32px; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;
+        }
+        .metric-card.dark {
+            background: #111827; color: white; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .metric-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .metric-value { font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .metric-sub { font-size: 0.85rem; font-weight: 600; }
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        .table-container { background: white; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        td { padding: 20px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        
+        .progress-bar-bg { height: 12px; background: #f1f5f9; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-bar-fill { height: 100%; }
+    </style>
+</head>
+<body>
+
+    <!-- Premium Admin Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/admin_sidebar.php"; ?>
+
+    <main class="main-content">
+        
+        <header class="page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">System Analytics</h1>
-                <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Financial performance and platform health metrics.</p>
+                <h1 style="font-size: 2rem; font-weight: 900; margin: 0 0 8px 0; color: #111827; letter-spacing: -0.5px;">System Analytics</h1>
+                <p style="color: #6b7280; margin: 0; font-size: 1rem; font-weight: 500;">Financial performance and platform health metrics.</p>
             </div>
-            <a href="dashboard.php" style="color: #636e72; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back to Command Tower</a>
-        </div>
+            <a href="dashboard.php" class="btn-secondary" style="font-size: 0.9rem; padding: 10px 16px;">
+                ← Back to Tower
+            </a>
+        </header>
 
         <!-- Big Metric Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
-            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                <div style="color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px;">Gross Volume (GMV)</div>
-                <div style="font-size: 2.2rem; font-weight: 900; color: #2d3436;"><?php echo number_format($totalVolume, 2); ?> DH</div>
-                <div style="margin-top: 15px; color: #00b894; font-weight: bold; font-size: 0.85rem;">↑ Total movement across TQSEET</div>
+        <div class="analytics-grid">
+            <div class="metric-card">
+                <div class="metric-label" style="color: #6b7280;">Gross Volume (GMV)</div>
+                <div class="metric-value" style="color: #111827;"><?php echo number_format($totalVolume, 2); ?> <span style="font-size: 1rem; color: #9ca3af;">DH</span></div>
+                <div class="metric-sub" style="color: #10b981;">↑ Total movement across TQSEET</div>
             </div>
 
-            <div style="background: #222; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                <div style="color: rgba(255,255,255,0.4); font-size: 0.75rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px;">Net Platform Revenue</div>
-                <div style="font-size: 2.2rem; font-weight: 900; color: white;"><?php echo number_format($totalRevenue, 2); ?> DH</div>
-                <div style="margin-top: 15px; color: #fab1a0; font-weight: bold; font-size: 0.85rem;">Based on 5% standard commission</div>
+            <div class="metric-card dark">
+                <div class="metric-label" style="color: #9ca3af;">Net Platform Revenue</div>
+                <div class="metric-value"><?php echo number_format($totalRevenue, 2); ?> <span style="font-size: 1rem; color: #6b7280;">DH</span></div>
+                <div class="metric-sub" style="color: #3b82f6;">Based on dynamic commissions</div>
             </div>
 
-            <div style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                <div style="color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; margin-bottom: 15px;">Transaction Count</div>
-                <div style="font-size: 2.2rem; font-weight: 900; color: #2d3436;"><?php echo $totalOrders; ?></div>
-                <div style="margin-top: 15px; color: #0984e3; font-weight: bold; font-size: 0.85rem;">Successful paid checkouts</div>
+            <div class="metric-card">
+                <div class="metric-label" style="color: #6b7280;">Transaction Count</div>
+                <div class="metric-value" style="color: #111827;"><?php echo $totalOrders; ?></div>
+                <div class="metric-sub" style="color: #3b82f6;">Successful paid checkouts</div>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 40px;">
+        <div class="data-grid">
             
             <!-- Top Merchants List -->
             <div>
-                <h3 style="font-weight: 900; margin-bottom: 20px;">Top Performing Merchants</h3>
-                <div style="background: white; border-radius: 25px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead style="background: #fafafa; text-align: left;">
+                <h3 style="font-weight: 800; font-size: 1.2rem; color: #111827; margin: 0 0 20px 0;">Top Performing Merchants</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Store</th>
-                                <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Orders</th>
-                                <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Revenue</th>
+                                <th>Store</th>
+                                <th>Orders</th>
+                                <th style="text-align: right;">Revenue</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php while($m = $topMerchants->fetch_assoc()): ?>
-                                <tr style="border-bottom: 1px solid #f8f9fa;">
-                                    <td style="padding: 20px; font-weight: 800;"><?php echo htmlspecialchars($m['store_name']); ?></td>
-                                    <td style="padding: 20px; color: #636e72;"><?php echo $m['sales_count']; ?> Sales</td>
-                                    <td style="padding: 20px; text-align: right; font-weight: 900; color: #00b894;"><?php echo number_format($m['total_revenue'], 2); ?> DH</td>
+                                <tr>
+                                    <td style="font-weight: 800; color: #0f172a;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 32px; height: 32px; background: #f1f5f9; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: #64748b;">
+                                                <?php echo strtoupper(substr($m['store_name'], 0, 2)); ?>
+                                            </div>
+                                            <?php echo htmlspecialchars($m['store_name']); ?>
+                                        </div>
+                                    </td>
+                                    <td style="color: #64748b; font-weight: 600;"><?php echo $m['sales_count']; ?> Sales</td>
+                                    <td style="text-align: right; font-weight: 900; color: #10b981;"><?php echo number_format($m['total_revenue'], 2); ?> DH</td>
                                 </tr>
                             <?php endwhile; ?>
+                            <?php if($topMerchants->num_rows === 0): ?>
+                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 40px;">No sales data available yet.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -103,41 +143,47 @@ $topMerchants = $conn->query("
 
             <!-- Installment Health -->
             <div>
-                <h3 style="font-weight: 900; margin-bottom: 20px;">Cashflow Health</h3>
-                <div style="background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                    <div style="margin-bottom: 25px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span style="font-weight: bold; font-size: 0.9rem;">Collected Payments</span>
-                            <span style="font-weight: 900; color: #00b894;"><?php echo number_format($collectedInstallments, 2); ?> DH</span>
+                <h3 style="font-weight: 800; font-size: 1.2rem; color: #111827; margin: 0 0 20px 0;">Cashflow Health</h3>
+                <div class="card" style="padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="margin-bottom: 32px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div>
+                                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 4px;">Collected Payments</div>
+                                <div style="font-weight: 900; color: #10b981; font-size: 1.5rem;"><?php echo number_format($collectedInstallments, 2); ?> DH</div>
+                            </div>
                         </div>
-                        <div style="height: 12px; background: #f1f3f5; border-radius: 10px; overflow: hidden;">
-                            <?php 
-                            $total_inst = ($collectedInstallments + $pendingInstallments) ?: 1;
-                            $pct = ($collectedInstallments / $total_inst) * 100;
-                            ?>
-                            <div style="width: <?php echo $pct; ?>%; height: 100%; background: #00b894;"></div>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span style="font-weight: bold; font-size: 0.9rem;">Pending Receivables</span>
-                            <span style="font-weight: 900; color: #fdcb6e;"><?php echo number_format($pendingInstallments, 2); ?> DH</span>
-                        </div>
-                        <div style="height: 12px; background: #f1f3f5; border-radius: 10px; overflow: hidden;">
-                            <div style="width: <?php echo 100 - $pct; ?>%; height: 100%; background: #fdcb6e;"></div>
+                        <?php 
+                        $total_inst = ($collectedInstallments + $pendingInstallments) ?: 1;
+                        $pct = ($collectedInstallments / $total_inst) * 100;
+                        ?>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: <?php echo $pct; ?>%; background: #10b981;"></div>
                         </div>
                     </div>
 
-                    <p style="font-size: 0.8rem; color: #b2bec3; line-height: 1.6; margin-top: 30px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-                        * This represents the total value of installments yet to be paid by customers across all active plans.
-                    </p>
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div>
+                                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 4px;">Pending Receivables</div>
+                                <div style="font-weight: 900; color: #f59e0b; font-size: 1.5rem;"><?php echo number_format($pendingInstallments, 2); ?> DH</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: <?php echo 100 - $pct; ?>%; background: #f59e0b;"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; margin-top: 32px;">
+                        <p style="font-size: 0.8rem; color: #64748b; line-height: 1.6; margin: 0; font-weight: 500;">
+                            ℹ️ Pending Receivables represents the total value of installments yet to be paid by customers across all active plans.
+                        </p>
+                    </div>
                 </div>
             </div>
 
         </div>
 
-    </div>
+    </main>
 
 </body>
 </html>

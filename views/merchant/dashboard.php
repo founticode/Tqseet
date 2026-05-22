@@ -10,12 +10,29 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch Merchant Status
-$stmt_m = $conn->prepare("SELECT status, commission_rate FROM merchants WHERE user_id = ?");
+$stmt_m = $conn->prepare("SELECT id, status, commission_rate FROM merchants WHERE user_id = ?");
 $stmt_m->bind_param("i", $user['id']);
 $stmt_m->execute();
 $merchantData = $stmt_m->get_result()->fetch_assoc();
+$merchantId = $merchantData['id'] ?? 0;
 $status = $merchantData['status'] ?? 'pending';
 $rate = $merchantData['commission_rate'] ?? 0.05;
+
+// Fetch Sales Analytics
+$stmt_sales = $conn->prepare("
+    SELECT COUNT(o.id) as total_orders, 
+           SUM(o.total_price) as gmv, 
+           SUM(o.merchant_earning) as net_earnings 
+    FROM orders o
+    JOIN products p ON o.product_id = p.id
+    WHERE p.merchant_id = ? AND o.status IN ('active', 'paid')
+");
+$stmt_sales->bind_param("i", $merchantId);
+$stmt_sales->execute();
+$salesData = $stmt_sales->get_result()->fetch_assoc();
+$gmv = $salesData['gmv'] ?? 0;
+$netEarnings = $salesData['net_earnings'] ?? 0;
+$totalOrders = $salesData['total_orders'] ?? 0;
 
 // Fetch validation status for merchant checklist
 $stmt_v = $conn->prepare("SELECT * FROM user_verifications WHERE user_id = ?");
@@ -54,7 +71,7 @@ $hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
                     <a href="add_product.php" class="btn-black" style="background: white; color: var(--primary-black); border: 1px solid var(--border-color);">
                         Add product
                     </a>
-                    <a href="#" class="btn-black">
+                    <a href="payment_links.php" class="btn-black">
                         Create payment link
                     </a>
                 <?php endif; ?>
@@ -95,7 +112,21 @@ $hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
                 </div>
             </div>
         <?php else: ?>
-            
+            <div class="stats-grid" style="margin-bottom: 24px;">
+                <div class="stat-box" style="background: #111827; color: white; border: none;">
+                    <div class="stat-title" style="color: #9ca3af;">Net Earnings (After Fee)</div>
+                    <div class="stat-value" style="color: white;"><?php echo number_format($netEarnings, 2); ?> <span style="font-size:1rem; color:#6b7280;">DH</span></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Gross Volume (GMV)</div>
+                    <div class="stat-value"><?php echo number_format($gmv, 2); ?> <span style="font-size:1rem; color:#9ca3af;">DH</span></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Total Orders</div>
+                    <div class="stat-value"><?php echo $totalOrders; ?></div>
+                </div>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-box">
                     <div class="stat-title">Platform Fee</div>
@@ -130,7 +161,7 @@ $hasFinancial = ($financial !== null && !empty($financial['salary_proof']));
                         <h4>Create Payment Link <span class="badge-new">New</span></h4>
                         <p>Generate a secure link to send to a customer via WhatsApp or email.</p>
                     </div>
-                    <a href="#" class="status-badge action">Create Link</a>
+                    <a href="payment_links.php" class="status-badge action">Create Link</a>
                 </div>
                 
                 <div class="checklist-row">

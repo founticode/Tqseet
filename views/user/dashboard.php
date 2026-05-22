@@ -211,7 +211,7 @@ $conn->close();
 
                     <div class="credit-card-actions">
                         <a href="orders.php" class="credit-card-btn-solid">Make Payment</a>
-                        <a href="orders.php" class="credit-card-btn-secondary">View Statement</a>
+                        <a href="#payment-timeline" class="credit-card-btn-secondary">View Statement</a>
                     </div>
                 </div>
             </div>
@@ -265,7 +265,7 @@ $conn->close();
         </div>
 
         <!-- Installment Timeline Widget -->
-        <div class="dashboard-card" style="margin-bottom: 40px;">
+        <div id="payment-timeline" class="dashboard-card" style="margin-bottom: 40px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Installment Timeline</h3>
                 <?php if ($activeOrder): ?>

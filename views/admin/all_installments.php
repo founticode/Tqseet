@@ -23,62 +23,68 @@ $result = $conn->query($query);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installment Wall - TQSEET Admin</title>
+    <!-- Tap into the premium CSS engine -->
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+    <!-- Premium Admin Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/admin_sidebar.php"; ?>
 
-    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+    <main class="main-content">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <header class="page-header" style="justify-content: space-between; align-items: flex-end;">
             <div>
-                <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Installment Wall</h1>
-                <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Monitoring every active payment plan across the platform.</p>
+                <h1>Installment Wall</h1>
+                <p style="color: #6b7280; font-size: 0.95rem; margin-top: 8px;">Monitoring every active payment plan across the platform.</p>
             </div>
-            <a href="dashboard.php" style="color: #636e72; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back to Command Tower</a>
-        </div>
+        </header>
 
-        <div style="background: white; border-radius: 25px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #fafafa; text-align: left;">
+        <div class="portal-table-wrapper" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <table class="portal-table">
+                <thead>
                     <tr>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Customer</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Product / Plan</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Amount</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase;">Due Date</th>
-                        <th style="padding: 20px; color: #b2bec3; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Status</th>
+                        <th>Customer</th>
+                        <th>Product / Plan</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th style="text-align: right;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if ($result->num_rows === 0): ?>
+                        <tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">No installments found.</td></tr>
+                    <?php endif; ?>
                     <?php while($row = $result->fetch_assoc()): ?>
                         <?php 
                             $isOverdue = (strtotime($row['due_date']) < time() && $row['status'] === 'unpaid');
                         ?>
-                        <tr style="border-bottom: 1px solid #f8f9fa;">
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 800;"><?php echo htmlspecialchars($row['user_name']); ?></div>
-                                <div style="font-size: 0.8rem; color: #b2bec3;"><?php echo htmlspecialchars($row['user_email']); ?></div>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600; color: #111827;"><?php echo htmlspecialchars($row['user_name']); ?></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;"><?php echo htmlspecialchars($row['user_email']); ?></div>
                             </td>
-                            <td style="padding: 20px;">
-                                <div style="font-weight: 600; color: #636e72;"><?php echo htmlspecialchars($row['product_name']); ?></div>
-                                <div style="font-size: 0.75rem; color: #b2bec3;">Plan #<?php echo $row['order_id']; ?></div>
+                            <td>
+                                <div style="font-weight: 600; color: #4b5563;"><?php echo htmlspecialchars($row['product_name']); ?></div>
+                                <div style="font-size: 0.8rem; color: #9ca3af;">Plan #<?php echo $row['order_id']; ?></div>
                             </td>
-                            <td style="padding: 20px; font-weight: 900; color: #2d3436;">
-                                <?php echo number_format($row['amount'], 2); ?> <span style="font-size: 0.7rem; color: #b2bec3;">DH</span>
+                            <td style="font-weight: 800; color: #111827;">
+                                <?php echo number_format($row['amount'], 2); ?> <span style="font-size: 0.8rem; color: #6b7280; font-weight: 600;">DH</span>
                             </td>
-                            <td style="padding: 20px;">
-                                <div style="font-weight: bold; color: <?php echo $isOverdue ? '#d63031' : '#2d3436'; ?>;">
+                            <td>
+                                <div style="font-weight: 700; color: <?php echo $isOverdue ? '#ef4444' : '#111827'; ?>;">
                                     <?php echo date('d M Y', strtotime($row['due_date'])); ?>
                                 </div>
                             </td>
-                            <td style="padding: 20px; text-align: right;">
+                            <td style="text-align: right;">
                                 <?php if ($row['status'] === 'paid'): ?>
-                                    <span style="background: #eafaf1; color: #27ae60; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Paid</span>
+                                    <span class="status-badge status-active">Paid</span>
                                 <?php elseif ($isOverdue): ?>
-                                    <span style="background: #fff5f5; color: #d63031; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Overdue</span>
+                                    <span class="status-badge status-pending" style="background: #fef2f2; color: #ef4444;">Overdue</span>
                                 <?php else: ?>
-                                    <span style="background: #fdf9e7; color: #f39c12; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Pending</span>
+                                    <span class="status-badge status-pending" style="background: #fffbeb; color: #f59e0b;">Pending</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -86,7 +92,8 @@ $result = $conn->query($query);
                 </tbody>
             </table>
         </div>
-    </div>
+
+    </main>
 
 </body>
 </html>

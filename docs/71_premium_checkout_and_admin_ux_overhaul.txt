@@ -1,0 +1,43 @@
+# Premium Checkout & Admin UX Overhaul
+
+## 1. Overview
+This update heavily focused on professionalizing the user interface for both the consumer BNPL checkout flow and the administrative Control Tower. The goal was to eliminate all "developer-grade" HTML/text outputs and replace them with enterprise-level, highly polished UI components that match top-tier fintech platforms (e.g., Klarna, Tabby).
+
+## 2. Consumer Checkout Flow Upgrades
+
+### A. The Checkout Wall (`calculate_installments.php`)
+- **Redesign**: Completely replaced the basic centered card with a premium "Two-Column Checkout Wall".
+- **Left Column**: Displays a crisp Order Summary featuring the product image, subtotal, and "0.00 DH" zero-interest breakdown.
+- **Right Column**: Displays a dynamic, vertical Installment Timeline. It calculates the 4 due dates and highlights the downpayment with a "Pay Today" badge.
+
+### B. Secure Payment Entry (`checkout_payment.php`)
+- **Interactive UI**: Replaced standard input fields with high-end, focus-glowing `.premium-input` fields.
+- **Live Credit Card Mockup**: Implemented a dark-mode gradient Mastercard mockup that updates in real-time via Javascript.
+- **Auto-Formatting JS**: 
+  - Automatically adds spaces after every 4 digits in the Card Number.
+  - Automatically inserts a `/` slash in the `MM/YY` expiry field after the second digit.
+
+### C. Guardrails & Error Handling (`place_order.php` & `process_simulated_payment.php`)
+- **Bug Fix**: Found raw `die()` statements being used for credit limits and missing products.
+- **Implementation**: Created a `showPremiumError()` helper function that renders a full-page, styled alert card. This ensures that if a user hits an insufficient credit wall, they remain inside the platform's UI rather than seeing raw unstyled text.
+
+## 3. Admin Control Tower Upgrades
+
+### A. System Analytics (`analytics.php`)
+- **UI Integration**: Stripped out the old `admin_navbar.php` and fully integrated the page into the `admin_sidebar.php` architecture.
+- **Metric Refinement**: Styled the "Net Platform Revenue" card in a dark-mode aesthetic for high contrast.
+- **CRITICAL LOGIC FIX**: 
+  - **Previous Logic**: `WHERE status != 'cancelled'` (This accidentally included unpaid `draft` carts in the GMV).
+  - **New Logic**: `WHERE status IN ('active', 'completed')` (This strictly ensures that only finalized, confirmed sales contribute to the GMV and Revenue numbers).
+
+### B. Audit Profile (`view_user.php`)
+- **Redesign**: Rebuilt the KYC/Verification review page into a two-column layout.
+- **Left Column**: Displays user documents (CIN and Income) in clean, distinct cards.
+- **Right Column**: Contains the "Decision Center" sticky widget, which uses high-contrast Green/Red buttons for Approval/Rejection.
+
+### C. Platform Settings (`settings.php`)
+- **UI Expansion**: Expanded the settings from a basic profile updater into a "Global Configurations" panel.
+- **Simulated Controls**: Added toggle switches for "BNPL Engine Status" and "Auto-Approve Merchants", alongside inputs for "Default Platform Commission" and "Max User Credit Limit" to simulate a true enterprise control panel.
+
+## 4. Next Steps
+With the core backend payment engine fully operational and the admin/consumer UI highly polished, the next absolute priority is the **Merchant Portal**. Currently, there is no distinct login panel or dashboard for B2B stores to view their specific sales and settlements.

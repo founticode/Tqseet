@@ -10,6 +10,10 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background: radial-gradient(circle at 10% 20%, #e8fcf4 0%, #f6f9fc 90%);
     color: #0f172a;
@@ -2288,4 +2292,83 @@ a:hover {
     font-weight: 700;
     margin-top: auto;
     opacity: 0.85;
+}
+
+/* ==========================================================================
+   Responsive Navigation & Mobile Overrides
+   ========================================================================== */
+
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #0f172a;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: auto;
+}
+
+@media (max-width: 900px) {
+    .mobile-menu-toggle { display: block; }
+    
+    .navbar-container { flex-wrap: wrap; }
+    
+    .navbar-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        gap: 15px;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
+        order: 3;
+    }
+    
+    .navbar-right {
+        display: none;
+        width: 100%;
+        justify-content: flex-start;
+        order: 4;
+        margin-top: 15px;
+    }
+    
+    /* Toggle Active State */
+    .navbar-container.mobile-active .navbar-links,
+    .navbar-container.mobile-active .navbar-right {
+        display: flex;
+    }
+    
+    .navbar-dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        margin-top: 10px;
+        display: none;
+        width: 100%;
+    }
+    
+    .navbar-dropdown-wrapper:hover .navbar-dropdown-menu,
+    .navbar-dropdown-wrapper:active .navbar-dropdown-menu {
+        display: flex;
+    }
+
+    /* Adjust footer grid for mobile */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-card { padding: 30px 20px; }
+    .hero-title { font-size: 2.5rem; }
+    .shop-hero-banner { flex-direction: column; text-align: center; padding: 30px 20px; }
+    .klarna-grid { grid-template-columns: 1fr; }
+    .testimonials-cards-row { flex-direction: column; }
 }

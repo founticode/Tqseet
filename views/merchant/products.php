@@ -24,7 +24,7 @@ if ($merchantStatus !== 'approved') {
 }
 
 // Fetch products for THIS merchant only, filtering out Payment Link temporary items
-$stmt = $conn->prepare("SELECT * FROM products WHERE merchant_id = ? AND description NOT LIKE 'Payment for %' ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT * FROM products WHERE merchant_id = ? AND is_payment_link = FALSE ORDER BY created_at DESC");
 $stmt->bind_param("i", $merchantId);
 $stmt->execute();
 $result = $stmt->get_result();

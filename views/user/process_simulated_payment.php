@@ -14,6 +14,40 @@ $amount = $_POST['amount'] ?? 0;
 $db = new Database();
 $conn = $db->connect();
 
+// Helper to show premium errors
+function showPremiumError($title, $message, $primaryBtnText, $primaryBtnLink) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Payment Error - TQSEET</title>
+        <link rel="stylesheet" href="../../assets/css/style.css">
+        <style>
+            .error-container { max-width: 500px; margin: 80px auto; background: white; padding: 48px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e2e8f0; }
+            .error-icon { width: 80px; height: 80px; background: #fef2f2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 24px auto; }
+            .error-title { font-size: 1.8rem; font-weight: 900; color: #0f172a; margin-bottom: 16px; letter-spacing: -0.5px; }
+            .error-message { color: #64748b; font-size: 1.05rem; line-height: 1.6; margin-bottom: 32px; }
+            .btn-primary { display: block; width: 100%; background: #0f172a; color: white; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.05rem; transition: transform 0.2s, box-shadow 0.2s; margin-bottom: 12px; }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        </style>
+    </head>
+    <body style="background: #f8fafc;">
+        <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+        <div class="error-container">
+            <div class="error-icon">❌</div>
+            <div class="error-title"><?php echo htmlspecialchars($title); ?></div>
+            <div class="error-message"><?php echo $message; ?></div>
+            <a href="<?php echo $primaryBtnLink; ?>" class="btn-primary"><?php echo htmlspecialchars($primaryBtnText); ?></a>
+        </div>
+        <?php include_once __DIR__ . "/../../includes/footer.php"; ?>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 // --- NEW: ABSOLUTE FINAL SECURITY CHECK ---
 $stmt_sec = $conn->prepare("SELECT status FROM user_financials WHERE user_id = ?");
 $stmt_sec->bind_param("i", $user['id']);
@@ -21,7 +55,7 @@ $stmt_sec->execute();
 $secStatus = $stmt_sec->get_result()->fetch_assoc()['status'] ?? 'none';
 
 if ($secStatus !== 'approved') {
-    die("Error: Transaction unauthorized. Your account is not in an approved state.");
+    showPremiumError("Unauthorized", "Your account is not fully verified yet. Please complete your identity and financial profile.", "Go to Settings", "settings.php");
 }
 
 // --- NEW: SAVE CARD LOGIC ---
@@ -90,11 +124,13 @@ if ($orderId > 0 && $installmentId == 0) {
     $stmt_p->execute();
     $orderData = $stmt_p->get_result()->fetch_assoc();
     
-    if (!$orderData) die("Order not found.");
+    if (!$orderData) {
+        showPremiumError("Order Not Found", "We couldn't process this transaction because the order no longer exists.", "Back to Shop", "../public/shop.php");
+    }
     $total = $orderData['total_price'];
 
     if ($total > $availableCredit) {
-        die("Error: Insufficient credit limit. (Limit: $maxLimit, Debt: $totalDebt, Order: $total)");
+        showPremiumError("Transaction Declined", "Insufficient available credit limit to complete this purchase. Please pay off active installments first.", "View Active Plans", "orders.php");
     }
 
     $installmentAmount = $total / 4;

@@ -28,6 +28,15 @@ if (isLoggedIn()) {
             <?php echo $logoText; ?>
         </a>
 
+        <!-- Mobile Menu Toggle Button -->
+        <button class="mobile-menu-toggle" onclick="document.querySelector('.navbar-container').classList.toggle('mobile-active')">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
         <!-- Center Links (Aesthetic Cleanliness, role-segregated) -->
         <div class="navbar-links">
             <?php if (isLoggedIn()): ?>
@@ -79,7 +88,7 @@ if (isLoggedIn()) {
                         </a>
                         
                         <?php if ($user['role'] === 'user'): ?>
-                            <a href="/views/user/profile.php" class="navbar-dropdown-item">
+                            <a href="/views/user/settings.php" class="navbar-dropdown-item">
                                 <span>⚙️</span> Settings & KYC
                             </a>
                             <a href="/views/user/orders.php" class="navbar-dropdown-item">
@@ -104,6 +113,9 @@ if (isLoggedIn()) {
                         <?php elseif ($user['role'] === 'admin'): ?>
                             <a href="/views/admin/verifications.php" class="navbar-dropdown-item">
                                 <span>🛡️</span> Verifications Hub
+                            </a>
+                            <a href="/views/admin/settings.php" class="navbar-dropdown-item">
+                                <span>⚙️</span> Admin Settings
                             </a>
                         <?php endif; ?>
                         

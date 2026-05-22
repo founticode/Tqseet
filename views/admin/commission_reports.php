@@ -29,52 +29,58 @@ $result = $conn->query($query);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commission Reports - TQSEET</title>
+    <!-- Tap into the premium CSS engine -->
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+    <!-- Premium Admin Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/admin_sidebar.php"; ?>
 
-    <div style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+    <main class="main-content">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <header class="page-header" style="justify-content: space-between; align-items: flex-end;">
             <div>
-                <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Revenue & Payouts</h1>
-                <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Financial reconciliation for all merchant partners.</p>
+                <h1>Revenue & Payouts</h1>
+                <p style="color: #6b7280; font-size: 0.95rem; margin-top: 8px;">Financial reconciliation for all merchant partners.</p>
             </div>
-            <a href="dashboard.php" style="color: #636e72; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back to Command Tower</a>
-        </div>
+        </header>
 
-        <div style="background: white; border-radius: 25px; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #222; text-align: left; color: white;">
+        <div class="portal-table-wrapper" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <table class="portal-table">
+                <thead style="background: #111827; color: white;">
                     <tr>
-                        <th style="padding: 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Merchant Partner</th>
-                        <th style="padding: 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Rate</th>
-                        <th style="padding: 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Gross Volume</th>
-                        <th style="padding: 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Our Commission</th>
-                        <th style="padding: 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; text-align: right;">Merchant Payout</th>
+                        <th style="color: #9ca3af;">Merchant Partner</th>
+                        <th style="color: #9ca3af;">Rate</th>
+                        <th style="color: #9ca3af;">Gross Volume</th>
+                        <th style="color: #9ca3af;">Our Commission</th>
+                        <th style="text-align: right; color: #9ca3af;">Merchant Payout</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if ($result->num_rows === 0): ?>
+                        <tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">No revenue data generated yet.</td></tr>
+                    <?php endif; ?>
                     <?php while($m = $result->fetch_assoc()): ?>
-                        <tr style="border-bottom: 1px solid #f8f9fa;">
-                            <td style="padding: 25px;">
-                                <div style="font-weight: 800; font-size: 1.1rem;"><?php echo htmlspecialchars($m['store_name']); ?></div>
-                                <div style="font-size: 0.8rem; color: #b2bec3;"><?php echo $m['order_count']; ?> Total Orders</div>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600; font-size: 1.1rem; color: #111827;"><?php echo htmlspecialchars($m['store_name']); ?></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;"><?php echo $m['order_count']; ?> Total Orders</div>
                             </td>
-                            <td style="padding: 25px;">
-                                <span style="background: #f1f3f5; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; color: #636e72;">
+                            <td>
+                                <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; color: #4b5563;">
                                     <?php echo ($m['commission_rate'] * 100); ?>%
                                 </span>
                             </td>
-                            <td style="padding: 25px; font-weight: 700; color: #2d3436;">
+                            <td style="font-weight: 700; color: #111827;">
                                 <?php echo number_format($m['gross_volume'] ?? 0, 2); ?> DH
                             </td>
-                            <td style="padding: 25px; font-weight: 900; color: #00b894;">
+                            <td style="font-weight: 800; color: #10b981;">
                                 + <?php echo number_format($m['total_commission'] ?? 0, 2); ?> DH
                             </td>
-                            <td style="padding: 25px; text-align: right; font-weight: 900; color: #0984e3;">
+                            <td style="text-align: right; font-weight: 800; color: #3b82f6;">
                                 <?php echo number_format($m['total_payout'] ?? 0, 2); ?> DH
                             </td>
                         </tr>
@@ -83,13 +89,14 @@ $result = $conn->query($query);
             </table>
         </div>
 
-        <div style="margin-top: 40px; background: #eef9ff; border-radius: 20px; padding: 30px; border: 1px solid #d1e9ff; display: flex; align-items: center; gap: 20px;">
-            <div style="font-size: 2rem;">💡</div>
-            <p style="margin: 0; color: #004085; font-size: 0.95rem; line-height: 1.6;">
-                <strong>Admin Tip:</strong> This report shows the "Net Earning" for merchants. In a standard payout cycle, you should wire the <strong>Merchant Payout</strong> amount to their bank account and keep the <strong>Commission</strong> as platform profit.
+        <div style="margin-top: 40px; background: #eff6ff; border-radius: 12px; padding: 24px; border: 1px solid #bfdbfe; display: flex; align-items: flex-start; gap: 16px;">
+            <div style="font-size: 1.5rem;">💡</div>
+            <p style="margin: 0; color: #1e3a8a; font-size: 0.95rem; line-height: 1.6;">
+                <strong>Admin Tip:</strong> This report shows the "Net Earning" for merchants. In a standard payout cycle, you should wire the <strong>Merchant Payout</strong> amount to their bank account and keep the <strong>Our Commission</strong> as platform profit.
             </p>
         </div>
-    </div>
+        
+    </main>
 
 </body>
 </html>

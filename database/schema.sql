@@ -70,7 +70,7 @@ CREATE TABLE orders (
     total_price DECIMAL(10,2),
     commission DECIMAL(10,2),        -- What the platform earns
     merchant_earning DECIMAL(10,2),  -- What the store earns
-    status ENUM('active', 'paid', 'cancelled') DEFAULT 'active',
+    status ENUM('pending', 'active', 'paid', 'cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
@@ -82,7 +82,7 @@ CREATE TABLE installments (
     order_id INT,
     amount DECIMAL(10,2),
     due_date DATE,
-    status ENUM('pending', 'paid', 'overdue') DEFAULT 'pending',
+    status ENUM('unpaid', 'paid', 'overdue') DEFAULT 'unpaid',
     paid_at TIMESTAMP NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
@@ -93,6 +93,16 @@ CREATE TABLE otp_codes (
     user_id INT NOT NULL,
     code VARCHAR(10) NOT NULL,
     expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 9. PAYMENT METHODS (Saved Credit Cards)
+CREATE TABLE payment_methods (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    last_four VARCHAR(4) NOT NULL,
+    expiry VARCHAR(5) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

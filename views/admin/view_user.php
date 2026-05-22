@@ -71,186 +71,202 @@ if ($user['role'] === 'merchant') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Review User: <?php echo htmlspecialchars($user['name']); ?> - TQSEET</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review User: <?php echo htmlspecialchars($user['name']); ?> - TQSEET Admin</title>
+    <link rel="stylesheet" href="../../assets/css/merchant_portal.css">
+    <style>
+        .review-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: start; }
+        .doc-section { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 32px; border: 1px solid #e5e7eb; }
+        .doc-label { display: block; color: #6b7280; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .doc-value { font-size: 1.15rem; font-weight: 800; color: #111827; }
+        @media (max-width: 1024px) {
+            .review-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
-    <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
+    <!-- Premium Admin Sidebar -->
+    <?php include_once __DIR__ . "/../../includes/admin_sidebar.php"; ?>
 
-    <div style="max-width: 900px; margin: 60px auto; padding: 0 20px;">
+    <main class="main-content">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div class="page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; background: white; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div>
-                <h1 style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">Review Profile</h1>
-                <p style="color: #636e72; margin: 8px 0 0 0; font-weight: 500;">Auditing documents for <strong><?php echo htmlspecialchars($user['name']); ?></strong> (ID: #<?php echo $userId; ?>)</p>
+                <h1 style="font-size: 2rem; font-weight: 900; margin: 0 0 8px 0; color: #111827; letter-spacing: -0.5px;">Review Profile</h1>
+                <p style="color: #6b7280; margin: 0; font-size: 1rem; font-weight: 500;">Auditing documents for <strong style="color: #111827;"><?php echo htmlspecialchars($user['name']); ?></strong> (ID: #<?php echo $userId; ?>)</p>
             </div>
-            <a href="verifications.php" style="color: #636e72; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back to List</a>
+            <a href="verifications.php" class="btn-secondary" style="font-size: 0.9rem; padding: 12px 20px;">
+                ← Back to List
+            </a>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+        <div class="review-grid">
             
             <!-- Left Column: Documents -->
             <div>
                 <!-- NEW: Merchant Profile Section -->
                 <?php if ($merchant): ?>
-                    <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid #0984e3;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3 style="margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #0984e3;">Business Profile</h3>
-                            <span style="background: #fff4e6; color: #d9480f; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase;"><?php echo $merchant['status']; ?></span>
+                    <div class="doc-section" style="border: 1px solid #bfdbfe;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2563eb;">Business Profile</h3>
+                            <span style="background: #eff6ff; color: #1d4ed8; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"><?php echo $merchant['status']; ?></span>
                         </div>
-                        <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 20px 0;">
                         
-                        <div style="margin-bottom: 25px;">
-                            <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">Store Name</label>
-                            <div style="font-size: 1.2rem; font-weight: 800; color: #2d3436;"><?php echo htmlspecialchars($merchant['store_name']); ?></div>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+                            <div>
+                                <label class="doc-label">Store Name</label>
+                                <div class="doc-value"><?php echo htmlspecialchars($merchant['store_name']); ?></div>
+                            </div>
+
+                            <div>
+                                <label class="doc-label">Description</label>
+                                <div style="color: #4b5563; font-size: 0.95rem; line-height: 1.6;"><?php echo nl2br(htmlspecialchars($merchant['description'] ?: 'No description provided.')); ?></div>
+                            </div>
                         </div>
 
-                        <div style="margin-bottom: 25px;">
-                            <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">Description</label>
-                            <div style="color: #636e72; font-size: 0.9rem;"><?php echo nl2br(htmlspecialchars($merchant['description'] ?: 'No description provided.')); ?></div>
-                        </div>
-
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px dashed #0984e3;">
-                            <label style="display: block; color: #0984e3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px;">🤝 Partner Agreement</label>
+                        <div style="margin-top: 32px; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px dashed #93c5fd;">
+                            <label class="doc-label" style="color: #2563eb; margin-bottom: 16px;">🤝 Partner Agreement</label>
                             
-                            <form action="../../controllers/VerificationController.php?action=update_commission" method="POST" style="display: flex; align-items: flex-end; gap: 10px;">
+                            <form action="../../controllers/VerificationController.php?action=update_commission" method="POST" style="display: flex; align-items: flex-end; gap: 16px;">
                                 <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
                                 <div style="flex: 1;">
-                                    <label style="display: block; color: #636e72; font-size: 0.65rem; font-weight: bold; margin-bottom: 5px;">COMMISSION RATE (%)</label>
+                                    <label style="display: block; color: #6b7280; font-size: 0.7rem; font-weight: 800; margin-bottom: 8px;">COMMISSION RATE (%)</label>
                                     <input type="number" name="commission_rate" step="0.01" min="0" max="1" 
                                            value="<?php echo $merchant['commission_rate']; ?>" 
-                                           style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-weight: bold;">
+                                           style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #d1d5db; outline: none; font-weight: 800; font-size: 1rem;">
                                 </div>
-                                <button type="submit" style="padding: 10px 20px; background: #0984e3; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                                <button type="submit" style="padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: background 0.2s;">
                                     Save
                                 </button>
                             </form>
-                            <p style="margin: 10px 0 0 0; font-size: 0.7rem; color: #b2bec3;">Note: 0.05 = 5%. Currently: <strong><?php echo ($merchant['commission_rate'] * 100); ?>%</strong></p>
+                            <p style="margin: 12px 0 0 0; font-size: 0.8rem; color: #6b7280; font-weight: 500;">Note: 0.05 = 5%. Currently: <strong style="color: #111827;"><?php echo ($merchant['commission_rate'] * 100); ?>%</strong></p>
                         </div>
                     </div>
                 <?php endif; ?>
 
                 <!-- Identity Card Section -->
-                <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid rgba(0,0,0,0.02);">
-                    <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #b2bec3;">Identity Document (CIN)</h3>
-                    <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 20px 0;">
+                <div class="doc-section">
+                    <h3 style="margin: 0 0 24px 0; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Identity Document (CIN)</h3>
                     
                     <?php if ($verification): ?>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">CIN Number</label>
-                            <div style="font-size: 1.2rem; font-weight: 800; color: #2d3436; margin-top: 5px;"><?php echo htmlspecialchars($verification['cin']); ?></div>
+                        <div style="margin-bottom: 24px;">
+                            <label class="doc-label">CIN Number</label>
+                            <div class="doc-value" style="font-size: 1.4rem; font-family: monospace; letter-spacing: 2px; color: #111827;"><?php echo htmlspecialchars($verification['cin']); ?></div>
                         </div>
-                        <img src="../../uploads/verifications/<?php echo $verification['cin_image']; ?>" 
-                             style="width: 100%; border-radius: 15px; border: 1px solid #f1f1f1; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                        <div style="background: #f9fafb; padding: 16px; border-radius: 16px; border: 1px solid #e5e7eb;">
+                            <img src="../../uploads/verifications/<?php echo $verification['cin_image']; ?>" 
+                                 style="width: 100%; border-radius: 12px; display: block;" onerror="this.src='https://via.placeholder.com/600x300?text=No+Image'">
+                        </div>
                     <?php else: ?>
-                        <p style="color: #d63031; font-style: italic;">No identity documents uploaded yet.</p>
+                        <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 16px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;">
+                            No identity documents uploaded yet.
+                        </div>
                     <?php endif; ?>
                 </div>
 
                 <!-- Financial Section -->
-                <div style="background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-                    <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #b2bec3;">
+                <div class="doc-section">
+                    <h3 style="margin: 0 0 24px 0; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">
                         <?php echo $user['role'] === 'merchant' ? 'Business Financials' : 'Financial Profile'; ?>
                     </h3>
-                    <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 20px 0;">
                     
                     <?php if ($financial): ?>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                             <div>
-                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
+                                <label class="doc-label">
                                     <?php echo $user['role'] === 'merchant' ? 'Business Structure' : 'Profession'; ?>
                                 </label>
-                                <div style="font-weight: 700; color: #2d3436;"><?php echo htmlspecialchars($financial['profession']); ?></div>
+                                <div class="doc-value"><?php echo htmlspecialchars($financial['profession']); ?></div>
                             </div>
                             <div>
-                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
+                                <label class="doc-label">
                                     <?php echo $user['role'] === 'merchant' ? 'Estimated Monthly Revenue' : 'Monthly Salary'; ?>
                                 </label>
-                                <div style="font-weight: 900; color: #00b894; font-size: 1.1rem;"><?php echo number_format($financial['salary'], 2); ?> DH</div>
+                                <div class="doc-value" style="color: #10b981; font-size: 1.3rem;"><?php echo number_format($financial['salary'], 2); ?> DH</div>
                             </div>
                         </div>
                         
                         <?php if ($financial['salary_proof']): ?>
-                            <div style="margin-top: 25px; padding: 20px; background: #fafafa; border-radius: 15px; border: 1px solid #eee;">
-                                <label style="display: block; color: #b2bec3; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;">Verification Document</label>
-                                <a href="../../uploads/financials/<?php echo $financial['salary_proof']; ?>" target="_blank" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0984e3; font-weight: bold;">
-                                    <span>
-                                        <?php echo $user['role'] === 'merchant' ? '📄 View Business Bank Statement / Tax Document' : '📄 View Salary Slip / Bank Statement'; ?>
-                                    </span>
+                            <div style="padding: 20px; background: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
+                                <label class="doc-label" style="margin-bottom: 12px;">Verification Document</label>
+                                <a href="../../uploads/financials/<?php echo $financial['salary_proof']; ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: #3b82f6; font-weight: 800; background: white; padding: 12px 20px; border-radius: 10px; border: 1px solid #bfdbfe; transition: all 0.2s;">
+                                    <span>📄</span>
+                                    <span><?php echo $user['role'] === 'merchant' ? 'View Business Bank Statement / Tax Document' : 'View Salary Slip / Bank Statement'; ?></span>
                                 </a>
                             </div>
                         <?php endif; ?>
                     <?php else: ?>
-                        <p style="color: #d63031; font-style: italic;">No financial data submitted yet.</p>
+                        <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 16px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;">
+                            No financial data submitted yet.
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
 
             <!-- Right Column: Decision Actions -->
-            <div style="position: sticky; top: 20px;">
-                <div style="background: #222; color: white; border-radius: 25px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4);">Decision Center</h3>
-                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.6;">Carefully review the documents on the left. Once approved, the user will be able to apply for installment plans.</p>
-                    
-                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+            <div style="position: sticky; top: 24px;">
+                <div style="background: #111827; color: white; border-radius: 24px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+                    <h3 style="margin: 0 0 12px 0; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af;">Decision Center</h3>
+                    <p style="font-size: 0.95rem; color: #d1d5db; line-height: 1.6; margin: 0 0 32px 0;">Carefully review the documents on the left. Once approved, the user will be able to apply for installment plans.</p>
 
                     <form action="../../controllers/VerificationController.php?action=decide" method="POST">
                         <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
                         
                         <?php if ($user['role'] === 'merchant'): ?>
-                            <div style="margin-bottom: 25px;">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; letter-spacing: 1px;">Platform Commission (%)</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="margin-bottom: 32px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
+                                <label style="display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #9ca3af; margin-bottom: 12px; letter-spacing: 1px;">Platform Commission (%)</label>
+                                <div style="display: flex; align-items: center; gap: 12px;">
                                     <input type="number" name="commission_rate" step="0.01" min="0" max="1" value="<?php echo $merchant['commission_rate'] ?: '0.05'; ?>" 
-                                           style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; color: white; outline: none; font-weight: bold;">
-                                    <span style="color: rgba(255,255,255,0.4); font-size: 0.8rem;">(0.05 = 5%)</span>
+                                           style="flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: white; outline: none; font-weight: 800; font-size: 1.1rem;">
+                                    <span style="color: #9ca3af; font-size: 0.85rem; font-weight: 600;">(0.05 = 5%)</span>
                                 </div>
                             </div>
                         <?php endif; ?>
 
                         <?php if ($user['role'] === 'user' && $financial): ?>
-                            <div style="margin-bottom: 25px; background: rgba(0,184,148,0.1); padding: 20px; border-radius: 15px; border: 1px solid rgba(0,184,148,0.2);">
-                                <label style="display: block; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: #00b894; margin-bottom: 8px; letter-spacing: 1px;">Calculated Buying Power</label>
-                                <div style="font-size: 1.5rem; font-weight: 900; color: white;">
-                                    <?php echo number_format($financial['salary'] * 1.5, 2); ?> <span style="font-size: 0.8rem; opacity: 0.5;">DH</span>
+                            <div style="margin-bottom: 32px; background: rgba(16, 185, 129, 0.1); padding: 24px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <label style="display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #10b981; margin-bottom: 8px; letter-spacing: 1px;">Calculated Buying Power</label>
+                                <div style="font-size: 1.8rem; font-weight: 900; color: white;">
+                                    <?php echo number_format($financial['salary'] * 1.5, 2); ?> <span style="font-size: 1rem; color: #9ca3af;">DH</span>
                                 </div>
-                                <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 8px 0 0 0;">Automated Limit: 1.5x Monthly Income</p>
+                                <p style="font-size: 0.8rem; color: #6ee7b7; margin: 8px 0 0 0; font-weight: 500;">Automated Limit: 1.5x Monthly Income</p>
                             </div>
                         <?php endif; ?>
 
                         <!-- Dynamic Verification Banners & Sandbox Bypass Info -->
                         <?php if ($isStrictMissing): ?>
-                            <div style="margin-bottom: 25px; background: rgba(230, 126, 34, 0.1); padding: 18px; border-radius: 15px; border: 1px solid rgba(230, 126, 34, 0.3);">
-                                <div style="font-size: 0.85rem; font-weight: bold; color: #e67e22; line-height: 1.5;">
+                            <div style="margin-bottom: 32px; background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24; line-height: 1.5;">
                                     <?php echo $warningMessage; ?>
                                 </div>
                             </div>
                         <?php elseif ($user['role'] === 'merchant' && !$hasFinancial): ?>
-                            <div style="margin-bottom: 25px; background: rgba(9, 132, 227, 0.1); padding: 18px; border-radius: 15px; border: 1px solid rgba(9, 132, 227, 0.3);">
-                                <div style="font-size: 0.85rem; font-weight: bold; color: #74b9ff; line-height: 1.5;">
+                            <div style="margin-bottom: 32px; background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 16px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                <div style="font-size: 0.9rem; font-weight: 700; color: #60a5fa; line-height: 1.5;">
                                     💡 Note: No financial documents submitted. (This is optional for Merchants - they can be approved with CIN only).
                                 </div>
                             </div>
                         <?php endif; ?>
 
-                        <div style="margin-bottom: 15px;">
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
                             <button type="submit" name="status" value="approved" 
-                                    style="width: 100%; padding: 15px; background: #00b894; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;">
+                                    style="width: 100%; padding: 18px; background: #10b981; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 1.05rem; cursor: pointer; transition: background 0.2s;">
                                 ✅ <?php echo ($user['role'] === 'merchant') ? 'Approve Merchant' : 'Approve User'; ?>
                             </button>
+                            
+                            <button type="submit" name="status" value="rejected" 
+                                    style="width: 100%; padding: 18px; background: transparent; color: #ef4444; border: 1px solid #ef4444; border-radius: 16px; font-weight: 800; font-size: 1.05rem; cursor: pointer; transition: background 0.2s;">
+                                ❌ Reject Application
+                            </button>
                         </div>
-                        
-                        <button type="submit" name="status" value="rejected" 
-                                style="width: 100%; padding: 15px; background: transparent; color: #ff7675; border: 1px solid #ff7675; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;">
-                            ❌ Reject Application
-                        </button>
                     </form>
                 </div>
             </div>
 
         </div>
 
-    </div>
+    </main>
 
     <script>
     // Simple verification check to confirm before final actions

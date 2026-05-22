@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // 2. Create a temporary 'product' for this payment link to reuse the existing checkout flow
         $desc = !empty($link['description']) ? $link['description'] : "Payment for " . $link['title'];
         $img = !empty($link['image']) ? $link['image'] : 'default_product.png';
-        $stmt_prod = $conn->prepare("INSERT INTO products (merchant_id, name, description, price, image) VALUES (?, ?, ?, ?, ?)");
+        $stmt_prod = $conn->prepare("INSERT INTO products (merchant_id, name, description, price, image, is_payment_link) VALUES (?, ?, ?, ?, ?, TRUE)");
         $stmt_prod->bind_param("issds", $link['merchant_id'], $link['title'], $desc, $link['amount'], $img);
         $stmt_prod->execute();
         $newProductId = $conn->insert_id;

@@ -1,0 +1,30 @@
+# Database Schema Sync: Payment Links Table
+
+## 1. Issue Description
+When accessing the Merchant Payment Links page (`views/merchant/payment_links.php`), the application encountered a PHP fatal error:
+`Fatal error: Uncaught mysqli_sql_exception: Table 'tqseet_db.payment_links' doesn't exist in C:\xampp\htdocs\Tqseet\views\merchant\payment_links.php:19`
+
+## 2. Root Cause Analysis
+- During recent updates (specifically related to the Merchant Payment Links & Dynamic Checkout feature), a new `payment_links` table was introduced.
+- Since the baseline database schema file (`database/schema.sql`) was imported on this new development system without the subsequent updates, the database was missing the `payment_links` table.
+- This caused queries on the payment links page to fail.
+
+## 3. Resolution Details
+- Modified `patch_db.php` to include:
+  1. Creating the `payment_links` table if it does not exist:
+     ```sql
+     CREATE TABLE IF NOT EXISTS payment_links (
+         id INT AUTO_INCREMENT PRIMARY KEY,
+         merchant_id INT NOT NULL,
+         link_hash VARCHAR(255) NOT NULL,
+         title VARCHAR(255) NOT NULL,
+         description TEXT,
+         image VARCHAR(255),
+         amount DECIMAL(10,2) NOT NULL,
+         status ENUM('active', 'paid', 'expired') DEFAULT 'active',
+         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+         FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE
+     );
+     ```
+- Executed `php patch_db.php` to patch the local database schema.
+- Verified that the payment links queries now compile and execute successfully.

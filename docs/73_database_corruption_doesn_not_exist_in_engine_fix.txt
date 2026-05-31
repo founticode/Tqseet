@@ -1,0 +1,26 @@
+# Database Corruption Fix: "Table doesn't exist in engine"
+
+## 1. Issue Description
+When accessing the main landing page (`index.php`), the application encountered a PHP fatal error:
+`Fatal error: Uncaught mysqli_sql_exception: Table 'tqseet_db.merchants' doesn't exist in engine in C:\xampp\htdocs\Tqseet\index.php:15`
+
+## 2. Root Cause Analysis
+- The error `Table doesn't exist in engine` indicates a mismatch or corruption within the MySQL/MariaDB InnoDB storage engine.
+- Specifically, the `.frm` metadata files for the tables (like `merchants`, `installments`, etc.) were missing or corrupt, while their corresponding `.ibd` tablespace files remained inside the physical database data directory (`C:\xampp\mysql\data\tqseet_db\`).
+- Because of these orphaned `.ibd` files, standard SQL commands (like `DROP DATABASE` or `CREATE TABLE`) failed with "Directory not empty" and "Table already exists/doesn't exist in engine" exceptions.
+
+## 3. Resolution Details
+- **Cleanup of Orphaned Files**: Removed all orphaned `.ibd` files directly from the MariaDB data folder:
+  `Remove-Item -Force C:\xampp\mysql\data\tqseet_db\*`
+- **Recreated the Database Schema**:
+  1. Executed a clean `DROP DATABASE IF EXISTS tqseet_db` query.
+  2. Executed a clean `CREATE DATABASE tqseet_db` query.
+  3. Imported the baseline structure from `database/schema.sql` into the newly created database.
+- **Applied Patches**:
+  1. Ran the schema patches from `patch_db.php` to add the `is_payment_link` column to the `products` table.
+- **Removed Temporary Scripts**:
+  - Cleaned up the helper recreation/test scripts to leave the repository workspace in a pristine state.
+
+## 4. Verification
+- The database tables are now clean, consistent, and fully synchronized with the codebase.
+- The SQL queries run without any exceptions.

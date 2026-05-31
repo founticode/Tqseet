@@ -1,0 +1,27 @@
+# Database Schema Sync: Settlements Table & Column
+
+## 1. Issue Description
+When accessing the Merchant Settlements page (`views/merchant/settlements.php`), the application encountered a PHP fatal error:
+`Fatal error: Uncaught mysqli_sql_exception: Unknown column 'o.settlement_id' in 'where clause' in C:\xampp\htdocs\Tqseet\views\merchant\settlements.php:29`
+
+## 2. Root Cause Analysis
+- During recent updates (specifically related to the Merchant Settlements Ledger & Payout System), a new table `settlements` was introduced, and the `orders` table was altered to include a `settlement_id` foreign key.
+- Since the baseline database schema file (`database/schema.sql`) was imported on this new development system without the subsequent updates, the database was missing both the `settlements` table and the `orders.settlement_id` column.
+- This caused queries on the settlements page to fail.
+
+## 3. Resolution Details
+- Modified `patch_db.php` to include:
+  1. Creating the `settlements` table if it does not exist:
+     ```sql
+     CREATE TABLE IF NOT EXISTS settlements (
+         id INT AUTO_INCREMENT PRIMARY KEY,
+         merchant_id INT NOT NULL,
+         amount DECIMAL(10,2) NOT NULL,
+         status ENUM('pending', 'paid') DEFAULT 'pending',
+         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+         FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE
+     );
+     ```
+  2. Altering the `orders` table to add the `settlement_id` column and the foreign key constraint `fk_orders_settlements` referencing `settlements.id` with `ON DELETE SET NULL` if not present.
+- Executed `php patch_db.php` to patch the local database schema.
+- Verified that the settlements queries now compile and execute successfully.

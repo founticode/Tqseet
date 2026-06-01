@@ -1,0 +1,30 @@
+# Advanced Merchant Tools: Portal, Payment Links & Settlements
+
+## 1. Feature Overview
+This phase introduces a robust Merchant Portal Dashboard equipped with advanced tools including Payment Links and Settlement Tracking, bringing the application closer to a fully-fledged B2B financial platform.
+
+## 2. Implemented Components
+
+### A. Merchant Portal Dashboard
+- **File**: `views/merchant/dashboard.php`
+- **Description**: The core dashboard for store owners to monitor sales, view active orders, and manage API settings. It aggregates data into actionable insights for the merchant.
+
+### B. Payment Links Logic
+- **Controller**: `controllers/PaymentLinkController.php`
+- **View**: `views/merchant/payment_links.php`
+- **Description**: Allows merchants to dynamically generate unique payment URLs for specific amounts. These links can be shared directly with customers via WhatsApp or Email, bypassing the traditional cart checkout flow.
+- **Database**: Introduced the `payment_links` table (documented in previous schema sync notes).
+
+### C. Settlements Dashboard & Tracking
+- **Controller**: `controllers/SettlementController.php` (and `AdminSettlementController.php`)
+- **View**: `views/merchant/settlements.php`
+- **Description**: Tracks the payout ledger from the platform to the merchant's bank account. This ensures merchants have full visibility over their balance, pending payouts, and historical settlements.
+- **Database**: Introduced the `settlements` table (documented in previous schema sync notes).
+
+## 3. Technical Integration
+- Both `PaymentLinkController` and `SettlementController` are integrated into the core MVC architecture.
+- They utilize the global authentication helper (`auth_helper_safe_session.php`) to ensure that only authenticated merchants can access their specific data.
+- The merchant sidebar (`includes/merchant_sidebar.php`) has been updated to provide navigation links to these new dashboards.
+
+## 4. Status
+- The Advanced Merchant Tools phase (Phase 19) is now fully integrated and marked as **Done**.

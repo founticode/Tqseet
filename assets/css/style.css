@@ -380,8 +380,8 @@ a:hover {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid #f1f5f9;
-    padding: 0 24px;
-    height: 72px;
+    padding: 16px 24px;
+    min-height: 72px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -409,6 +409,7 @@ a:hover {
     text-decoration: none;
     text-transform: uppercase;
     transition: transform 0.2s ease;
+    margin-top: 5px;
 }
 
 .navbar-brand:hover {
@@ -591,7 +592,6 @@ a:hover {
     }
     .navbar {
         padding: 0 16px;
-        height: 64px;
     }
     .navbar-brand {
         font-size: 1.3rem;
@@ -1578,15 +1578,7 @@ a:hover {
     .verification-step-grid {
         grid-template-columns: 1fr;
     }
-    .navbar-container {
-        flex-direction: column;
-        gap: 12px;
-    }
-    .navbar-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 12px;
-    }
+    /* Navbar mobile overrides moved to 900px */
     .container {
         padding: 0 16px;
     }
@@ -1643,21 +1635,7 @@ a:hover {
         border-bottom: 1px solid #e2e8f0;
         padding-bottom: 20px;
     }
-    .shop-hero-banner {
-        padding: 30px;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-    }
-    .shop-banner-content {
-        max-width: 100%;
-    }
-    .shop-banner-title {
-        font-size: 1.8rem;
-    }
-    .shop-banner-illustration {
-        display: none;
-    }
+    /* Shop Hero overrides moved to 900px */
     .klarna-grid {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
@@ -2311,7 +2289,12 @@ a:hover {
 @media (max-width: 900px) {
     .mobile-menu-toggle { display: block; }
     
-    .navbar-container { flex-wrap: wrap; }
+    .navbar {
+        display: block;
+        height: auto;
+        padding-bottom: 16px;
+    }
+    .navbar-container { flex-wrap: wrap; align-items: flex-start; }
     
     .navbar-links {
         display: none;
@@ -2326,6 +2309,7 @@ a:hover {
     
     .navbar-right {
         display: none;
+        flex-direction: column;
         width: 100%;
         justify-content: flex-start;
         order: 4;
@@ -2344,6 +2328,7 @@ a:hover {
         border: 1px solid #e2e8f0;
         margin-top: 10px;
         display: none;
+        flex-direction: column;
         width: 100%;
     }
     
@@ -2363,12 +2348,86 @@ a:hover {
         text-align: center;
         gap: 20px;
     }
+    
+    .shop-hero-banner {
+        padding: 30px 20px;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+    .shop-banner-content {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+    .shop-banner-title {
+        font-size: 2rem;
+    }
+    .shop-banner-illustration {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        width: 100%;
+        height: 100px;
+        margin-top: 20px;
+    }
+    .shop-illustration-assets {
+        font-size: 4rem;
+    }
+    .shop-layout {
+        flex-direction: column;
+    }
+    .shop-sidebar {
+        width: 100%;
+        margin-bottom: 30px;
+    }
 }
 
 @media (max-width: 600px) {
     .auth-card { padding: 30px 20px; }
-    .hero-title { font-size: 2.5rem; }
+    .hero-title { font-size: 2rem; line-height: 1.1; }
     .shop-hero-banner { flex-direction: column; text-align: center; padding: 30px 20px; }
-    .klarna-grid { grid-template-columns: 1fr; }
     .testimonials-cards-row { flex-direction: column; }
+    
+    .klarna-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .klarna-img-box { height: 140px; padding: 10px; border-radius: 12px; }
+    .klarna-title { font-size: 0.8rem; }
+    .klarna-current-price { font-size: 0.95rem; }
+    .klarna-original-price { font-size: 0.75rem; }
+    .klarna-store { font-size: 0.7rem; margin-bottom: 5px; }
+    .klarna-bnpl-text { font-size: 0.7rem; margin-bottom: 5px; }
+    .klarna-store-count { font-size: 0.65rem; }
+    .klarna-btn-row span:last-child { font-size: 0.9rem !important; }
+    
+    .partner-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .partner-heading {
+        font-size: 1.6rem;
+    }
+    
+    .cta-banner-wrapper {
+        flex-direction: column !important;
+        padding: 30px 20px !important;
+        text-align: center;
+        gap: 20px;
+    }
+    .cta-banner-content {
+        max-width: 100% !important;
+    }
+    .cta-banner-title {
+        font-size: 1.8rem !important;
+    }
+    .cta-banner-btns {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px !important;
+    }
+    .cta-banner-btns a {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
 }

@@ -101,7 +101,7 @@ $history = $stmt_hist->get_result();
         <?php endif; ?>
 
         <!-- Financial Overview Cards -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px;">
+        <div class="stats-grid" style="margin-bottom: 40px;">
             <div class="card" style="margin: 0;">
                 <h3 style="color: #6b7280; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Available to Payout</h3>
                 <div style="font-size: 2rem; font-weight: 800; color: #10b981;">

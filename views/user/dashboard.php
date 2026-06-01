@@ -168,7 +168,7 @@ $conn->close();
                     <?php if ($isVerified == 1): ?>
                         <span class="badge badge-success" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700;">✓ OTP Verified</span>
                     <?php else: ?>
-                        <span class="badge badge-danger" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700;">⏳ OTP Required</span>
+                        <a href="../auth/verify_otp.php" class="badge badge-danger" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700; text-decoration: none; cursor: pointer;">⏳ OTP Required (Click to Verify)</a>
                     <?php endif; ?>
 
                     <?php if ($status === 'approved' && $id_status === 'approved'): ?>
@@ -176,7 +176,7 @@ $conn->close();
                     <?php elseif ($status === 'pending' || $id_status === 'pending'): ?>
                         <span class="badge badge-warning" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700;">⏳ KYC Under Review</span>
                     <?php else: ?>
-                        <span class="badge badge-danger" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700;">❌ Incomplete KYC</span>
+                        <a href="settings.php" class="badge badge-danger" style="font-size: 0.65rem; padding: 4px 8px; font-weight: 700; text-decoration: none; cursor: pointer;">❌ Incomplete KYC (Click to Complete)</a>
                     <?php endif; ?>
                 </div>
             </div>

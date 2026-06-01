@@ -66,7 +66,7 @@ $total_paid = $conn->query("SELECT SUM(amount) FROM settlements WHERE status = '
         <?php endif; ?>
 
         <!-- Stat Cards -->
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 40px;">
+        <div class="stats-grid" style="margin-bottom: 40px;">
             <div class="card" style="margin: 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: <?php echo $total_pending > 0 ? '1px solid #fecaca' : '1px solid #e2e8f0'; ?>;">
                 <h3 style="color: #6b7280; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Action Required: Pending Wire Transfers</h3>
                 <div style="font-size: 2.5rem; font-weight: 800; color: <?php echo $total_pending > 0 ? '#ef4444' : '#111827'; ?>;">

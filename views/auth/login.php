@@ -11,6 +11,8 @@ unset($_SESSION['success']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TQSEET - Login</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
@@ -24,7 +26,7 @@ unset($_SESSION['success']);
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
             </div>
-            <h1 class="auth-brand serif-title">TQSEET</h1>
+            <h1 class="auth-brand" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.2px; color: #005a4e; text-transform: uppercase; margin: 0 0 5px 0;">TQSEET</h1>
             <p class="auth-subtitle">Precision. Agility. Security.</p>
         </div>
 
@@ -70,15 +72,14 @@ unset($_SESSION['success']);
                     </svg>
                 </button>
             </form>
-
-            <!-- Alternative Navigation -->
-            <p style="margin-top: 25px; font-size: 0.85rem; color: #64748b; font-weight: 500;">
-                Don't have an account? <a href="register.php" style="color: #005a4e; font-weight: 700; margin-left: 4px;">Register here</a>
-            </p>
         </div>
 
         <!-- Footer -->
         <div class="auth-footer">
+            <!-- Alternative Navigation -->
+            <p style="margin-bottom: 25px; font-size: 0.95rem; color: #64748b; font-weight: 500;">
+                Don't have an account? <a href="register.php" style="color: #005a4e; font-weight: 700; margin-left: 4px;">Register here</a>
+            </p>
             <div class="auth-footer-links">
                 <a href="#">Privacy</a>
                 <a href="#">Compliance</a>

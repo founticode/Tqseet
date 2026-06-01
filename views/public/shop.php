@@ -17,6 +17,7 @@ $merchantsQuery = "
     SELECT DISTINCT m.id, m.store_name 
     FROM merchants m
     JOIN products p ON p.merchant_id = m.id
+    WHERE p.is_payment_link = FALSE
     ORDER BY m.store_name ASC
 ";
 $merchantsResult = $conn->query($merchantsQuery);
@@ -25,6 +26,7 @@ $merchantsResult = $conn->query($merchantsQuery);
 $countsQuery = "
     SELECT merchant_id, COUNT(*) as count 
     FROM products 
+    WHERE is_payment_link = FALSE
     GROUP BY merchant_id
 ";
 $countsResult = $conn->query($countsQuery);

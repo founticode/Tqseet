@@ -175,6 +175,12 @@ $error = $_GET['error'] ?? '';
                                     </button>
                                     
                                     <form action="../../controllers/PaymentLinkController.php" method="POST" style="margin: 0;">
+                                        <input type="hidden" name="action" value="publish">
+                                        <input type="hidden" name="link_id" value="<?php echo $link['id']; ?>">
+                                        <button type="submit" style="background: #005a4e; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">+ Catalog</button>
+                                    </form>
+                                    
+                                    <form action="../../controllers/PaymentLinkController.php" method="POST" style="margin: 0;">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="link_id" value="<?php echo $link['id']; ?>">
                                         <button type="submit" class="btn-danger" style="padding: 6px 12px;">Delete</button>

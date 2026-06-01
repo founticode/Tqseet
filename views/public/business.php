@@ -9,15 +9,13 @@ require_once __DIR__ . "/../../includes/auth.php";
     <title>TQSEET for Business - Power Your Store's Growth</title>
     <!-- Google Fonts Outfit & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>">
     
     <style>
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
             color: #0f172a;
-            background-color: #fcfcfd;
-            margin: 0;
-            overflow-x: hidden;
         }
 
         h1, h2, h3, h4, .outfit-font {
@@ -379,6 +377,23 @@ require_once __DIR__ . "/../../includes/auth.php";
                 height: 480px;
             }
         }
+        @media (max-width: 600px) {
+            .tabby-hero-left h1 { font-size: 2.5rem; line-height: 1.1; }
+            .tabby-hero { padding: 40px 0 60px 0; text-align: center; }
+            .tabby-hero-left .btn-primary { width: 100%; justify-content: center; }
+            .klarna-stat-item h3 { font-size: 2.5rem; }
+            .omnichannel-section { padding: 60px 0; }
+            .tabs-section { padding: 60px 0; }
+            .solutions-section { padding: 60px 0; }
+            .bottom-cta { padding: 60px 20px; }
+            .bottom-cta h2 { font-size: 2.2rem; }
+            .cta-btns { flex-direction: column !important; gap: 10px !important; }
+            .cta-btns a { width: 100%; box-sizing: border-box; text-align: center; }
+            .phone-container { width: 100%; max-width: 320px; }
+            .solution-card { height: auto; padding: 30px 20px; }
+            .omnichannel-right .serif-title { font-size: 2.2rem !important; }
+            .tabs-section .serif-title, .solutions-section .serif-title { font-size: 2.2rem !important; }
+        }
     </style>
 </head>
 <body>
@@ -653,7 +668,7 @@ require_once __DIR__ . "/../../includes/auth.php";
         <div class="container">
             <h2>Ready to power your growth?</h2>
             <p>Join top Moroccan merchants integrating TQSEET to maximize conversions and drive repeat consumer visits.</p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
+            <div style="display: flex; gap: 15px; justify-content: center;" class="cta-btns">
                 <a href="/views/auth/register.php?role=merchant" class="btn" style="background-color: #00f5c7; color: #003a31; padding: 18px 45px; border-radius: 100px; font-weight: 800; font-size: 1rem; text-decoration: none;">Apply as Partner</a>
                 <a href="/views/public/business_docs.php" class="btn" style="background-color: transparent; border: 2px solid rgba(255,255,255,0.2); color: white; padding: 18px 45px; border-radius: 100px; font-weight: 800; font-size: 1rem; text-decoration: none; transition: border-color 0.2s;">Read API Docs</a>
             </div>

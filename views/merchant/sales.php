@@ -20,6 +20,8 @@ $merchantId = $merchantData['id'] ?? 0;
 // Total Revenue (Total value of all active orders)
 $stmt_stats = $conn->prepare("SELECT 
                                 SUM(o.total_price) as total_volume,
+                                SUM(o.merchant_earning) as total_earnings,
+                                SUM(o.commission) as total_commission,
                                 COUNT(o.id) as total_orders
                              FROM orders o 
                              JOIN products p ON o.product_id = p.id 
@@ -44,10 +46,10 @@ $stmt_sales->bind_param("i", $merchantId);
 $stmt_sales->execute();
 $salesRows = $stmt_sales->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Calculate Platform Commission (Actual rate from merchant profile)
+// Use the exact accounting figures captured at checkout to prevent historical discrepancies
 $commissionRate = $merchantData['commission_rate'] ?? 0.05;
-$totalCommission = ($stats['total_volume'] ?? 0) * $commissionRate;
-$netRevenue = ($stats['total_volume'] ?? 0) - $totalCommission;
+$totalCommission = $stats['total_commission'] ?? 0;
+$netRevenue = $stats['total_earnings'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">

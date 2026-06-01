@@ -21,17 +21,17 @@
             <div class="footer-column">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Use</a></li>
-                    <li><a href="#">BNPL Agreement</a></li>
+                    <li><a href="/views/public/privacy.php">Privacy Policy</a></li>
+                    <li><a href="/views/public/terms.php">Terms of Use</a></li>
+                    <li><a href="/views/public/bnpl_agreement.php">BNPL Agreement</a></li>
                 </ul>
             </div>
             
             <div class="footer-column">
                 <h4>Support</h4>
                 <ul>
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Contact Support</a></li>
+                    <li><a href="/views/public/help.php">Help Center</a></li>
+                    <li><a href="/views/public/contact.php">Contact Support</a></li>
                     <li><a href="/views/merchant/dashboard.php">Merchant Portal</a></li>
                 </ul>
             </div>

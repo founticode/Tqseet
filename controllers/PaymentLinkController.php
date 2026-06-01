@@ -78,6 +78,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit;
     }
+    if ($action === 'publish') {
+        $link_id = intval($_POST['link_id'] ?? 0);
+        
+        $stmt = $conn->prepare("SELECT * FROM payment_links WHERE id = ? AND merchant_id = ?");
+        $stmt->bind_param("ii", $link_id, $merchantId);
+        $stmt->execute();
+        $link = $stmt->get_result()->fetch_assoc();
+        
+        if ($link) {
+            $desc = !empty($link['description']) ? $link['description'] : $link['title'];
+            $img = !empty($link['image']) ? $link['image'] : 'default_product.png';
+            // Insert as a NORMAL product (is_payment_link = FALSE)
+            $stmt_prod = $conn->prepare("INSERT INTO products (merchant_id, name, description, price, image, is_payment_link) VALUES (?, ?, ?, ?, ?, FALSE)");
+            $stmt_prod->bind_param("issds", $link['merchant_id'], $link['title'], $desc, $link['amount'], $img);
+            
+            if ($stmt_prod->execute()) {
+                header("Location: ../views/merchant/payment_links.php?success=Successfully published to public catalog.");
+            } else {
+                header("Location: ../views/merchant/payment_links.php?error=Failed to publish to catalog.");
+            }
+        } else {
+            header("Location: ../views/merchant/payment_links.php?error=Link not found.");
+        }
+        exit;
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -103,13 +128,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                  </div>");
         }
         
-        // 2. Create a temporary 'product' for this payment link to reuse the existing checkout flow
-        $desc = !empty($link['description']) ? $link['description'] : "Payment for " . $link['title'];
-        $img = !empty($link['image']) ? $link['image'] : 'default_product.png';
-        $stmt_prod = $conn->prepare("INSERT INTO products (merchant_id, name, description, price, image, is_payment_link) VALUES (?, ?, ?, ?, ?, TRUE)");
-        $stmt_prod->bind_param("issds", $link['merchant_id'], $link['title'], $desc, $link['amount'], $img);
-        $stmt_prod->execute();
-        $newProductId = $conn->insert_id;
+        // 2. Reuse existing dummy product or create a new one for this payment link
+        $stmt_check = $conn->prepare("SELECT id FROM products WHERE merchant_id = ? AND name = ? AND price = ? AND is_payment_link = TRUE LIMIT 1");
+        $stmt_check->bind_param("isd", $link['merchant_id'], $link['title'], $link['amount']);
+        $stmt_check->execute();
+        $existing = $stmt_check->get_result()->fetch_assoc();
+        
+        if ($existing) {
+            $newProductId = $existing['id'];
+        } else {
+            $desc = !empty($link['description']) ? $link['description'] : "Payment for " . $link['title'];
+            $img = !empty($link['image']) ? $link['image'] : 'default_product.png';
+            $stmt_prod = $conn->prepare("INSERT INTO products (merchant_id, name, description, price, image, is_payment_link) VALUES (?, ?, ?, ?, ?, TRUE)");
+            $stmt_prod->bind_param("issds", $link['merchant_id'], $link['title'], $desc, $link['amount'], $img);
+            $stmt_prod->execute();
+            $newProductId = $conn->insert_id;
+        }
         
         // 3. Optional: mark link as paid or pending here, but for now we leave it active until checkout finishes.
         

@@ -145,14 +145,14 @@ $merchantsResult = $conn->query($merchantsQuery);
 
         <!-- Separator CTA Banner Section -->
         <section style="padding: 40px 0;">
-            <div style="background: linear-gradient(135deg, #005a4e 0%, #013b33 100%); border-radius: 32px; padding: 60px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 90, 78, 0.1);">
-                <div style="max-width: 60%; z-index: 2;">
-                    <h2 style="font-size: 2.2rem; font-weight: 900; margin: 0 0 10px 0; letter-spacing: -1px;">Ready to split your first payment?</h2>
+            <div class="cta-banner-wrapper" style="background: linear-gradient(135deg, #005a4e 0%, #013b33 100%); border-radius: 32px; padding: 60px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 90, 78, 0.1);">
+                <div class="cta-banner-content" style="max-width: 60%; z-index: 2;">
+                    <h2 class="cta-banner-title" style="font-size: 2.2rem; font-weight: 900; margin: 0 0 10px 0; letter-spacing: -1px;">Ready to split your first payment?</h2>
                     <p style="color: rgba(255, 255, 255, 0.85); font-size: 1.05rem; margin: 0; line-height: 1.5; font-weight: 550;">
                         Join thousands of smart shoppers in Morocco using TQSEET to purchase instantly and pay in 4 interest-free installments.
                     </p>
                 </div>
-                <div style="display: flex; gap: 15px; z-index: 2;">
+                <div class="cta-banner-btns" style="display: flex; gap: 15px; z-index: 2;">
                     <a href="views/auth/register.php" style="background-color: #00f5c7; color: #002d27; padding: 16px 28px; border-radius: 14px; font-weight: 800; font-size: 0.95rem; text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Get Started</a>
                     <a href="views/public/shop.php" style="border: 2px solid #ffffff; color: #ffffff; padding: 14px 26px; border-radius: 14px; font-weight: 800; font-size: 0.95rem; text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Browse Shop</a>
                 </div>

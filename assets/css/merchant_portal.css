@@ -396,7 +396,25 @@ body {
 
 /* Mobile Phones */
 @media (max-width: 480px) {
-    .main-content { padding: 12px; }
+    .main-content { padding: 12px; box-sizing: border-box; }
     .card { padding: 20px; }
-    .btn-black { width: 100%; justify-content: center; }
+    .btn-black, .btn-secondary, .btn-danger { 
+        width: 100%; 
+        justify-content: center; 
+        box-sizing: border-box; 
+        text-align: center; 
+        display: flex; 
+    }
+    .checklist-row { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 12px; 
+    }
+    .status-badge { 
+        width: 100%; 
+        box-sizing: border-box; 
+        text-align: center; 
+        display: block; 
+    }
+    .stat-value { font-size: 1.6rem; }
 }

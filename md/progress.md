@@ -139,7 +139,7 @@
 - [x] Step 2: Style auth pages (login, register)
 - [x] Step 3: Style dashboards
 - [x] Step 4: Responsive design (mobile-friendly)
-- [ ] Step 5: Error/success message styling
+- [x] Step 5: Error/success message styling
 - [ ] Step 6: Loading states and animations
 - [x] Step 7: Style landing, shop catalog pages (Klarna-style shop), and testimonials
 
@@ -179,11 +179,26 @@
 
 ---
 
-## Phase 19: Advanced Merchant Tools (Upcoming) ⬜
-- [ ] Step 1: Build the core Merchant Portal Dashboard (Sales, Orders, API Settings) for store owners.
-- [ ] Step 2: Build Payment Links logic (Generate unique URL for dynamic amount to send via WhatsApp/Email)
-- [ ] Step 3: Build Settlements dashboard and tracking logic (Track platform payouts to the merchant's bank)
+## Phase 19: Advanced Merchant Tools ✅
+- [x] Step 1: Build the core Merchant Portal Dashboard (Sales, Orders, API Settings) for store owners.
+- [x] Step 2: Build Payment Links logic (Generate unique URL for dynamic amount to send via WhatsApp/Email)
+- [x] Step 3: Build Settlements dashboard and tracking logic (Track platform payouts to the merchant's bank)
 
 ---
 
-## Current Position: Ready to build the Merchant Portal Dashboard (`views/merchant/dashboard.php`)
+## Phase 20: Returns & Refunds (Order Cancellation) ⬜
+- [ ] Step 1: User UI - Add "Request Return" action on active orders.
+- [ ] Step 2: Merchant UI - Add "Approve/Reject Return" panel on the order management page.
+- [ ] Step 3: Debt Forgiveness - Core logic to cancel all unpaid future installments and immediately restore the user's credit limit.
+- [ ] Step 4: Merchant Clawback - Ledger logic to deduct the refund amount from the merchant's "Available to Payout" balance (handling negative balances if already settled).
+- [ ] Step 5: Refund Processing - System logic to simulate refunding the downpayment back to the customer's card.
+
+## Phase 21: Database Integrity & Soft Deletes ⬜
+- [ ] Step 1: Schema Update - Add an `is_banned` or `status` column to the `users` table.
+- [ ] Step 2: Auth Logic - Update login endpoints to block access if a user is suspended or soft-deleted.
+- [ ] Step 3: Admin UI - Add a "Suspend User" button in the admin panel instead of executing hard deletes.
+- [ ] Step 4: Schema Safety - Remove `ON DELETE CASCADE` from critical financial tables (`orders`, `installments`) and replace with `RESTRICT` to permanently prevent accidental debt deletion.
+
+---
+
+## Current Position: Ready to build Phase 20 (Returns & Refunds)

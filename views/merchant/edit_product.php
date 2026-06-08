@@ -38,6 +38,16 @@ if (!$product) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TQSEET - Edit Product</title>
+    <style>
+        .image-upload-container { display: flex; align-items: start; gap: 20px; background: #fdfdfd; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px; }
+        .form-actions { display: flex; align-items: center; gap: 20px; }
+        @media (max-width: 600px) {
+            .image-upload-container { flex-direction: column; align-items: stretch; }
+            .form-actions { flex-direction: column; align-items: stretch; gap: 15px; }
+            .form-actions button { width: 100%; justify-content: center; }
+            .form-actions a { display: block; text-align: center; width: 100%; padding: 10px 0; }
+        }
+    </style>
 </head>
 <body style="font-family: sans-serif; margin: 0; background: #f8f9fa;">
 
@@ -73,7 +83,7 @@ if (!$product) {
 
             <div style="margin-bottom: 30px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: bold;">Product Image:</label>
-                <div style="display: flex; align-items: start; gap: 20px; background: #fdfdfd; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px;">
+                <div class="image-upload-container">
                     <div>
                         <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #666;">Current Image:</p>
                         <img src="../../uploads/products/<?php echo $product['image']; ?>" alt="Current" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
@@ -85,11 +95,11 @@ if (!$product) {
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <button type="submit" style="background: #007bff; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+            <div class="form-actions">
+                <button type="submit" style="background: #111827; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s;">
                     Update Product
                 </button>
-                <a href="products.php" style="color: #6c757d; text-decoration: none;">Cancel</a>
+                <a href="products.php" style="color: #6c757d; text-decoration: none; font-weight: 600;">Cancel</a>
             </div>
 
         </form>

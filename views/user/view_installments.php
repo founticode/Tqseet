@@ -66,25 +66,54 @@ foreach ($installmentRows as $ins) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TQSEET - Payment Timeline</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; margin: 0; color: #0f172a; }
+        h1, h2, h3, .brand-font { font-family: 'Outfit', sans-serif; }
+        
+        .summary-card { background: white; border-radius: 20px; padding: 30px; display: flex; align-items: center; gap: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .summary-image { width: 120px; height: 120px; border-radius: 16px; overflow: hidden; background: #f1f5f9; flex-shrink: 0; }
+        .summary-title { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; color: #0f172a; }
+        .summary-stats { display: flex; gap: 30px; margin-top: 15px; }
+        
+        .timeline-card { background: white; border-radius: 20px; padding: 35px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .timeline-item-content { flex-grow: 1; display: flex; justify-content: space-between; align-items: flex-start; margin-top: 4px; }
+        .timeline-item-right { text-align: right; }
+        .pay-btn-container { margin-top: 12px; }
+        
+        @media (max-width: 600px) {
+            .summary-card { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            .summary-image { width: 100px; height: 100px; }
+            .summary-title { font-size: 1.3rem !important; line-height: 1.2; }
+            .summary-stats { width: 100%; justify-content: space-between; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 12px; margin-top: 5px; box-sizing: border-box; }
+            
+            .timeline-card { padding: 20px; }
+            .timeline-item-content { flex-direction: column; align-items: stretch !important; gap: 10px; }
+            .timeline-item-right { text-align: left; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 12px; margin-top: 5px; }
+            .pay-btn-container { margin-top: 0 !important; }
+        }
+    </style>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; margin: 0; color: #2d3436;">
+<body>
 
     <?php include_once __DIR__ . "/../../includes/navbar.php"; ?>
 
     <div style="max-width: 750px; margin: 60px auto; padding: 0 20px;">
         
         <!-- Summary Card -->
-        <div style="background: white; border-radius: 25px; padding: 35px; display: flex; align-items: center; gap: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 40px; border: 1px solid rgba(0,0,0,0.02);">
-            <div style="width: 140px; height: 140px; border-radius: 20px; overflow: hidden; background: #f0f0f0; flex-shrink: 0;">
+        <div class="summary-card">
+            <div class="summary-image">
                 <img src="/uploads/products/<?php echo htmlspecialchars($order['product_image']); ?>" 
                      style="width: 100%; height: 100%; object-fit: cover;"
                      onerror="this.src='https://via.placeholder.com/140?text=Product'">
             </div>
-            <div style="flex-grow: 1;">
-                <h1 style="margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px;"><?php echo htmlspecialchars($order['product_name']); ?></h1>
-                <p style="color: #636e72; margin: 8px 0 20px 0; font-weight: 500;">Plan #<?php echo $order['id']; ?></p>
+            <div style="flex-grow: 1; width: 100%;">
+                <h1 class="summary-title"><?php echo htmlspecialchars($order['product_name']); ?></h1>
+                <p style="color: #64748b; margin: 6px 0 10px 0; font-size: 0.9rem; font-weight: 500;">Plan #<?php echo $order['id']; ?></p>
                 
-                <div style="display: flex; gap: 40px;">
+                <div class="summary-stats">
                     <div>
                         <div style="font-size: 0.75rem; color: #b2bec3; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Paid Already</div>
                         <div style="font-size: 1.4rem; font-weight: 900; color: #00b894; margin-top: 4px;"><?php echo number_format($totalPaid, 2); ?> <span style="font-size: 0.8rem;">DH</span></div>
@@ -98,8 +127,8 @@ foreach ($installmentRows as $ins) {
         </div>
 
         <!-- Timeline Section -->
-        <div style="background: white; border-radius: 25px; padding: 45px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);">
-            <h3 style="margin: 0 0 40px 0; font-weight: 900; font-size: 1.4rem;">Payment Journey</h3>
+        <div class="timeline-card">
+            <h3 style="margin: 0 0 30px 0; font-weight: 800; font-size: 1.3rem; color: #0f172a;">Payment Journey</h3>
 
             <?php foreach ($installmentRows as $index => $ins): ?>
                 <div style="display: flex; gap: 30px; position: relative; padding-bottom: 40px;">
@@ -121,9 +150,9 @@ foreach ($installmentRows as $ins) {
                     </div>
 
                     <!-- Payment Info -->
-                    <div style="flex-grow: 1; display: flex; justify-content: space-between; align-items: flex-start; margin-top: 4px;">
+                    <div class="timeline-item-content">
                         <div>
-                            <div style="font-weight: 800; font-size: 1.15rem; color: <?php echo ($ins['status'] === 'paid') ? '#00b894' : '#2d3436'; ?>;">
+                            <div style="font-weight: 700; font-size: 1.1rem; color: <?php echo ($ins['status'] === 'paid') ? '#10b981' : '#0f172a'; ?>;">
                                 <?php 
                                     if ($index === 0) echo "Initial Downpayment";
                                     else echo "Installment #" . ($index + 1);
@@ -134,23 +163,25 @@ foreach ($installmentRows as $ins) {
                             </div>
                         </div>
 
-                        <div style="text-align: right;">
+                        <div class="timeline-item-right">
                             <div style="font-size: 1.3rem; font-weight: 900; color: #222;"><?php echo number_format($ins['amount'], 2); ?> <span style="font-size: 0.8rem;">DH</span></div>
                             
                             <?php if ($ins['status'] === 'unpaid'): ?>
-                                <?php if ($canPayNext): ?>
+                                <div class="pay-btn-container">
+                                    <?php if ($canPayNext): ?>
                                     <a href="checkout_payment.php?order_id=<?php echo $orderId; ?>&installment_id=<?php echo $ins['id']; ?>&amount=<?php echo $ins['amount']; ?>" 
                                        style="display: inline-block; margin-top: 12px; background: #222; color: white; text-decoration: none; padding: 8px 18px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; transition: transform 0.2s;">
                                         Pay Now
                                     </a>
                                     <?php $canPayNext = false; // Next ones are locked until this is paid ?>
-                                <?php else: ?>
+                                    <?php else: ?>
                                     <div style="margin-top: 12px; background: #f1f3f5; color: #b2bec3; padding: 8px 18px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; display: inline-block; cursor: not-allowed; border: 1px solid #e1e4e8;">
                                         🔒 Locked
                                     </div>
-                                <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
                             <?php else: ?>
-                                <div style="display: flex; align-items: center; gap: 5px; justify-content: flex-end; margin-top: 12px; color: #00b894; font-weight: bold; font-size: 0.8rem;">
+                                <div class="pay-btn-container" style="display: flex; align-items: center; gap: 5px; color: #10b981; font-weight: 700; font-size: 0.85rem;">
                                     <span style="font-size: 1rem;">🛡️</span> Fully Paid
                                 </div>
                             <?php endif; ?>

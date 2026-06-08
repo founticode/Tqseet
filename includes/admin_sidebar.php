@@ -6,13 +6,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#111827" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        tqseet <span style="font-size:0.6rem; color:#6b7280; text-transform:uppercase; margin-left:8px; font-weight:800; letter-spacing:1px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Admin</span>
+        TQSEET <span style="font-size:0.6rem; color:#6b7280; text-transform:uppercase; margin-left:8px; font-weight:800; letter-spacing:1px; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Admin</span>
     </div>
 
-    <a href="../../index.php" class="sidebar-link" style="background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; font-weight: 700; margin-bottom: 20px;">
-        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Back to Public Shop
-    </a>
 
     <div class="sidebar-section">Overview</div>
     <a href="dashboard.php" class="sidebar-link <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">

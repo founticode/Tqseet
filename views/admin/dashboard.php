@@ -55,7 +55,7 @@ $pending_docs = $conn->query("SELECT user_id, cin as name, 'Customer KYC' as typ
         </header>
 
         <!-- Top Stats Row -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px;">
+        <div class="stats-grid" style="margin-bottom: 40px;">
             <div class="card" style="margin: 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                 <h3 style="color: #6b7280; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Platform Volume</h3>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #111827;">
@@ -82,7 +82,7 @@ $pending_docs = $conn->query("SELECT user_id, cin as name, 'Customer KYC' as typ
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+        <div class="dashboard-grid">
             
             <!-- Main Feed -->
             <div>

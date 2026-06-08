@@ -199,6 +199,13 @@
 - [ ] Step 3: Admin UI - Add a "Suspend User" button in the admin panel instead of executing hard deletes.
 - [ ] Step 4: Schema Safety - Remove `ON DELETE CASCADE` from critical financial tables (`orders`, `installments`) and replace with `RESTRICT` to permanently prevent accidental debt deletion.
 
+## Phase 22: Internationalization (French & Arabic) ⬜
+- [ ] Step 1: Create Centralized Language Dictionary (en.json, fr.json, ar.json)
+- [ ] Step 2: Implement PHP Translation Helper function
+- [ ] Step 3: Add UI Language Switcher to Navbars
+- [ ] Step 4: Implement RTL CSS Architecture & Logical Properties
+- [ ] Step 5: Translate core static UI components
+
 ---
 
-## Current Position: Ready to build Phase 20 (Returns & Refunds)
+## Current Position: Ready to build Phase 20 (Returns & Refunds) or Phase 22 (Internationalization)

@@ -6,7 +6,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#111827" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        tqseet
+        TQSEET
     </div>
 
     <div class="sidebar-section">General</div>

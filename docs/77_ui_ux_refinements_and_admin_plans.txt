@@ -1,0 +1,16 @@
+# Document: UI/UX Refinements & Admin Installment Restructuring
+
+## 1. Database Changes
+**None.** No database schema changes were introduced during this session. All modifications were frontend structural logic, query optimizations, and UI styling.
+
+## 2. Frontend Responsiveness Updates
+- **`merchant/edit_product.php`**: Mobile layout fixed by converting the image upload section into a vertically stacking flex-column, removing horizontal squishing. Action buttons were updated to the premium dark branding (`#111827`).
+- **`user/view_installments.php`**: Complete CSS overhaul. Integrated TQSEET's official Google Fonts (Outfit, Inter) and `style.css` which were previously missing. Adjusted the summary card to utilize mobile breakpoints, wrapping "Paid Already" and "Outstanding" balances into elegant grey bounding boxes. Timeline flex layouts were corrected to stack cleanly on narrow viewports instead of overflowing text.
+
+## 3. Admin Payment Monitor Overhaul
+- **`admin/all_installments.php`**: The "Installment Wall" was heavily refactored. Instead of querying raw individual installments (which creates 4 rows per purchase), the SQL was rewritten to group by `orders`. The table now displays 1 row per purchase plan, showing Total Volume and a dynamic Progress indicator (e.g., "1 / 4 Paid"). Fixed CSS wrapping issues on the Action buttons.
+- **`admin/view_plan.php`**: Created a brand new dedicated detailed view for Admins. Clicking "View Details" on the installment wall routes to this page. It features a native calculation of the customer's total paid and remaining balances, alongside a read-only visual timeline of the installment schedule. Fully responsive mobile layouts were implemented.
+
+## 4. Documentation & Future Planning
+- Created **`explaining/explain_i18n.md`** documenting the architecture for the upcoming Phase 22 (French & Arabic translation support via JSON dictionaries and RTL logical CSS properties).
+- Appended Phase 22 to the **`md/progress.md`** master tracker.

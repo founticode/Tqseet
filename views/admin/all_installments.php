@@ -8,14 +8,15 @@ requireRole("admin");
 $db = new Database();
 $conn = $db->connect();
 
-// Fetch all installments with User and Product info
+// Fetch all orders with User, Product info and Installment counts
 $query = "
-    SELECT i.*, u.name as user_name, u.email as user_email, p.name as product_name
-    FROM installments i
-    JOIN orders o ON i.order_id = o.id
+    SELECT o.*, u.name as user_name, u.email as user_email, p.name as product_name,
+           (SELECT COUNT(*) FROM installments WHERE order_id = o.id AND status = 'paid') as paid_count,
+           (SELECT COUNT(*) FROM installments WHERE order_id = o.id) as total_count
+    FROM orders o
     JOIN users u ON o.user_id = u.id
     JOIN products p ON o.product_id = p.id
-    ORDER BY i.due_date DESC
+    ORDER BY o.created_at DESC
 ";
 $result = $conn->query($query);
 ?>
@@ -48,9 +49,9 @@ $result = $conn->query($query);
                     <tr>
                         <th>Customer</th>
                         <th>Product / Plan</th>
-                        <th>Amount</th>
-                        <th>Due Date</th>
-                        <th style="text-align: right;">Status</th>
+                        <th>Total Volume</th>
+                        <th>Progress</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,7 +60,7 @@ $result = $conn->query($query);
                     <?php endif; ?>
                     <?php while($row = $result->fetch_assoc()): ?>
                         <?php 
-                            $isOverdue = (strtotime($row['due_date']) < time() && $row['status'] === 'unpaid');
+                            $isComplete = ($row['paid_count'] == $row['total_count'] && $row['total_count'] > 0);
                         ?>
                         <tr>
                             <td>
@@ -68,24 +69,22 @@ $result = $conn->query($query);
                             </td>
                             <td>
                                 <div style="font-weight: 600; color: #4b5563;"><?php echo htmlspecialchars($row['product_name']); ?></div>
-                                <div style="font-size: 0.8rem; color: #9ca3af;">Plan #<?php echo $row['order_id']; ?></div>
+                                <div style="font-size: 0.8rem; color: #9ca3af;">Plan #<?php echo $row['id']; ?></div>
                             </td>
                             <td style="font-weight: 800; color: #111827;">
-                                <?php echo number_format($row['amount'], 2); ?> <span style="font-size: 0.8rem; color: #6b7280; font-weight: 600;">DH</span>
+                                <?php echo number_format($row['total_price'], 2); ?> <span style="font-size: 0.8rem; color: #6b7280; font-weight: 600;">DH</span>
                             </td>
                             <td>
-                                <div style="font-weight: 700; color: <?php echo $isOverdue ? '#ef4444' : '#111827'; ?>;">
-                                    <?php echo date('d M Y', strtotime($row['due_date'])); ?>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="font-weight: 700; color: <?php echo $isComplete ? '#10b981' : '#f59e0b'; ?>; font-size: 0.9rem;">
+                                        <?php echo $row['paid_count']; ?> / <?php echo $row['total_count']; ?> Paid
+                                    </div>
                                 </div>
                             </td>
-                            <td style="text-align: right;">
-                                <?php if ($row['status'] === 'paid'): ?>
-                                    <span class="status-badge status-active">Paid</span>
-                                <?php elseif ($isOverdue): ?>
-                                    <span class="status-badge status-pending" style="background: #fef2f2; color: #ef4444;">Overdue</span>
-                                <?php else: ?>
-                                    <span class="status-badge status-pending" style="background: #fffbeb; color: #f59e0b;">Pending</span>
-                                <?php endif; ?>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <a href="view_plan.php?order_id=<?php echo $row['id']; ?>" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; display: inline-block; white-space: nowrap;">
+                                    View Details
+                                </a>
                             </td>
                         </tr>
                     <?php endwhile; ?>

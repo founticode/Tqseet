@@ -367,7 +367,7 @@ require_once __DIR__ . "/../../includes/auth.php";
             .omnichannel-grid,
             .tabs-layout {
                 grid-template-columns: 1fr;
-                gap: 50px;
+                gap: 40px;
             }
             .solutions-grid,
             .klarna-stats-grid {
@@ -376,23 +376,131 @@ require_once __DIR__ . "/../../includes/auth.php";
             .solution-card {
                 height: 480px;
             }
+            .tabby-hero {
+                padding: 60px 0 80px 0;
+            }
+            .tabby-hero-left h1 {
+                font-size: 3rem;
+                letter-spacing: -1.5px;
+            }
+            .tabby-hero-left p {
+                font-size: 1.1rem;
+                margin-bottom: 30px;
+            }
         }
         @media (max-width: 600px) {
-            .tabby-hero-left h1 { font-size: 2.5rem; line-height: 1.1; }
-            .tabby-hero { padding: 40px 0 60px 0; text-align: center; }
-            .tabby-hero-left .btn-primary { width: 100%; justify-content: center; }
-            .klarna-stat-item h3 { font-size: 2.5rem; }
-            .omnichannel-section { padding: 60px 0; }
-            .tabs-section { padding: 60px 0; }
-            .solutions-section { padding: 60px 0; }
-            .bottom-cta { padding: 60px 20px; }
-            .bottom-cta h2 { font-size: 2.2rem; }
-            .cta-btns { flex-direction: column !important; gap: 10px !important; }
-            .cta-btns a { width: 100%; box-sizing: border-box; text-align: center; }
-            .phone-container { width: 100%; max-width: 320px; }
-            .solution-card { height: auto; padding: 30px 20px; }
-            .omnichannel-right .serif-title { font-size: 2.2rem !important; }
-            .tabs-section .serif-title, .solutions-section .serif-title { font-size: 2.2rem !important; }
+            .tabby-hero {
+                padding: 30px 0 50px 0;
+                text-align: center;
+            }
+            .tabby-hero-left h1 {
+                font-size: 2.2rem;
+                line-height: 1.1;
+                letter-spacing: -1px;
+                margin-bottom: 16px;
+            }
+            .tabby-hero-left p {
+                font-size: 1rem;
+                line-height: 1.5;
+                margin-bottom: 24px;
+                color: rgba(255,255,255,0.8);
+            }
+            .tabby-hero-left .btn-primary {
+                width: 100%;
+                justify-content: center;
+                padding: 16px 30px;
+                font-size: 0.95rem;
+            }
+            .hero-badge {
+                font-size: 0.7rem;
+                padding: 8px 18px;
+            }
+            
+            /* Phone mockup mobile */
+            .phone-container {
+                width: 260px;
+                height: 520px;
+                max-width: 100%;
+                border-radius: 38px;
+                padding: 10px;
+            }
+            .phone-screen {
+                border-radius: 30px !important;
+            }
+
+            /* Stats section */
+            .klarna-stats-section {
+                padding: 40px 0;
+            }
+            .klarna-stat-item h3 {
+                font-size: 2.2rem;
+            }
+            .klarna-stat-item p {
+                font-size: 0.85rem;
+            }
+
+            /* Omnichannel section */
+            .omnichannel-section {
+                padding: 50px 0;
+            }
+            .omnichannel-right .serif-title {
+                font-size: 2rem !important;
+                letter-spacing: -0.5px !important;
+            }
+            .omnichannel-feature-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            /* Tabs section */
+            .tabs-section {
+                padding: 50px 0;
+            }
+            .tabs-section .serif-title,
+            .solutions-section .serif-title {
+                font-size: 2rem !important;
+                letter-spacing: -0.5px !important;
+            }
+            .tab-content-display {
+                padding: 25px !important;
+            }
+            .tab-content-display h3 {
+                font-size: 1.6rem !important;
+            }
+
+            /* Solutions section */
+            .solutions-section {
+                padding: 50px 0;
+            }
+            .solution-card {
+                height: auto;
+                padding: 28px 20px;
+            }
+            .solution-card h4 {
+                font-size: 1.05rem;
+            }
+
+            /* Bottom CTA */
+            .bottom-cta {
+                padding: 50px 20px;
+            }
+            .bottom-cta h2 {
+                font-size: 1.9rem;
+                letter-spacing: -0.5px;
+            }
+            .bottom-cta p {
+                font-size: 1rem;
+            }
+            .cta-btns {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .cta-btns a {
+                width: 100%;
+                box-sizing: border-box;
+                text-align: center;
+            }
         }
     </style>
 </head>

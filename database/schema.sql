@@ -10,6 +10,7 @@ CREATE TABLE users (
     phone VARCHAR(20) UNIQUE,
     role ENUM('user','merchant','admin') DEFAULT 'user',
     is_verified BOOLEAN DEFAULT FALSE,
+    profile_pic VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -101,6 +102,7 @@ CREATE TABLE otp_codes (
 CREATE TABLE payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    card_brand VARCHAR(50),
     last_four VARCHAR(4) NOT NULL,
     expiry VARCHAR(5) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

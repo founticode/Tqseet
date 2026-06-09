@@ -14,8 +14,19 @@ if (isLoggedIn()) {
     }
 }
 ?>
-<!-- Centralized style sheet for the entire platform -->
+<!-- Centralized style sheet and favicon for the entire platform -->
 <link rel="stylesheet" href="/assets/css/style.css">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<script>
+// Inject favicon into <head> for strict HTML parsers
+if (!document.querySelector('head link[rel="icon"]')) {
+    var link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = '/assets/favicon.svg';
+    document.head.appendChild(link);
+}
+</script>
 
 <nav class="navbar">
     <div class="navbar-container">

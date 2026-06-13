@@ -10,13 +10,10 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch Merchant Status
-$stmt_m = $conn->prepare("SELECT id, status, commission_rate FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-$merchantId = $merchantData['id'] ?? 0;
-$status = $merchantData['status'] ?? 'pending';
-$rate = $merchantData['commission_rate'] ?? 0.05;
+$merchantData = ensureMerchantRecord($conn);
+$merchantId = $merchantData['id'];
+$status = $merchantData['status'];
+$rate = $merchantData['commission_rate'];
 
 // Fetch Sales Analytics
 $stmt_sales = $conn->prepare("

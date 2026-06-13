@@ -9,11 +9,8 @@ $db = new Database();
 $conn = $db->connect();
 $user = currentUser();
 
-$stmt_m = $conn->prepare("SELECT status FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-$status = $merchantData['status'] ?? 'pending';
+$merchantData = ensureMerchantRecord($conn);
+$status = $merchantData['status'];
 
 if ($status !== 'approved') {
     header("Location: dashboard.php?error=pending_approval");

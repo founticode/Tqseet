@@ -10,14 +10,7 @@ $conn = $db->connect();
 $user = currentUser();
 
 // 1. Get Merchant Profile ID
-$stmt_m = $conn->prepare("SELECT id FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-
-if (!$merchantData) {
-    die("Merchant profile not found.");
-}
+$merchantData = ensureMerchantRecord($conn);
 $merchantId = $merchantData['id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

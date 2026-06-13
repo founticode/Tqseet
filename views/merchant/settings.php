@@ -9,10 +9,7 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch Merchant Data
-$stmt = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$merchant = $stmt->get_result()->fetch_assoc();
+$merchant = ensureMerchantRecord($conn);
 
 // Fetch Verification data
 $stmt_v = $conn->prepare("SELECT * FROM user_verifications WHERE user_id = ?");
@@ -45,8 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         
         if ($stmt_upd->execute()) {
             $message = "Store profile updated successfully!";
-            $stmt->execute();
-            $merchant = $stmt->get_result()->fetch_assoc();
+            $merchant = ensureMerchantRecord($conn);
         }
     }
     
@@ -175,12 +171,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     
                     <div class="form-group">
                         <label class="form-label">Public Store Name</label>
-                        <input type="text" name="store_name" class="form-input" value="<?php echo htmlspecialchars($merchant['store_name']); ?>" required placeholder="e.g. Zara Morocco">
+                        <input type="text" name="store_name" class="form-input" value="<?php echo htmlspecialchars($merchant['store_name'] ?? 'My Store'); ?>" required placeholder="e.g. Zara Morocco">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Store Description</label>
-                        <textarea name="description" class="form-input" rows="4" required placeholder="Describe your store..." style="resize: none;"><?php echo htmlspecialchars($merchant['description']); ?></textarea>
+                        <textarea name="description" class="form-input" rows="4" required placeholder="Describe your store..." style="resize: none;"><?php echo htmlspecialchars($merchant['description'] ?? ''); ?></textarea>
                         <small style="color: var(--text-muted); margin-top: 6px; display: block; font-size: 0.8rem;">This will be visible on your checkout pages.</small>
                     </div>
 
@@ -198,17 +194,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="checklist-row" style="padding: 12px 0;">
                         <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Commission Rate</span>
                         <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-black); background: #f3f4f6; padding: 4px 10px; border-radius: 8px;">
-                            <?php echo ($merchant['commission_rate'] * 100); ?>%
+                            <?php echo (($merchant['commission_rate'] ?? 0.05) * 100); ?>%
                         </span>
                     </div>
                     <div class="checklist-row" style="padding: 12px 0; border-bottom: none;">
                         <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Status</span>
                         <?php 
                             $statusClass = 'pending';
-                            if ($merchant['status'] === 'approved') $statusClass = 'success';
+                            if (($merchant['status'] ?? 'pending') === 'approved') $statusClass = 'success';
                         ?>
                         <span class="status-badge <?php echo $statusClass; ?>">
-                            <?php echo ucfirst($merchant['status']); ?>
+                            <?php echo ucfirst($merchant['status'] ?? 'pending'); ?>
                         </span>
                     </div>
                 </div>

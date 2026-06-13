@@ -16,11 +16,8 @@ $conn = $db->connect();
 $merchantId = 0;
 // If the user is a merchant, fetch their merchant ID (needed for create/delete)
 if ($user['role'] === 'merchant') {
-    $stmt_m = $conn->prepare("SELECT id FROM merchants WHERE user_id = ?");
-    $stmt_m->bind_param("i", $user['id']);
-    $stmt_m->execute();
-    $merchantData = $stmt_m->get_result()->fetch_assoc();
-    $merchantId = $merchantData['id'] ?? 0;
+    $merchantData = ensureMerchantRecord($conn);
+    $merchantId = $merchantData['id'];
 }
 
 // Security Gate: Only merchants can create or delete

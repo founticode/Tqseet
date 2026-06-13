@@ -1,0 +1,7 @@
+{
+    "php.validate.executablePath": "C:\\xampp\\php\\php.exe",
+    "php.executablePath": "C:\\xampp\\php\\php.exe",
+    "phpserver.phpPath": "C:\\xampp\\php\\php.exe",
+    "phpserver.browser": "chrome",
+    "phpserver.port": 8000
+}

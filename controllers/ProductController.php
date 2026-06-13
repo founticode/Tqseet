@@ -10,18 +10,7 @@ $db = new Database();
 $conn = $db->connect();
 
 // 1. UNIVERSAL FIX: Fetch the actual Merchant Profile ID and Status for all actions
-$userId = currentUser()['id'];
-$stmt_m = $conn->prepare("SELECT id, status FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $userId);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-
-if (!$merchantData) {
-    // This shouldn't happen with the new registration flow, but keep as fallback
-    header("Location: ../views/merchant/dashboard.php?error=no_profile");
-    exit;
-}
-
+$merchantData = ensureMerchantRecord($conn);
 $merchantId = $merchantData['id'];
 $merchantStatus = $merchantData['status'];
 

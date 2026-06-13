@@ -10,12 +10,9 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch actual Merchant ID and Profile
-$stmt_m = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-$merchantId = $merchantData['id'] ?? 0;
-$merchantStatus = $merchantData['status'] ?? 'pending';
+$merchantData = ensureMerchantRecord($conn);
+$merchantId = $merchantData['id'];
+$merchantStatus = $merchantData['status'];
 
 // SECURITY GATE
 if ($merchantStatus !== 'approved') {

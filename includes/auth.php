@@ -77,3 +77,30 @@ function redirectIfLoggedIn() {
         exit;
     }
 }
+
+/**
+ * Ensure a merchants table row exists for the current user.
+ * Auto-creates one if the user has the 'merchant' role but no merchants row
+ * (e.g. admin changed role directly in DB without the upgrade flow).
+ * Returns the merchant record as an associative array.
+ *
+ * @param mysqli $conn  Active DB connection
+ * @return array        Merchant row from DB
+ */
+function ensureMerchantRecord($conn) {
+    $user = currentUser();
+    $stmt = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
+    $stmt->bind_param("i", $user['id']);
+    $stmt->execute();
+    $merchant = $stmt->get_result()->fetch_assoc();
+
+    if (!$merchant) {
+        $stmt_create = $conn->prepare("INSERT INTO merchants (user_id, store_name, description, commission_rate, status) VALUES (?, 'My Store', '', 0.05, 'pending')");
+        $stmt_create->bind_param("i", $user['id']);
+        $stmt_create->execute();
+        $stmt->execute();
+        $merchant = $stmt->get_result()->fetch_assoc();
+    }
+
+    return $merchant;
+}

@@ -10,10 +10,7 @@ $db = new Database();
 $conn = $db->connect();
 
 // 1. Fetch Merchant Profile
-$stmt_m = $conn->prepare("SELECT id, status FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
+$merchantData = ensureMerchantRecord($conn);
 $merchantId = $merchantData['id'];
 
 // SECURITY GATE

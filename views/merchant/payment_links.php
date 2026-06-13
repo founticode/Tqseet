@@ -9,11 +9,8 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch actual Merchant ID
-$stmt_m = $conn->prepare("SELECT id FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-$merchantId = $merchantData['id'] ?? 0;
+$merchantData = ensureMerchantRecord($conn);
+$merchantId = $merchantData['id'];
 
 // Fetch all payment links for this merchant
 $stmt = $conn->prepare("SELECT * FROM payment_links WHERE merchant_id = ? ORDER BY created_at DESC");

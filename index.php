@@ -9,7 +9,6 @@ $conn = $db->connect();
 $merchantsQuery = "
     SELECT DISTINCT m.id, m.store_name 
     FROM merchants m
-    JOIN products p ON p.merchant_id = m.id
     ORDER BY m.store_name ASC
 ";
 $merchantsResult = $conn->query($merchantsQuery);

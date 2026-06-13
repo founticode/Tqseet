@@ -10,11 +10,8 @@ $db = new Database();
 $conn = $db->connect();
 
 // Fetch actual Merchant ID and Profile Data
-$stmt_m = $conn->prepare("SELECT * FROM merchants WHERE user_id = ?");
-$stmt_m->bind_param("i", $user['id']);
-$stmt_m->execute();
-$merchantData = $stmt_m->get_result()->fetch_assoc();
-$merchantId = $merchantData['id'] ?? 0;
+$merchantData = ensureMerchantRecord($conn);
+$merchantId = $merchantData['id'];
 
 // 1. Fetch Sales Analytics for this merchant
 // Total Revenue (Total value of all active orders)
